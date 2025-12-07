@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,11 +17,25 @@
  * @package    Mockery
  * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery\Generator\StringManipulation\Pass;
 
 use Mockery\Generator\MockConfiguration;
+<<<<<<< HEAD
+=======
+use Mockery\Generator\TargetClassInterface;
+use function preg_replace;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 /**
  * The standard Mockery\Mock class includes some methods to ease mocking, such
@@ -28,24 +43,54 @@ use Mockery\Generator\MockConfiguration;
  * mocked. This pass removes the builtin methods where they are final on the
  * target
  */
+<<<<<<< HEAD
 class RemoveBuiltinMethodsThatAreFinalPass
 {
     protected $methods = array(
         '__wakeup' => '/public function __wakeup\(\)\s+\{.*?\}/sm',
     );
 
+=======
+class RemoveBuiltinMethodsThatAreFinalPass implements Pass
+{
+    protected $methods = [
+        '__wakeup' => '/public function __wakeup\(\)\s+\{.*?\}/sm',
+        '__toString' => '/public function __toString\(\)\s+(:\s+string)?\s*\{.*?\}/sm',
+    ];
+
+    /**
+     * @param  string $code
+     * @return string
+     */
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function apply($code, MockConfiguration $config)
     {
         $target = $config->getTargetClass();
 
+<<<<<<< HEAD
         if (!$target) {
+=======
+        if (! $target instanceof TargetClassInterface) {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             return $code;
         }
 
         foreach ($target->getMethods() as $method) {
+<<<<<<< HEAD
             if ($method->isFinal() && isset($this->methods[$method->getName()])) {
                 $code = preg_replace($this->methods[$method->getName()], '', $code);
             }
+=======
+            if (! $method->isFinal()) {
+                continue;
+            }
+
+            if (! isset($this->methods[$method->getName()])) {
+                continue;
+            }
+
+            $code = preg_replace($this->methods[$method->getName()], '', $code);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         return $code;

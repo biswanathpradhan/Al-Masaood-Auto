@@ -150,10 +150,18 @@ class ShareReportAction
             'context',
             'logs',
             'dumps',
+<<<<<<< HEAD
         ];
 
         return Collection::make($contextItems)
             ->reject(function ($value, $group) use ($predefinedContextItemGroups) {
+=======
+            'exception',
+        ];
+
+        return Collection::make($contextItems)
+            ->reject(function ($_value, $group) use ($predefinedContextItemGroups) {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 return in_array($group, $predefinedContextItemGroups);
             })
             ->keys()

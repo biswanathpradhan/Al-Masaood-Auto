@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,7 +29,11 @@ use Psy\Exception\FatalErrorException;
  */
 class RequirePass extends CodeCleanerPass
 {
+<<<<<<< HEAD
     private static $requireTypes = [Include_::TYPE_REQUIRE, Include_::TYPE_REQUIRE_ONCE];
+=======
+    private const REQUIRE_TYPES = [Include_::TYPE_REQUIRE, Include_::TYPE_REQUIRE_ONCE];
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * {@inheritdoc}
@@ -35,7 +43,11 @@ class RequirePass extends CodeCleanerPass
     public function enterNode(Node $origNode)
     {
         if (!$this->isRequireNode($origNode)) {
+<<<<<<< HEAD
             return;
+=======
+            return null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         $node = clone $origNode;
@@ -49,10 +61,22 @@ class RequirePass extends CodeCleanerPass
          *
          *   $foo = require \Psy\CodeCleaner\RequirePass::resolve($bar)
          */
+<<<<<<< HEAD
         $node->expr = new StaticCall(
             new FullyQualifiedName(self::class),
             'resolve',
             [new Arg($origNode->expr), new Arg(new LNumber($origNode->getLine()))],
+=======
+        // PHP-Parser 4.x uses LNumber, 5.x has LNumber as an alias to Int_
+        // Just use LNumber for compatibility with both versions
+        // @todo Switch to Int_ once we drop support for PHP-Parser 4.x
+        $arg = new LNumber($origNode->getStartLine());
+
+        $node->expr = new StaticCall(
+            new FullyQualifiedName(self::class),
+            'resolve',
+            [new Arg($origNode->expr), new Arg($arg)],
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $origNode->getAttributes()
         );
 
@@ -71,11 +95,19 @@ class RequirePass extends CodeCleanerPass
      * @throws ErrorException      if $file is empty and E_WARNING is included in error_reporting level
      *
      * @param string $file
+<<<<<<< HEAD
      * @param int    $lineNumber Line number of the original require expression
      *
      * @return string Exactly the same as $file, unless $file collides with a path in the currently running phar
      */
     public static function resolve($file, $lineNumber = null): string
+=======
+     * @param int    $startLine Line number of the original require expression
+     *
+     * @return string Exactly the same as $file, unless $file collides with a path in the currently running phar
+     */
+    public static function resolve($file, $startLine = null): string
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $file = (string) $file;
 
@@ -84,7 +116,11 @@ class RequirePass extends CodeCleanerPass
             // fake the file and line number, but we can't call it statically.
             // So we're duplicating some of the logics here.
             if (\E_WARNING & \error_reporting()) {
+<<<<<<< HEAD
                 ErrorException::throwException(\E_WARNING, 'Filename cannot be empty', null, $lineNumber);
+=======
+                ErrorException::throwException(\E_WARNING, 'Filename cannot be empty', null, $startLine);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             }
             // @todo trigger an error as fallback? this is pretty ugly…
             // trigger_error('Filename cannot be empty', E_USER_WARNING);
@@ -93,7 +129,11 @@ class RequirePass extends CodeCleanerPass
         $resolvedPath = \stream_resolve_include_path($file);
         if ($file === '' || !$resolvedPath) {
             $msg = \sprintf("Failed opening required '%s'", $file);
+<<<<<<< HEAD
             throw new FatalErrorException($msg, 0, \E_ERROR, null, $lineNumber);
+=======
+            throw new FatalErrorException($msg, 0, \E_ERROR, null, $startLine);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         // Special case: if the path is not already relative or absolute, and it would resolve to
@@ -119,7 +159,11 @@ class RequirePass extends CodeCleanerPass
 
     private function isRequireNode(Node $node): bool
     {
+<<<<<<< HEAD
         return $node instanceof Include_ && \in_array($node->type, self::$requireTypes);
+=======
+        return $node instanceof Include_ && \in_array($node->type, self::REQUIRE_TYPES);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     private static function getIncludePath(): array

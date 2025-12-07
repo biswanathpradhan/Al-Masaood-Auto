@@ -36,6 +36,11 @@
             'shareEndpoint' => $shareEndpoint,
             'defaultTab' => $defaultTab,
             'defaultTabProps' => $defaultTabProps,
+<<<<<<< HEAD
+=======
+            'appEnv' => $appEnv,
+            'appDebug' => $appDebug,
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         ])
     ?>;
 

@@ -21,12 +21,20 @@ use Ramsey\Collection\Tool\ValueToStringTrait;
 use function array_combine;
 use function array_key_exists;
 use function is_int;
+<<<<<<< HEAD
+=======
+use function var_export;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 /**
  * `NamedParameterMap` represents a mapping of values to a set of named keys
  * that may optionally be typed
  *
+<<<<<<< HEAD
  * @template-extends AbstractMap<mixed>
+=======
+ * @extends AbstractMap<mixed>
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 class NamedParameterMap extends AbstractMap
 {
@@ -38,7 +46,11 @@ class NamedParameterMap extends AbstractMap
      *
      * @var array<string, string>
      */
+<<<<<<< HEAD
     protected $namedParameters;
+=======
+    protected array $namedParameters;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Constructs a new `NamedParameterMap`.
@@ -70,14 +82,22 @@ class NamedParameterMap extends AbstractMap
         if ($offset === null) {
             throw new InvalidArgumentException(
                 'Map elements are key/value pairs; a key must be provided for '
+<<<<<<< HEAD
                 . 'value ' . var_export($value, true)
+=======
+                . 'value ' . var_export($value, true),
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             );
         }
 
         if (!array_key_exists($offset, $this->namedParameters)) {
             throw new InvalidArgumentException(
                 'Attempting to set value for unconfigured parameter \''
+<<<<<<< HEAD
                 . $offset . '\''
+=======
+                . $offset . '\'',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             );
         }
 
@@ -85,7 +105,11 @@ class NamedParameterMap extends AbstractMap
             throw new InvalidArgumentException(
                 'Value for \'' . $offset . '\' must be of type '
                 . $this->namedParameters[$offset] . '; value is '
+<<<<<<< HEAD
                 . $this->toolValueToString($value)
+=======
+                . $this->toolValueToString($value),
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             );
         }
 

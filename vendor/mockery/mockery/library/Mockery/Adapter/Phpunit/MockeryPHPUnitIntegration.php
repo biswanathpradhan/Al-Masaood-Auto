@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,17 +17,33 @@
  * @package    Mockery
  * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery\Adapter\Phpunit;
 
 use Mockery;
+<<<<<<< HEAD
 
 if (class_exists('PHPUnit_Framework_TestCase') || version_compare(\PHPUnit\Runner\Version::id(), '8.0.0', '<')) {
     class_alias(MockeryPHPUnitIntegrationAssertPostConditionsForV7AndPrevious::class, MockeryPHPUnitIntegrationAssertPostConditions::class);
 } else {
     class_alias(MockeryPHPUnitIntegrationAssertPostConditionsForV8::class, MockeryPHPUnitIntegrationAssertPostConditions::class);
 }
+=======
+use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\Before;
+
+use function method_exists;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 /**
  * Integrates Mockery into PHPUnit. Ensures Mockery expectations are verified
@@ -38,6 +55,33 @@ trait MockeryPHPUnitIntegration
 
     protected $mockeryOpen;
 
+<<<<<<< HEAD
+=======
+    protected function addMockeryExpectationsToAssertionCount()
+    {
+        $this->addToAssertionCount(Mockery::getContainer()->mockery_getExpectationCount());
+    }
+
+    protected function checkMockeryExceptions()
+    {
+        if (! method_exists($this, 'markAsRisky')) {
+            return;
+        }
+
+        foreach (Mockery::getContainer()->mockery_thrownExceptions() as $e) {
+            if (! $e->dismissed()) {
+                $this->markAsRisky();
+            }
+        }
+    }
+
+    protected function closeMockery()
+    {
+        Mockery::close();
+        $this->mockeryOpen = false;
+    }
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     /**
      * Performs assertions shared by all tests of a test case. This method is
      * called before execution of a test ends and before the tearDown method.
@@ -51,6 +95,7 @@ trait MockeryPHPUnitIntegration
         parent::assertPostConditions();
     }
 
+<<<<<<< HEAD
     protected function addMockeryExpectationsToAssertionCount()
     {
         $this->addToAssertionCount(Mockery::getContainer()->mockery_getExpectationCount());
@@ -86,6 +131,12 @@ trait MockeryPHPUnitIntegration
     /**
      * @after
      */
+=======
+    /**
+     * @after
+     */
+    #[After]
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     protected function purgeMockeryContainer()
     {
         if ($this->mockeryOpen) {
@@ -93,4 +144,16 @@ trait MockeryPHPUnitIntegration
             Mockery::close();
         }
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * @before
+     */
+    #[Before]
+    protected function startMockery()
+    {
+        $this->mockeryOpen = true;
+    }
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

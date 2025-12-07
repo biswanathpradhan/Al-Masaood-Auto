@@ -13,4 +13,8 @@ RewriteRule ^ server.php
 
 
 # Custom error pages (adjust paths as needed)
+<<<<<<< HEAD
 #ErrorDocument 404 /errors/404.html
+=======
+ErrorDocument 404 /errors/404.html
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1

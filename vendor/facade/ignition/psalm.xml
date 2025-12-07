@@ -35,6 +35,7 @@
         <UndefinedClass>
             <errorLevel type="suppress">
                 <file name="src/ErrorPage/ErrorPageViewModel.php" />
+<<<<<<< HEAD
             </errorLevel>
         </UndefinedClass>
         <UnusedClosureParam>
@@ -42,6 +43,12 @@
                 <file name="src/SolutionProviders/InvalidRouteActionSolutionProvider.php" />
             </errorLevel>
         </UnusedClosureParam>
+=======
+                <file name="src/ErrorPage/IgnitionExceptionRenderer.php" />
+                <file name="src/IgnitionServiceProvider.php" />
+            </errorLevel>
+        </UndefinedClass>
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     </issueHandlers>
 
     <plugins>

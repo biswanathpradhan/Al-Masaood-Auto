@@ -6,6 +6,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\FunctionLike;
 
+<<<<<<< HEAD
 class ArrowFunction extends Expr implements FunctionLike
 {
     /** @var bool */
@@ -36,16 +37,59 @@ class ArrowFunction extends Expr implements FunctionLike
      * @param array $attributes Additional attributes
      */
     public function __construct(array $subNodes = [], array $attributes = []) {
+=======
+class ArrowFunction extends Expr implements FunctionLike {
+    /** @var bool Whether the closure is static */
+    public bool $static;
+
+    /** @var bool Whether to return by reference */
+    public bool $byRef;
+
+    /** @var Node\Param[] */
+    public array $params = [];
+
+    /** @var null|Node\Identifier|Node\Name|Node\ComplexType */
+    public ?Node $returnType;
+
+    /** @var Expr Expression body */
+    public Expr $expr;
+    /** @var Node\AttributeGroup[] */
+    public array $attrGroups;
+
+    /**
+     * @param array{
+     *     expr: Expr,
+     *     static?: bool,
+     *     byRef?: bool,
+     *     params?: Node\Param[],
+     *     returnType?: null|Node\Identifier|Node\Name|Node\ComplexType,
+     *     attrGroups?: Node\AttributeGroup[]
+     * } $subNodes Array of the following subnodes:
+     *             'expr'                  : Expression body
+     *             'static'     => false   : Whether the closure is static
+     *             'byRef'      => false   : Whether to return by reference
+     *             'params'     => array() : Parameters
+     *             'returnType' => null    : Return type
+     *             'attrGroups' => array() : PHP attribute groups
+     * @param array<string, mixed> $attributes Additional attributes
+     */
+    public function __construct(array $subNodes, array $attributes = []) {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $this->attributes = $attributes;
         $this->static = $subNodes['static'] ?? false;
         $this->byRef = $subNodes['byRef'] ?? false;
         $this->params = $subNodes['params'] ?? [];
+<<<<<<< HEAD
         $returnType = $subNodes['returnType'] ?? null;
         $this->returnType = \is_string($returnType) ? new Node\Identifier($returnType) : $returnType;
+=======
+        $this->returnType = $subNodes['returnType'] ?? null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $this->expr = $subNodes['expr'];
         $this->attrGroups = $subNodes['attrGroups'] ?? [];
     }
 
+<<<<<<< HEAD
     public function getSubNodeNames() : array {
         return ['attrGroups', 'static', 'byRef', 'params', 'returnType', 'expr'];
     }
@@ -55,6 +99,17 @@ class ArrowFunction extends Expr implements FunctionLike
     }
 
     public function getParams() : array {
+=======
+    public function getSubNodeNames(): array {
+        return ['attrGroups', 'static', 'byRef', 'params', 'returnType', 'expr'];
+    }
+
+    public function returnsByRef(): bool {
+        return $this->byRef;
+    }
+
+    public function getParams(): array {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return $this->params;
     }
 
@@ -62,18 +117,30 @@ class ArrowFunction extends Expr implements FunctionLike
         return $this->returnType;
     }
 
+<<<<<<< HEAD
     public function getAttrGroups() : array {
+=======
+    public function getAttrGroups(): array {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return $this->attrGroups;
     }
 
     /**
      * @return Node\Stmt\Return_[]
      */
+<<<<<<< HEAD
     public function getStmts() : array {
         return [new Node\Stmt\Return_($this->expr)];
     }
 
     public function getType() : string {
+=======
+    public function getStmts(): array {
+        return [new Node\Stmt\Return_($this->expr)];
+    }
+
+    public function getType(): string {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return 'Expr_ArrowFunction';
     }
 }

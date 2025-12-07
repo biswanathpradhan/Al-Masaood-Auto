@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,7 +25,11 @@ use Symfony\Component\Console\Input\InputInterface;
 class VariableEnumerator extends Enumerator
 {
     // n.b. this array is the order in which special variables will be listed
+<<<<<<< HEAD
     private static $specialNames = [
+=======
+    private const SPECIAL_NAMES = [
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         '_', '_e', '__out', '__function', '__method', '__class', '__namespace', '__file', '__line', '__dir',
     ];
 
@@ -45,7 +53,11 @@ class VariableEnumerator extends Enumerator
     /**
      * {@inheritdoc}
      */
+<<<<<<< HEAD
     protected function listItems(InputInterface $input, \Reflector $reflector = null, $target = null): array
+=======
+    protected function listItems(InputInterface $input, ?\Reflector $reflector = null, $target = null): array
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         // only list variables when no Reflector is present.
         if ($reflector !== null || $target !== null) {
@@ -80,8 +92,13 @@ class VariableEnumerator extends Enumerator
     {
         $scopeVars = $this->context->getAll();
         \uksort($scopeVars, function ($a, $b) {
+<<<<<<< HEAD
             $aIndex = \array_search($a, self::$specialNames);
             $bIndex = \array_search($b, self::$specialNames);
+=======
+            $aIndex = \array_search($a, self::SPECIAL_NAMES);
+            $bIndex = \array_search($b, self::SPECIAL_NAMES);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
             if ($aIndex !== false) {
                 if ($bIndex !== false) {
@@ -100,7 +117,11 @@ class VariableEnumerator extends Enumerator
 
         $ret = [];
         foreach ($scopeVars as $name => $val) {
+<<<<<<< HEAD
             if (!$showAll && \in_array($name, self::$specialNames)) {
+=======
+            if (!$showAll && \in_array($name, self::SPECIAL_NAMES)) {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 continue;
             }
 
@@ -126,7 +147,11 @@ class VariableEnumerator extends Enumerator
                 $fname = '$'.$name;
                 $ret[$fname] = [
                     'name'  => $fname,
+<<<<<<< HEAD
                     'style' => \in_array($name, self::$specialNames) ? self::IS_PRIVATE : self::IS_PUBLIC,
+=======
+                    'style' => \in_array($name, self::SPECIAL_NAMES) ? self::IS_PRIVATE : self::IS_PUBLIC,
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                     'value' => $this->presentRef($val),
                 ];
             }

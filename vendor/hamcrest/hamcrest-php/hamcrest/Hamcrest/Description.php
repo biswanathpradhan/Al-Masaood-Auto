@@ -34,7 +34,11 @@ interface Description
     public function appendDescriptionOf(SelfDescribing $value);
 
     /**
+<<<<<<< HEAD
      * Appends an arbitary value to the description.
+=======
+     * Appends an arbitrary value to the description.
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      *
      * @param mixed $value
      *

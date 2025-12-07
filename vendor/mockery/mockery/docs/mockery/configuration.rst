@@ -5,13 +5,22 @@ Mockery Global Configuration
 ============================
 
 To allow for a degree of fine-tuning, Mockery utilises a singleton
+<<<<<<< HEAD
 configuration object to store a small subset of core behaviours. The two
+=======
+configuration object to store a small subset of core behaviours. The three
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 currently present include:
 
 * Option to allow/disallow the mocking of methods which do not actually exist
   fulfilled (i.e. unused)
 * Setter/Getter for added a parameter map for internal PHP class methods
   (``Reflection`` cannot detect these automatically)
+<<<<<<< HEAD
+=======
+* Option to drive if quick definitions should define a stub or a mock with
+  an 'at least once' expectation.
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 By default, the first behaviour is enabled. Of course, there are
 situations where this can lead to unintended consequences. The mocking of
@@ -49,6 +58,22 @@ won't correctly add it automatically for internal classes. Note that internal cl
 parameter overriding is not available in PHP 8. This is because incompatible
 signatures have been reclassified as fatal errors.
 
+<<<<<<< HEAD
+=======
+Finally there is the possibility to change what a quick definition produces.
+By default quick definitions create stubs but you can change this behaviour
+by asking Mockery to use 'at least once' expectations.
+
+.. code-block:: php
+
+    \Mockery::getConfiguration()->getQuickDefinitions()->shouldBeCalledAtLeastOnce(bool)
+
+Passing a true allows the behaviour, false disallows it. It takes effect
+immediately until switched back. By doing so you can avoid the proliferating of
+quick definitions that accumulate overtime in your code since the test would
+fail in case the 'at least once' expectation is not fulfilled.
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 Disabling reflection caching
 ----------------------------
 

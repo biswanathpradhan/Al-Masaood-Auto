@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,6 +17,15 @@
  * @package    Mockery
  * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery\Matcher;
@@ -23,6 +33,7 @@ namespace Mockery\Matcher;
 class AndAnyOtherArgs extends MatcherAbstract
 {
     /**
+<<<<<<< HEAD
      * Check if the actual value matches the expected.
      *
      * @param mixed $actual
@@ -34,6 +45,8 @@ class AndAnyOtherArgs extends MatcherAbstract
     }
 
     /**
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * Return a string representation of this Matcher
      *
      * @return string
@@ -42,4 +55,21 @@ class AndAnyOtherArgs extends MatcherAbstract
     {
         return '<AndAnyOthers>';
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Check if the actual value matches the expected.
+     *
+     * @template TMixed
+     *
+     * @param TMixed $actual
+     *
+     * @return bool
+     */
+    public function match(&$actual)
+    {
+        return true;
+    }
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

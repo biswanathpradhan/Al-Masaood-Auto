@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,16 +17,46 @@
  * @package    Mockery
  * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery\Generator;
 
+<<<<<<< HEAD
 class MockNameBuilder
 {
     protected static $mockCounter = 0;
 
     protected $parts = [];
 
+=======
+use function implode;
+use function str_replace;
+
+class MockNameBuilder
+{
+    /**
+     * @var int
+     */
+    protected static $mockCounter = 0;
+
+    /**
+     * @var list<string>
+     */
+    protected $parts = [];
+
+    /**
+     * @param string $part
+     */
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function addPart($part)
     {
         $this->parts[] = $part;
@@ -33,12 +64,22 @@ class MockNameBuilder
         return $this;
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * @return string
+     */
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function build()
     {
         $parts = ['Mockery', static::$mockCounter++];
 
         foreach ($this->parts as $part) {
+<<<<<<< HEAD
             $parts[] = str_replace("\\", "_", $part);
+=======
+            $parts[] = str_replace('\\', '_', $part);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         return implode('_', $parts);

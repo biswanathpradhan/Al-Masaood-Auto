@@ -27,7 +27,10 @@ use App\car_pickup_request;
 use App\notifications;
 use App\notifications_sent;
 use App\service_package_enquiry;
+<<<<<<< HEAD
 use App\ValidationHelper;
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 use DataTables;
 use Illuminate\Support\Str;
@@ -72,6 +75,7 @@ class CustomerController extends Controller
            // 'unique' => 'The :attribute field should be unique.',
             //'unique' => 'The :attribute field should be unique.',
         ];
+<<<<<<< HEAD
        
 
        $category_dropdown = ['AUH','DXB','SHJ','AJMAN','RAK','UAQ','FUJ'];
@@ -96,6 +100,37 @@ class CustomerController extends Controller
             'category_number' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9\-]+$/'],
             'image' => 'image|max:5120',
             'language_id' => ['nullable', 'integer', 'in:1,2'],
+=======
+        if(!Str::startsWith($request->mobile_number, '9715'))
+        {
+
+           $mobile_number_validation =  ["mobile_number" => [ 0 => "The mobile number field should start with 5 after country code."]];
+
+
+            return ["status" => "0","response_message" => $mobile_number_validation,"display_message" => "Please check your Mobile Number","error_message" => $mobile_number_validation];
+        }
+
+       $category_dropdown = ['AUH','DXB','SHJ','AJMAN','RAK','UAQ','FUJ'];
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|max:255',
+            //'username' => 'required|regex:/^[a-zA-Z]+$/|max:255',
+           // 'username' => 'required|alpha',
+           // 'mobile_number' => 'required|unique:customer',
+            'mobile_number' => 'required|numeric|unique:customer',
+            'email' => 'required|email:rfc,dns|unique:customer',
+            'car_registration_number' => 'required|max:255',
+            'reg_chasis_number' => 'required|unique:customer|max:255',
+            'reg_brand_id' => ['required',Rule::in($brand_id)],
+            'reg_model_id' => 'required|max:255',
+            'device_type' => ['required',Rule::in($device_id)],
+            'device_id' => 'required|max:255',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'device_token' => 'required',
+            'category_dropdown'=>['required',Rule::in($category_dropdown)],
+            'category_number'=> 'required',
+            'image' => 'image',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         ],$messages);
         // dd($validator->fails());
         if ($validator->fails()) {
@@ -268,6 +303,7 @@ class CustomerController extends Controller
 
     public function model_list(Request $request)
     {	
+<<<<<<< HEAD
         // XSS Protection & Pagination: Validate and sanitize incoming parameters
         $validator = Validator::make($request->all(), [
             'language_id' => ValidationHelper::languageId(false),
@@ -314,6 +350,15 @@ class CustomerController extends Controller
                 "has_more" => $page < $totalPages
             ]
         ];
+=======
+        
+
+         $getallcarmodel = models::getallcarmodel();
+         //dd($getallcarmodel);
+    	return ["status" => "1","response_message" => "success","display_message" => "Model List",
+    			"model_list" =>  $getallcarmodel
+    			];
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }   
 
 public function logon()
@@ -617,6 +662,7 @@ public function logon()
 //     SIgnup model List Added
 public static function getmodel_listsignup(Request $request)
     {   
+<<<<<<< HEAD
                 // XSS Protection: Validate and sanitize all incoming parameters
                 $validator = Validator::make($request->all(), [
                     'language_id' => ['required', 'integer', 'in:1,2'],
@@ -633,11 +679,25 @@ public static function getmodel_listsignup(Request $request)
                 $language_id = [1,2];
                 $car_owned_type = [0,1];
             
+=======
+                $language_id = [1,2];
+                $car_owned_type = [0,1];
+             //  print_r(Rule::in($language_id)) ;
+              
+//echo $request->main_brand_id;
+               //print_r($request);
+              // exit;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 if(count($language_id)!=0 && isset($request->language_id) && isset($request->main_brand_id))
                 {   
                      if(isset($request->session_id) && isset($request->customer_id))
                      {
+<<<<<<< HEAD
                         
+=======
+                       //  $customer_session_check = customer_session::check_customersession($request);
+                         
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                          if($customer_session_check == null)
                          {
                             return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
@@ -698,6 +758,7 @@ public static function getmodel_listsignup(Request $request)
 
     public function version_list(Request $request)
     {	
+<<<<<<< HEAD
                 // XSS Protection & Pagination: Using ValidationHelper for secure input validation
                 $validator = Validator::make($request->all(), [
                     'session_id' => ValidationHelper::sessionId(),
@@ -708,6 +769,18 @@ public static function getmodel_listsignup(Request $request)
                 ], ValidationHelper::errorMessages());
 
                  if ($validator->fails()) {
+=======
+
+                   $language_id = [1,2];
+                $validator = Validator::make($request->all(), [
+                    'session_id' => 'required',
+                    'customer_id' => 'required',
+                    'language_id' => ['required',Rule::in($language_id)]
+                ]);
+
+                 if ($validator->fails()) {
+                    // return $validator->errors();
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                     return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
                 }
                 else
@@ -723,6 +796,7 @@ public static function getmodel_listsignup(Request $request)
                         $check_customer_id = customer::getcustomer($request->customer_id,$request->session_id);
                         if($check_customer_id != null)
                         {
+<<<<<<< HEAD
                                         // Pagination parameters
                                         $page = $request->input('page', 1);
                                         $perPage = $request->input('per_page', 10);
@@ -749,6 +823,13 @@ public static function getmodel_listsignup(Request $request)
                                                 "total_pages" => $totalPages,
                                                 "has_more" => $page < $totalPages
                                             ]
+=======
+
+                                        $getallcarmodel = versions::getcarversionsby_model($request);
+                                        //dd($getallcarmodel);
+                                        return ["status" => "1","response_message" => "success","display_message" => "Model Version List",
+                                        "version_list" =>  $getallcarmodel
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                                         ];
                              
                         }
@@ -759,6 +840,15 @@ public static function getmodel_listsignup(Request $request)
                         
          
                 } 
+<<<<<<< HEAD
+=======
+
+     //        $getallcarmodel = versions::getcarversionsby_model($request);
+     //        // dd($getallcarmodel);
+    	// return ["status" => "1","response_message" => "success","display_message" => "Model Version List",
+    	// 		"version_list" => $getallcarmodel
+    	// 		];
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     } 
     public function generateotp45(Request $request)
 {
@@ -821,6 +911,7 @@ public static function getmodel_listsignup(Request $request)
     // Generate Oto
     public function generateotp(Request $request)
     {	
+<<<<<<< HEAD
     	     $validator = Validator::make($request->all(), [              
                 'mobile_number' => [
                     'required',
@@ -831,6 +922,12 @@ public static function getmodel_listsignup(Request $request)
                 ],  
         ]);
         
+=======
+    	     $validator = Validator::make($request->all(), [
+            'mobile_number' => 'required',
+             
+        ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         if ($validator->fails()) {
             // return $validator->errors();
@@ -948,11 +1045,18 @@ public static function getmodel_listsignup(Request $request)
     
     public static function login(Request $request)
 {
+<<<<<<< HEAD
     // XSS Protection: Using ValidationHelper for secure input validation
     $validator = Validator::make($request->all(), [
         'mobile_number' => ValidationHelper::mobileNumber(),
         'otp' => ValidationHelper::otp(),
     ], ValidationHelper::errorMessages());
+=======
+    $validator = Validator::make($request->all(), [
+        'mobile_number' => 'required',
+        'otp' => 'required',
+    ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     if ($validator->fails()) {
         return ["status" => "0", "response_message" => $validator->errors(), "display_message" => "Please check your inputs", "error_message" => $validator->errors()];
@@ -996,8 +1100,13 @@ public static function getmodel_listsignup(Request $request)
     {  //echo 'hi';exit;
         // Validate the incoming request data
         $validator = Validator::make($request->all(), [
+<<<<<<< HEAD
             'mobile_number' => ['required', 'string', 'max:12', 'regex:/^\+?[0-9\s\-\(\)]+$/'],
             'otp' => ['required', 'string', 'max:10', 'regex:/^[0-9]+$/']
+=======
+            'mobile_number' => 'required',
+            'otp' => 'required'
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         ]);
 
         if ($validator->fails()) {
@@ -1024,12 +1133,21 @@ public static function getmodel_listsignup(Request $request)
     // Customer Profile 
     public static function profile(Request $request)
     {   
+<<<<<<< HEAD
                 // XSS Protection: Using ValidationHelper for secure input validation
 		    	$validator = Validator::make($request->all(), [
 		            'session_id' => ValidationHelper::sessionId(),
 		            'customer_id' => ValidationHelper::customerId(),
                     'language_id' => ValidationHelper::languageId()
 		        ], ValidationHelper::errorMessages());
+=======
+                $language_id = [1,2];
+		    	$validator = Validator::make($request->all(), [
+		            'session_id' => 'required',
+		            'customer_id' => 'required',
+                    'language_id' => ['required',Rule::in($language_id)]
+		        ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 		         if ($validator->fails()) {
 		            // return $validator->errors();
@@ -1701,6 +1819,7 @@ public static function getmodel_listsignup(Request $request)
   // Customer Profile Edit
     public static function profileEdit(Request $request)
     {           
+<<<<<<< HEAD
                 // XSS Protection: Using ValidationHelper for secure input validation
 		    	$validator = Validator::make($request->all(), [
 		            'session_id' => ValidationHelper::sessionId(),
@@ -1711,6 +1830,20 @@ public static function getmodel_listsignup(Request $request)
                     'mobile' => ValidationHelper::mobileNumber(false),
                     'language_id' => ValidationHelper::languageId()
 		        ], ValidationHelper::errorMessages());
+=======
+       
+                $language_id = [1,2];
+             
+		    	$validator = Validator::make($request->all(), [
+		            'session_id' => 'required',
+		            'customer_id' => 'required',
+		            'username' => 'required',
+		            'image' => 'image',
+                    'email' => 'string',
+                    'mobile' => 'string',
+                    'language_id' => ['required',Rule::in($language_id)]
+		        ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 		        
 		        
                 
@@ -1815,6 +1948,7 @@ public static function getmodel_listsignup(Request $request)
         // Customer Profile Edit
     public static function homepage(Request $request)
     {           
+<<<<<<< HEAD
                 // XSS Protection: Using ValidationHelper for secure input validation
                 $validator = Validator::make($request->all(), [
                     'session_id' => ValidationHelper::sessionId(),
@@ -1823,6 +1957,19 @@ public static function getmodel_listsignup(Request $request)
                     'main_brand_id' => ValidationHelper::brandId(),
                     'language_id' => ValidationHelper::languageId()
                 ], ValidationHelper::errorMessages());
+=======
+                
+                $brand_id = [1,2,3]; // 
+                $language_id = [1,2]; // 
+                $validator = Validator::make($request->all(), [
+                    'session_id' => 'required',
+                    'customer_id' => 'required',
+                    // 'device_token' => 'required',
+                    'main_brand_id' => ['required',Rule::in($brand_id)],
+                    'language_id' => ['required',Rule::in($language_id)]
+      
+                ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
                  if ($validator->fails()) {
                     // return $validator->errors();
@@ -3628,10 +3775,16 @@ public static function getmodel_listsignup(Request $request)
 
 public static function guestlogin(Request $request)
     {
+<<<<<<< HEAD
         // XSS Protection: Using ValidationHelper for secure input validation
     	$validator = Validator::make($request->all(), [
             'device' => ValidationHelper::deviceType() // 1 - IOS , 2- Android
         ], ValidationHelper::errorMessages());
+=======
+    	$validator = Validator::make($request->all(), [
+            'device' => ['required',Rule::in([1,2])] // 1 - IOS , 2- Android
+        ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
          if ($validator->fails()) {
             // return $validator->errors();

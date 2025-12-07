@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,10 +26,16 @@ class GNUReadline implements Readline
 {
     /** @var string|false */
     protected $historyFile;
+<<<<<<< HEAD
     /** @var int */
     protected $historySize;
     /** @var bool */
     protected $eraseDups;
+=======
+    protected int $historySize;
+    // @todo better type for this
+    protected ?bool $eraseDups;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * GNU Readline is supported iff `readline_list_history` is defined. PHP
@@ -105,7 +115,11 @@ class GNUReadline implements Readline
     /**
      * {@inheritdoc}
      */
+<<<<<<< HEAD
     public function readline(string $prompt = null)
+=======
+    public function readline(?string $prompt = null)
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         return \readline($prompt);
     }

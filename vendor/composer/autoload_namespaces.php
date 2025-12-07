@@ -7,7 +7,10 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Webpatser\\Uuid' => array($vendorDir . '/webpatser/laravel-uuid/src'),
+<<<<<<< HEAD
     'Mockery' => array($vendorDir . '/mockery/mockery/library'),
     'Highlight\\' => array($vendorDir . '/scrivo/highlight.php'),
     'HighlightUtilities\\' => array($vendorDir . '/scrivo/highlight.php'),
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 );

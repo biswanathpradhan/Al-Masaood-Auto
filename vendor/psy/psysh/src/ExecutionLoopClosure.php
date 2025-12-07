@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,13 +16,21 @@
 namespace Psy;
 
 use Psy\Exception\BreakException;
+<<<<<<< HEAD
+=======
+use Psy\Exception\InterruptException;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Psy\Exception\ThrowUpException;
 
 /**
  * The Psy Shell's execution loop scope.
  *
+<<<<<<< HEAD
  * @todo Once we're on PHP 5.5, we can switch ExecutionClosure to a generator
  * and get rid of the duplicate closure implementations :)
+=======
+ * @todo Switch ExecutionClosure to a generator and get rid of the duplicate closure implementations?
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 class ExecutionLoopClosure extends ExecutionClosure
 {
@@ -29,6 +41,10 @@ class ExecutionLoopClosure extends ExecutionClosure
     {
         $this->setClosure($__psysh__, function () use ($__psysh__) {
             // Restore execution scope variables
+<<<<<<< HEAD
+=======
+            // @phan-suppress-next-line PhanTypeNonVarPassByRef assigning to a temp variable pollutes scope
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             \extract($__psysh__->getScopeVariables(false));
 
             while (true) {
@@ -40,6 +56,10 @@ class ExecutionLoopClosure extends ExecutionClosure
                     try {
                         // Pull in any new execution scope variables
                         if ($__psysh__->getLastExecSuccess()) {
+<<<<<<< HEAD
+=======
+                            // @phan-suppress-next-line PhanTypeNonVarPassByRef assigning to a temp variable pollutes scope
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                             \extract($__psysh__->getScopeVariablesDiff(\get_defined_vars()));
                         }
 
@@ -71,6 +91,7 @@ class ExecutionLoopClosure extends ExecutionClosure
 
                     $__psysh__->writeReturnValue($_);
                 } catch (BreakException $_e) {
+<<<<<<< HEAD
                     $__psysh__->writeException($_e);
 
                     return;
@@ -83,6 +104,26 @@ class ExecutionLoopClosure extends ExecutionClosure
                 }
 
                 $__psysh__->afterLoop();
+=======
+                    // exit() or ctrl-d exits the REPL
+                    $__psysh__->writeException($_e);
+
+                    return $_e->getCode();
+                } catch (ThrowUpException $_e) {
+                    // `throw-up` command throws the exception out of the REPL
+                    $__psysh__->writeException($_e);
+
+                    throw $_e;
+                } catch (InterruptException $_e) {
+                    // ctrl-c stops execution, but continues the REPL
+                    $__psysh__->writeException($_e);
+                } catch (\Throwable $_e) {
+                    // Everything else gets printed to the shell output
+                    $__psysh__->writeException($_e);
+                } finally {
+                    $__psysh__->afterLoop();
+                }
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             }
         });
     }

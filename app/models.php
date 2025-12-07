@@ -128,7 +128,11 @@ class models extends Model
                     else {
                          $models = models::where('soft_delete', 0)->where('car_model.car_owned_type', $car_owned_type)->select('model_name as label','id as model_id','model_base_image_url as image_url')->orderBy('sort_order_app')->get();
                     }
+<<<<<<< HEAD
                    // dd($models);die;
+=======
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                     
                 }
 

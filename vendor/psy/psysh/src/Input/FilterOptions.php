@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -21,10 +25,17 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class FilterOptions
 {
+<<<<<<< HEAD
     private $filter = false;
     private $pattern;
     private $insensitive;
     private $invert;
+=======
+    private bool $filter = false;
+    private ?string $pattern = null;
+    private bool $insensitive = false;
+    private bool $invert = false;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Get input option definitions for filtering.
@@ -82,12 +93,25 @@ class FilterOptions
     /**
      * Check whether a string matches the current filter options.
      *
+<<<<<<< HEAD
      * @param string $string
      * @param array  $matches
      */
     public function match(string $string, array &$matches = null): bool
     {
         return $this->filter === false || (\preg_match($this->pattern, $string, $matches) xor $this->invert);
+=======
+     * @param string     $string
+     * @param array|null $matches
+     */
+    public function match(string $string, ?array &$matches = null): bool
+    {
+        if ($this->filter === false || $this->pattern === null) {
+            return true;
+        }
+
+        return \preg_match($this->pattern, $string, $matches) xor $this->invert;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -129,6 +153,10 @@ class FilterOptions
     {
         \set_error_handler([ErrorException::class, 'throwException']);
         try {
+<<<<<<< HEAD
+=======
+            // @phan-suppress-next-line PhanParamSuspiciousOrder - intentionally testing regex against empty string
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             \preg_match($pattern, '');
         } catch (ErrorException $e) {
             throw new RuntimeException(\str_replace('preg_match(): ', 'Invalid regular expression: ', $e->getRawMessage()));

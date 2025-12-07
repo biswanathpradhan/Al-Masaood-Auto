@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -28,6 +32,7 @@ class TimeitCommand extends Command
     const AVG_RESULT_MSG = '<info>Command took %.6f seconds on average (%.6f median; %.6f total) to complete.</info>';
 
     // All times stored as nanoseconds!
+<<<<<<< HEAD
     private static $useHrtime;
     private static $start = null;
     private static $times = [];
@@ -35,17 +40,31 @@ class TimeitCommand extends Command
     private $parser;
     private $traverser;
     private $printer;
+=======
+    private static ?int $start = null;
+    private static array $times = [];
+
+    private CodeArgumentParser $parser;
+    private NodeTraverser $traverser;
+    private Printer $printer;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * {@inheritdoc}
      */
     public function __construct($name = null)
     {
+<<<<<<< HEAD
         // @todo Remove microtime use after we drop support for PHP < 7.3
         self::$useHrtime = \function_exists('hrtime');
 
         $this->parser = new CodeArgumentParser();
 
+=======
+        $this->parser = new CodeArgumentParser();
+
+        // @todo Pass visitor directly to once we drop support for PHP-Parser 4.x
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $this->traverser = new NodeTraverser();
         $this->traverser->addVisitor(new TimeitVisitor());
 
@@ -82,18 +101,31 @@ HELP
      *
      * @return int 0 if everything went fine, or an exit code
      */
+<<<<<<< HEAD
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $code = $input->getArgument('code');
         $num = (int) ($input->getOption('num') ?: 1);
         $shell = $this->getApplication();
+=======
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $code = $input->getArgument('code');
+        $num = (int) ($input->getOption('num') ?: 1);
+
+        $shell = $this->getShell();
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         $instrumentedCode = $this->instrumentCode($code);
 
         self::$times = [];
 
         do {
+<<<<<<< HEAD
             $_ = $shell->execute($instrumentedCode);
+=======
+            $_ = $shell->execute($instrumentedCode, true);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $this->ensureEndMarked();
         } while (\count(self::$times) < $num);
 
@@ -103,11 +135,20 @@ HELP
         self::$times = [];
 
         if ($num === 1) {
+<<<<<<< HEAD
+=======
+            // @phpstan-ignore-next-line offsetAccess.nonOffsetAccessible (guaranteed by loop: count($times) >= $num)
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $output->writeln(\sprintf(self::RESULT_MSG, $times[0] / 1e+9));
         } else {
             $total = \array_sum($times);
             \rsort($times);
+<<<<<<< HEAD
             $median = $times[\round($num / 2)];
+=======
+            // @phpstan-ignore-next-line offsetAccess.nonOffsetAccessible (guaranteed by loop: count($times) >= $num)
+            $median = $times[(int) \round($num / 2)];
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
             $output->writeln(\sprintf(self::AVG_RESULT_MSG, ($total / $num) / 1e+9, $median / 1e+9, $total / 1e+9));
         }
@@ -124,7 +165,11 @@ HELP
      */
     public static function markStart()
     {
+<<<<<<< HEAD
         self::$start = self::$useHrtime ? \hrtime(true) : (\microtime(true) * 1e+6);
+=======
+        self::$start = \hrtime(true);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -143,7 +188,11 @@ HELP
      */
     public static function markEnd($ret = null)
     {
+<<<<<<< HEAD
         self::$times[] = (self::$useHrtime ? \hrtime(true) : (\microtime(true) * 1e+6)) - self::$start;
+=======
+        self::$times[] = \hrtime(true) - self::$start;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         self::$start = null;
 
         return $ret;

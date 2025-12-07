@@ -2,6 +2,7 @@
 
 namespace PhpParser\Node\Scalar;
 
+<<<<<<< HEAD
 use PhpParser\Node\Scalar;
 
 class DNumber extends Scalar
@@ -73,5 +74,16 @@ class DNumber extends Scalar
 
     public function getType() : string {
         return 'Scalar_DNumber';
+=======
+require __DIR__ . '/Float_.php';
+
+if (false) {
+    /**
+     * For classmap-authoritative support.
+     *
+     * @deprecated use \PhpParser\Node\Scalar\Float_ instead.
+     */
+    class DNumber extends Float_ {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

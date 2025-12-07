@@ -49,7 +49,11 @@ class FileLink extends File
     public function __construct(
         string $streamName,
         string $mode,
+<<<<<<< HEAD
         string $context = null,
+=======
+        ?string $context = null,
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         bool $wait = false
     ) {
         if (!\is_link($streamName)) {

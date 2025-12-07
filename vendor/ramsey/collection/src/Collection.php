@@ -71,7 +71,11 @@ namespace Ramsey\Collection;
  * ```
  *
  * @template T
+<<<<<<< HEAD
  * @template-extends AbstractCollection<T>
+=======
+ * @extends AbstractCollection<T>
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 class Collection extends AbstractCollection
 {
@@ -80,10 +84,15 @@ class Collection extends AbstractCollection
      *
      * A collection's type is immutable once it is set. For this reason, this
      * property is set private.
+<<<<<<< HEAD
      *
      * @var string
      */
     private $collectionType;
+=======
+     */
+    private string $collectionType;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Constructs a collection object of the specified type, optionally with the

@@ -8,17 +8,28 @@
     <a href="https://github.com/ramsey/collection"><img src="http://img.shields.io/badge/source-ramsey/collection-blue.svg?style=flat-square" alt="Source Code"></a>
     <a href="https://packagist.org/packages/ramsey/collection"><img src="https://img.shields.io/packagist/v/ramsey/collection.svg?style=flat-square&label=release" alt="Download Package"></a>
     <a href="https://php.net"><img src="https://img.shields.io/packagist/php-v/ramsey/collection.svg?style=flat-square&colorB=%238892BF" alt="PHP Programming Language"></a>
+<<<<<<< HEAD
     <a href="https://github.com/ramsey/collection/actions?query=workflow%3ACI"><img src="https://img.shields.io/github/workflow/status/ramsey/collection/CI?label=CI&logo=github&style=flat-square" alt="Build Status"></a>
     <a href="https://codecov.io/gh/ramsey/collection"><img src="https://img.shields.io/codecov/c/gh/ramsey/collection?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage"></a>
     <a href="https://shepherd.dev/github/ramsey/collection"><img src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fshepherd.dev%2Fgithub%2Framsey%2Fcollection%2Fcoverage" alt="Psalm Type Coverage"></a>
     <a href="https://github.com/ramsey/collection/blob/master/LICENSE"><img src="https://img.shields.io/packagist/l/ramsey/collection.svg?style=flat-square&colorB=darkcyan" alt="Read License"></a>
     <a href="https://packagist.org/packages/ramsey/collection/stats"><img src="https://img.shields.io/packagist/dt/ramsey/collection.svg?style=flat-square&colorB=darkmagenta" alt="Package downloads on Packagist"></a>
     <a href="https://phpc.chat/channel/ramsey"><img src="https://img.shields.io/badge/phpc.chat-%23ramsey-darkslateblue?style=flat-square" alt="Chat with the maintainers"></a>
+=======
+    <a href="https://github.com/ramsey/collection/blob/master/LICENSE"><img src="https://img.shields.io/packagist/l/ramsey/collection.svg?style=flat-square&colorB=darkcyan" alt="Read License"></a>
+    <a href="https://github.com/ramsey/collection/actions/workflows/continuous-integration.yml"><img src="https://img.shields.io/github/actions/workflow/status/ramsey/collection/continuous-integration.yml?branch=main&logo=github&style=flat-square" alt="Build Status"></a>
+    <a href="https://codecov.io/gh/ramsey/collection"><img src="https://img.shields.io/codecov/c/gh/ramsey/collection?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage"></a>
+    <a href="https://shepherd.dev/github/ramsey/collection"><img src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fshepherd.dev%2Fgithub%2Framsey%2Fcollection%2Fcoverage" alt="Psalm Type Coverage"></a>
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 </p>
 
 ## About
 
+<<<<<<< HEAD
 ramsey/collection is a PHP 7.2+ library for representing and manipulating collections.
+=======
+ramsey/collection is a PHP library for representing and manipulating collections.
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 Much inspiration for this library came from the [Java Collections Framework][java].
 
@@ -36,11 +47,16 @@ composer require ramsey/collection
 
 ## Usage
 
+<<<<<<< HEAD
 Examples of how to use this framework can be found in the
+=======
+Examples of how to use this library may be found in the
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 [Wiki pages](https://github.com/ramsey/collection/wiki/Examples).
 
 ## Contributing
 
+<<<<<<< HEAD
 Contributions are welcome! Before contributing to this project, familiarize
 yourself with [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -55,6 +71,10 @@ composer install
 ```
 
 Now, you are ready to develop!
+=======
+Contributions are welcome! To contribute, please familiarize yourself with
+[CONTRIBUTING.md](CONTRIBUTING.md).
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 ## Coordinated Disclosure
 
@@ -81,4 +101,8 @@ MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
 
 
 [java]: http://docs.oracle.com/javase/8/docs/technotes/guides/collections/index.html
+<<<<<<< HEAD
 [security.md]: https://github.com/ramsey/collection/blob/master/SECURITY.md
+=======
+[security.md]: https://github.com/ramsey/collection/blob/main/SECURITY.md
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1

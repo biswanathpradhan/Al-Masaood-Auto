@@ -2,6 +2,7 @@
 
 namespace PhpParser\Node\Scalar;
 
+<<<<<<< HEAD
 use PhpParser\Error;
 use PhpParser\Node\Scalar;
 
@@ -76,5 +77,16 @@ class LNumber extends Scalar
 
     public function getType() : string {
         return 'Scalar_LNumber';
+=======
+require __DIR__ . '/Int_.php';
+
+if (false) {
+    /**
+     * For classmap-authoritative support.
+     *
+     * @deprecated use \PhpParser\Node\Scalar\Int_ instead.
+     */
+    class LNumber extends Int_ {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

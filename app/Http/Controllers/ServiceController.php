@@ -12,7 +12,10 @@ use App\service_packages;
 use App\service_needed;
 use App\appointment;
 use Carbon\Carbon;
+<<<<<<< HEAD
 use App\ValidationHelper;
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 
 class ServiceController extends Controller
@@ -49,6 +52,7 @@ class ServiceController extends Controller
            
     public static function getservices(Request $request)
     {           
+<<<<<<< HEAD
                 // XSS Protection: Using ValidationHelper for secure input validation
                 $validator = Validator::make($request->all(), [
                     'session_id' => ValidationHelper::sessionId(),
@@ -56,6 +60,18 @@ class ServiceController extends Controller
                     'main_brand_id' => ValidationHelper::brandId(),
                     'language_id' => ValidationHelper::languageId()
                 ], ValidationHelper::errorMessages());
+=======
+                
+                $brand_id = [1,2,3]; // 
+                $language_id = [1,2,3]; // 
+                $validator = Validator::make($request->all(), [
+                    'session_id' => 'required',
+                    'customer_id' => 'required',
+                    'main_brand_id' => ['required',Rule::in($brand_id)],
+                    'language_id' => ['required',Rule::in($language_id)]
+      
+                ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
                  if ($validator->fails()) {
                     // return $validator->errors();
@@ -102,6 +118,7 @@ class ServiceController extends Controller
         // Get Service Packages
          public static function getservicePackages(Request $request)
         {           
+<<<<<<< HEAD
                 // XSS Protection: Using ValidationHelper for secure input validation
                 $validator = Validator::make($request->all(), [
                     'session_id' => ValidationHelper::sessionId(),
@@ -109,6 +126,18 @@ class ServiceController extends Controller
                     'main_brand_id' => ValidationHelper::brandId(),
                     'language_id' => ValidationHelper::languageId()
                 ], ValidationHelper::errorMessages());
+=======
+                
+                $brand_id = [1,2,3]; // 
+                $language_id = [1,2,3]; // 
+                $validator = Validator::make($request->all(), [
+                    'session_id' => 'required',
+                    'customer_id' => 'required',
+                    'main_brand_id' => ['required',Rule::in($brand_id)],
+                    'language_id' => ['required',Rule::in($language_id)]
+      
+                ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
                  if ($validator->fails()) {
                     // return $validator->errors();
@@ -156,6 +185,7 @@ class ServiceController extends Controller
          // Get Service Packages
          public static function getserviceNeeded(Request $request)
         {           
+<<<<<<< HEAD
                 // XSS Protection: Using ValidationHelper for secure input validation
                 $validator = Validator::make($request->all(), [
                     'session_id' => ValidationHelper::sessionId(),
@@ -163,6 +193,18 @@ class ServiceController extends Controller
                     'main_brand_id' => ValidationHelper::brandId(),
                     'language_id' => ValidationHelper::languageId()
                 ], ValidationHelper::errorMessages());
+=======
+                
+                $brand_id = [1,2,3]; //
+                 $language_id = [1,2,3]; //  
+                $validator = Validator::make($request->all(), [
+                    'session_id' => 'required',
+                    'customer_id' => 'required',
+                    'main_brand_id' => ['required',Rule::in($brand_id)],
+                    'language_id' => ['required',Rule::in($language_id)]
+      
+                ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
                  if ($validator->fails()) {
                     // return $validator->errors();

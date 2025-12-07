@@ -17,6 +17,10 @@ namespace Ramsey\Collection\Tool;
 use Ramsey\Collection\Exception\ValueExtractionException;
 
 use function get_class;
+<<<<<<< HEAD
+=======
+use function is_object;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use function method_exists;
 use function property_exists;
 use function sprintf;
@@ -37,6 +41,10 @@ trait ValueExtractorTrait
      *
      * @throws ValueExtractionException if the method or property is not defined.
      */
+<<<<<<< HEAD
+=======
+    // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     protected function extractValue($object, string $propertyOrMethod)
     {
         if (!is_object($object)) {
@@ -52,7 +60,12 @@ trait ValueExtractorTrait
         }
 
         throw new ValueExtractionException(
+<<<<<<< HEAD
             sprintf('Method or property "%s" not defined in %s', $propertyOrMethod, get_class($object))
+=======
+            // phpcs:ignore SlevomatCodingStandard.Classes.ModernClassNameReference.ClassNameReferencedViaFunctionCall
+            sprintf('Method or property "%s" not defined in %s', $propertyOrMethod, get_class($object)),
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         );
     }
 }

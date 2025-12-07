@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,10 +17,20 @@
  * @package   Mockery
  * @copyright Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license   http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery\Adapter\Phpunit;
 
+<<<<<<< HEAD
 if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
     class_alias('Mockery\Adapter\Phpunit\Legacy\TestListenerForV5', 'Mockery\Adapter\Phpunit\TestListener');
 } elseif (version_compare(\PHPUnit\Runner\Version::id(), '7.0.0', '<')) {
@@ -31,5 +42,31 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
 if (false) {
     class TestListener
     {
+=======
+use PHPUnit\Framework\Test;
+use PHPUnit\Framework\TestListener as PHPUnitTestListener;
+use PHPUnit\Framework\TestListenerDefaultImplementation;
+use PHPUnit\Framework\TestSuite;
+
+class TestListener implements PHPUnitTestListener
+{
+    use TestListenerDefaultImplementation;
+
+    private $trait;
+
+    public function __construct()
+    {
+        $this->trait = new TestListenerTrait();
+    }
+
+    public function endTest(Test $test, float $time): void
+    {
+        $this->trait->endTest($test, $time);
+    }
+
+    public function startTestSuite(TestSuite $suite): void
+    {
+        $this->trait->startTestSuite();
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

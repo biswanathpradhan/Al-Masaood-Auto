@@ -2,6 +2,7 @@
 
 namespace PhpParser\Node\Stmt;
 
+<<<<<<< HEAD
 use PhpParser\Node;
 
 class PropertyProperty extends Node\Stmt
@@ -30,5 +31,18 @@ class PropertyProperty extends Node\Stmt
     
     public function getType() : string {
         return 'Stmt_PropertyProperty';
+=======
+use PhpParser\Node\PropertyItem;
+
+require __DIR__ . '/../PropertyItem.php';
+
+if (false) {
+    /**
+     * For classmap-authoritative support.
+     *
+     * @deprecated use \PhpParser\Node\PropertyItem instead.
+     */
+    class PropertyProperty extends PropertyItem {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

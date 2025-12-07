@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,10 +27,20 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 class ProcOutputPager extends StreamOutput implements OutputPager
 {
+<<<<<<< HEAD
     private $proc;
     private $pipe;
     private $stream;
     private $cmd;
+=======
+    /** @var ?resource */
+    private $proc = null;
+    /** @var ?resource */
+    private $pipe = null;
+    /** @var resource */
+    private $stream;
+    private string $cmd;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Constructor.
@@ -48,14 +62,28 @@ class ProcOutputPager extends StreamOutput implements OutputPager
      *
      * @throws \RuntimeException When unable to write output (should never happen)
      */
+<<<<<<< HEAD
     public function doWrite($message, $newline)
+=======
+    public function doWrite($message, $newline): void
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $pipe = $this->getPipe();
         if (false === @\fwrite($pipe, $message.($newline ? \PHP_EOL : ''))) {
             // @codeCoverageIgnoreStart
+<<<<<<< HEAD
             // should never happen
             $this->close();
             throw new \RuntimeException('Unable to write output');
+=======
+            // When the message is sufficiently long, writing to the pipe fails
+            // if the pager process is closed before the entire message is read.
+            //
+            // This is a normal condition, so we just close the pipe and return.
+            $this->close();
+
+            return;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             // @codeCoverageIgnoreEnd
         }
 

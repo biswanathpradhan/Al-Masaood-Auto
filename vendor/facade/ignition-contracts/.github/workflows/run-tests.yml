@@ -1,10 +1,17 @@
 name: Run tests
 
 on:
+<<<<<<< HEAD
   push:
   pull_request:
   schedule:
       - cron: '0 0 * * *'
+=======
+    push:
+    pull_request:
+    schedule:
+        -   cron: '0 0 * * *'
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 jobs:
     php-tests:
@@ -12,6 +19,7 @@ jobs:
 
         strategy:
             matrix:
+<<<<<<< HEAD
                 php: [7.4, 7.3, 7.2]
                 laravel: [7.*]
                 dependency-version: [prefer-lowest, prefer-stable]
@@ -75,3 +83,34 @@ jobs:
               env:
                 SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+=======
+                php: [ 8.0, 7.4, 7.3 ]
+                dependency-version: [ prefer-lowest, prefer-stable ]
+                os: [ ubuntu-latest, windows-latest ]
+                allow_failures:
+                    -   php: 8.0
+
+        name: P${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v2
+
+            -   name: Set up PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    coverage: none
+                    tools: composer:v2
+
+            -   name: Install PHP 7 dependencies
+                run: composer update --${{ matrix.dependency-version }} --no-interaction --no-progress
+                if: "matrix.php < 8"
+
+            -   name: Install PHP 8 dependencies
+                run: composer update --prefer-stable --ignore-platform-req=php --no-interaction --no-progress
+                if: "matrix.php >= 8"
+
+            -   name: Execute tests
+                run: vendor/bin/phpunit
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1

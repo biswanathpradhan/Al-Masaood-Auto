@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,10 +17,20 @@
  * @package    Mockery
  * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery\Matcher;
 
+<<<<<<< HEAD
 class HasKey extends MatcherAbstract
 {
     /**
@@ -34,12 +45,45 @@ class HasKey extends MatcherAbstract
     }
 
     /**
+=======
+use ArrayAccess;
+
+use function array_key_exists;
+use function is_array;
+use function sprintf;
+
+class HasKey extends MatcherAbstract
+{
+    /**
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * Return a string representation of this Matcher
      *
      * @return string
      */
     public function __toString()
     {
+<<<<<<< HEAD
         return "<HasKey[$this->_expected]>";
+=======
+        return sprintf('<HasKey[%s]>', $this->_expected);
+    }
+
+    /**
+     * Check if the actual value matches the expected.
+     *
+     * @template TMixed
+     *
+     * @param TMixed $actual
+     *
+     * @return bool
+     */
+    public function match(&$actual)
+    {
+        if (! is_array($actual) && ! $actual instanceof ArrayAccess) {
+            return false;
+        }
+
+        return array_key_exists($this->_expected, (array) $actual);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

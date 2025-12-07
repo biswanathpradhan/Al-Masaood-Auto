@@ -229,7 +229,11 @@ abstract class FileGeneric extends Stream implements StreamPathable, StreamStata
     /**
      * Set access and modification time of file.
      */
+<<<<<<< HEAD
     public function touch(int $time = null, int $atime = null): bool
+=======
+    public function touch(?int $time = null, ?int $atime = null): bool
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if (null === $time) {
             $time = \time();
@@ -333,7 +337,11 @@ abstract class FileGeneric extends Stream implements StreamPathable, StreamStata
     /**
      * Change the current umask.
      */
+<<<<<<< HEAD
     public static function umask(int $umask = null): int
+=======
+    public static function umask(?int $umask = null): int
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if (null === $umask) {
             return \umask();

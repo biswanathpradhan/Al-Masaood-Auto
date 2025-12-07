@@ -49,7 +49,11 @@ class FileLinkReadWrite extends FileLink implements StreamIn, StreamOut
     public function __construct(
         string $streamName,
         string $mode = parent::MODE_APPEND_READ_WRITE,
+<<<<<<< HEAD
         string $context = null,
+=======
+        ?string $context = null,
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         bool $wait = false
     ) {
         parent::__construct($streamName, $mode, $context, $wait);
@@ -60,7 +64,11 @@ class FileLinkReadWrite extends FileLink implements StreamIn, StreamOut
     /**
      * Open the stream and return the associated resource.
      */
+<<<<<<< HEAD
     protected function &_open(string $streamName, StreamContext $context = null)
+=======
+    protected function &_open(string $streamName, ?StreamContext $context = null)
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         static $createModes = [
             parent::MODE_READ_WRITE,
@@ -150,7 +158,11 @@ class FileLinkReadWrite extends FileLink implements StreamIn, StreamOut
      * Read an array.
      * Alias of the $this->scanf() method.
      */
+<<<<<<< HEAD
     public function readArray(string $format = null)
+=======
+    public function readArray(?string $format = null)
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         return $this->scanf($format);
     }

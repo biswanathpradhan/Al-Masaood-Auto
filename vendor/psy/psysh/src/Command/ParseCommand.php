@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -29,6 +33,7 @@ use Symfony\Component\VarDumper\Caster\Caster;
  */
 class ParseCommand extends Command implements ContextAware, PresenterAware
 {
+<<<<<<< HEAD
     /**
      * Context instance (for ContextAware interface).
      *
@@ -39,14 +44,23 @@ class ParseCommand extends Command implements ContextAware, PresenterAware
     private $presenter;
     private $parserFactory;
     private $parsers;
+=======
+    protected Context $context;
+    private Presenter $presenter;
+    private Parser $parser;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * {@inheritdoc}
      */
     public function __construct($name = null)
     {
+<<<<<<< HEAD
         $this->parserFactory = new ParserFactory();
         $this->parsers = [];
+=======
+        $this->parser = (new ParserFactory())->createParser();
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         parent::__construct($name);
     }
@@ -90,6 +104,7 @@ class ParseCommand extends Command implements ContextAware, PresenterAware
      */
     protected function configure()
     {
+<<<<<<< HEAD
         $kindMsg = 'One of PhpParser\\ParserFactory constants: '
             .\implode(', ', ParserFactory::getPossibleKinds())
             ." (default is based on current interpreter's version).";
@@ -101,6 +116,14 @@ class ParseCommand extends Command implements ContextAware, PresenterAware
             new InputOption('depth', '', InputOption::VALUE_REQUIRED, 'Depth to parse.', 10),
             new InputOption('kind', '', InputOption::VALUE_REQUIRED, $kindMsg, $this->parserFactory->getDefaultKind()),
         ])
+=======
+        $this
+            ->setName('parse')
+            ->setDefinition([
+                new CodeArgument('code', CodeArgument::REQUIRED, 'PHP code to parse.'),
+                new InputOption('depth', '', InputOption::VALUE_REQUIRED, 'Depth to parse.', 10),
+            ])
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             ->setDescription('Parse PHP code and show the abstract syntax tree.')
             ->setHelp(
                 <<<'HELP'
@@ -119,6 +142,7 @@ HELP
     /**
      * {@inheritdoc}
      */
+<<<<<<< HEAD
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $code = $input->getArgument('code');
@@ -126,6 +150,27 @@ HELP
         $depth = $input->getOption('depth');
 
         $nodes = $this->getParser($parserKind)->parse($code);
+=======
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $code = $input->getArgument('code');
+        $depth = $input->getOption('depth');
+
+        if (!\preg_match('/^\s*<\\?/', $code)) {
+            $code = '<?php '.$code;
+        }
+
+        try {
+            $nodes = $this->parser->parse($code);
+        } catch (\PhpParser\Error $e) {
+            if ($this->parseErrorIsEOF($e)) {
+                $nodes = $this->parser->parse($code.';');
+            } else {
+                throw $e;
+            }
+        }
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $output->page($this->presenter->present($nodes, $depth));
 
         $this->context->setReturnValue($nodes);
@@ -133,6 +178,7 @@ HELP
         return 0;
     }
 
+<<<<<<< HEAD
     /**
      * Get (or create) the Parser instance.
      *
@@ -145,5 +191,12 @@ HELP
         }
 
         return $this->parsers[$kind];
+=======
+    private function parseErrorIsEOF(\PhpParser\Error $e): bool
+    {
+        $msg = $e->getRawMessage();
+
+        return ($msg === 'Unexpected token EOF') || (\strpos($msg, 'Syntax error, unexpected EOF') !== false);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

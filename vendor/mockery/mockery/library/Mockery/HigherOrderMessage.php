@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,10 +17,20 @@
  * @package    Mockery
  * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery;
 
+<<<<<<< HEAD
 /**
  * @method \Mockery\Expectation withArgs(\Closure|array $args)
  */
@@ -28,6 +39,25 @@ class HigherOrderMessage
     private $mock;
     private $method;
 
+=======
+use Closure;
+
+/**
+ * @method Expectation withArgs(array|Closure $args)
+ */
+class HigherOrderMessage
+{
+    /**
+     * @var string
+     */
+    private $method;
+
+    /**
+     * @var LegacyMockInterface|MockInterface
+     */
+    private $mock;
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function __construct(MockInterface $mock, $method)
     {
         $this->mock = $mock;
@@ -35,7 +65,14 @@ class HigherOrderMessage
     }
 
     /**
+<<<<<<< HEAD
      * @return \Mockery\Expectation
+=======
+     * @param string $method
+     * @param array  $args
+     *
+     * @return Expectation|ExpectationInterface|HigherOrderMessage
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function __call($method, $args)
     {
@@ -44,6 +81,10 @@ class HigherOrderMessage
         }
 
         $expectation = $this->mock->{$this->method}($method);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return $expectation->withArgs($args);
     }
 }

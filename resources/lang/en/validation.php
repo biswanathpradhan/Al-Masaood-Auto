@@ -130,6 +130,7 @@ return [
     */
 
     'custom' => [
+<<<<<<< HEAD
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
@@ -181,6 +182,74 @@ return [
         ],
         'longitude' => [
             'between' => 'The longitude must be between -180 and 180.',
+=======
+        'email' => [
+            'required' => 'Email address is required.',
+            'email' => 'Please enter a valid email address.',
+            'unique' => 'This email address is already registered.',
+        ],
+        'name' => [
+            'required' => 'Name is required.',
+            'string' => 'Name must be a valid text.',
+            'max' => 'Name cannot exceed :max characters.',
+        ],
+        'mobile' => [
+            'required' => 'Mobile number is required.',
+            'string' => 'Mobile number must be a valid text.',
+            'max' => 'Mobile number cannot exceed :max characters.',
+        ],
+        'mobile_number' => [
+            'required' => 'Mobile number is required.',
+            'string' => 'Mobile number must be a valid text.',
+        ],
+        'phone' => [
+            'required' => 'Phone number is required.',
+            'string' => 'Phone number must be a valid text.',
+        ],
+        'password' => [
+            'required' => 'Password is required.',
+            'min' => 'Password must be at least :min characters.',
+            'confirmed' => 'Password confirmation does not match.',
+        ],
+        'car_registration_number' => [
+            'required' => 'Car registration number is required.',
+            'string' => 'Car registration number must be a valid text.',
+        ],
+        'chassis_number' => [
+            'required' => 'Chassis number is required.',
+            'string' => 'Chassis number must be a valid text.',
+        ],
+        'brand' => [
+            'required' => 'Brand selection is required.',
+            'exists' => 'Selected brand is invalid.',
+        ],
+        'model' => [
+            'required' => 'Model selection is required.',
+            'exists' => 'Selected model is invalid.',
+        ],
+        'version' => [
+            'required' => 'Version selection is required.',
+            'exists' => 'Selected version is invalid.',
+        ],
+        'city' => [
+            'required' => 'City selection is required.',
+            'exists' => 'Selected city is invalid.',
+        ],
+        'location' => [
+            'required' => 'Location selection is required.',
+            'exists' => 'Selected location is invalid.',
+        ],
+        'date' => [
+            'required' => 'Date is required.',
+            'date' => 'Please enter a valid date.',
+        ],
+        'time' => [
+            'required' => 'Time is required.',
+        ],
+        'service' => [
+            'required' => 'Service selection is required.',
+            'exists' => 'Selected service is invalid.',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         ],
     ],
 
@@ -195,6 +264,43 @@ return [
     |
     */
 
+<<<<<<< HEAD
     'attributes' => [],
+=======
+    'attributes' => [
+        'email' => 'email address',
+        'name' => 'name',
+        'mobile' => 'mobile number',
+        'mobile_number' => 'mobile number',
+        'phone' => 'phone number',
+        'password' => 'password',
+        'password_confirmation' => 'password confirmation',
+        'car_registration_number' => 'car registration number',
+        'chassis_number' => 'chassis number',
+        'brand' => 'brand',
+        'model' => 'model',
+        'version' => 'version',
+        'city' => 'city',
+        'location' => 'location',
+        'date' => 'date',
+        'time' => 'time',
+        'service' => 'service',
+        'first_name' => 'first name',
+        'last_name' => 'last name',
+        'surname' => 'surname',
+        'title' => 'title',
+        'address' => 'address',
+        'latitude' => 'latitude',
+        'longitude' => 'longitude',
+        'image' => 'image',
+        'file' => 'file',
+        'description' => 'description',
+        'status' => 'status',
+        'category' => 'category',
+        'mileage' => 'mileage',
+        'insurance_date' => 'insurance date',
+        'service_due_date' => 'service due date',
+    ],
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 ];

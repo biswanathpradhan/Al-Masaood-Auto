@@ -20,14 +20,23 @@ use Ramsey\Collection\Exception\InvalidArgumentException;
 use function array_key_exists;
 use function array_keys;
 use function in_array;
+<<<<<<< HEAD
+=======
+use function var_export;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 /**
  * This class provides a basic implementation of `MapInterface`, to minimize the
  * effort required to implement this interface.
  *
  * @template T
+<<<<<<< HEAD
  * @template-extends AbstractArray<T>
  * @template-implements MapInterface<T>
+=======
+ * @extends AbstractArray<T>
+ * @implements MapInterface<T>
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 abstract class AbstractMap extends AbstractArray implements MapInterface
 {
@@ -39,7 +48,11 @@ abstract class AbstractMap extends AbstractArray implements MapInterface
         if ($offset === null) {
             throw new InvalidArgumentException(
                 'Map elements are key/value pairs; a key must be provided for '
+<<<<<<< HEAD
                 . 'value ' . var_export($value, true)
+=======
+                . 'value ' . var_export($value, true),
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             );
         }
 

@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -31,7 +35,11 @@ use Psy\Command\TimeitCommand;
  */
 class TimeitVisitor extends NodeVisitorAbstract
 {
+<<<<<<< HEAD
     private $functionDepth;
+=======
+    private int $functionDepth = 0;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * {@inheritdoc}
@@ -41,6 +49,11 @@ class TimeitVisitor extends NodeVisitorAbstract
     public function beforeTraverse(array $nodes)
     {
         $this->functionDepth = 0;
+<<<<<<< HEAD
+=======
+
+        return null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -55,13 +68,22 @@ class TimeitVisitor extends NodeVisitorAbstract
         if ($node instanceof FunctionLike) {
             $this->functionDepth++;
 
+<<<<<<< HEAD
             return;
+=======
+            return null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         // replace any top-level `return` statements with a `markEnd` call
         if ($this->functionDepth === 0 && $node instanceof Return_) {
             return new Return_($this->getEndCall($node->expr), $node->getAttributes());
         }
+<<<<<<< HEAD
+=======
+
+        return null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -74,6 +96,11 @@ class TimeitVisitor extends NodeVisitorAbstract
         if ($node instanceof FunctionLike) {
             $this->functionDepth--;
         }
+<<<<<<< HEAD
+=======
+
+        return null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -84,7 +111,11 @@ class TimeitVisitor extends NodeVisitorAbstract
     public function afterTraverse(array $nodes)
     {
         // prepend a `markStart` call
+<<<<<<< HEAD
         \array_unshift($nodes, $this->maybeExpression($this->getStartCall()));
+=======
+        \array_unshift($nodes, new Expression($this->getStartCall(), []));
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         // append a `markEnd` call (wrapping the final node, if it's an expression)
         $last = $nodes[\count($nodes) - 1];
@@ -97,7 +128,11 @@ class TimeitVisitor extends NodeVisitorAbstract
         } elseif ($last instanceof Return_) {
             // nothing to do here, we're already ending with a return call
         } else {
+<<<<<<< HEAD
             $nodes[] = $this->maybeExpression($this->getEndCall());
+=======
+            $nodes[] = new Expression($this->getEndCall(), []);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         return $nodes;
@@ -120,7 +155,11 @@ class TimeitVisitor extends NodeVisitorAbstract
      *
      * @param Expr|null $arg
      */
+<<<<<<< HEAD
     private function getEndCall(Expr $arg = null): StaticCall
+=======
+    private function getEndCall(?Expr $arg = null): StaticCall
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if ($arg === null) {
             $arg = NoReturnValue::create();
@@ -128,6 +167,7 @@ class TimeitVisitor extends NodeVisitorAbstract
 
         return new StaticCall(new FullyQualifiedName(TimeitCommand::class), 'markEnd', [new Arg($arg)]);
     }
+<<<<<<< HEAD
 
     /**
      * Compatibility shim for PHP Parser 3.x.
@@ -143,4 +183,6 @@ class TimeitVisitor extends NodeVisitorAbstract
     {
         return \class_exists(Expression::class) ? new Expression($expr, $attrs) : $expr;
     }
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

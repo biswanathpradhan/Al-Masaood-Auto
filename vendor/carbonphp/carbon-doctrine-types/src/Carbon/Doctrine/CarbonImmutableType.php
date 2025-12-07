@@ -2,6 +2,7 @@
 
 namespace Carbon\Doctrine;
 
+<<<<<<< HEAD
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 class CarbonImmutableType extends DateTimeImmutableType implements CarbonDoctrineType
@@ -25,4 +26,8 @@ class CarbonImmutableType extends DateTimeImmutableType implements CarbonDoctrin
     {
         return true;
     }
+=======
+class CarbonImmutableType extends DateTimeImmutableType implements CarbonDoctrineType
+{
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

@@ -7,6 +7,7 @@ use PhpParser\BuilderHelpers;
 use PhpParser\Node;
 use PhpParser\Node\Stmt;
 
+<<<<<<< HEAD
 class Function_ extends FunctionLike
 {
     protected $name;
@@ -14,6 +15,15 @@ class Function_ extends FunctionLike
 
     /** @var Node\AttributeGroup[] */
     protected $attributeGroups = [];
+=======
+class Function_ extends FunctionLike {
+    protected string $name;
+    /** @var list<Stmt> */
+    protected array $stmts = [];
+
+    /** @var list<Node\AttributeGroup> */
+    protected array $attributeGroups = [];
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Creates a function builder.
@@ -55,7 +65,11 @@ class Function_ extends FunctionLike
      *
      * @return Stmt\Function_ The built function node
      */
+<<<<<<< HEAD
     public function getNode() : Node {
+=======
+    public function getNode(): Node {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return new Stmt\Function_($this->name, [
             'byRef'      => $this->returnByRef,
             'params'     => $this->params,

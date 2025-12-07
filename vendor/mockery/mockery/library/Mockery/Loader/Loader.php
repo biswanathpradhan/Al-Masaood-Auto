@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,6 +17,15 @@
  * @package    Mockery
  * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery\Loader;
@@ -24,5 +34,13 @@ use Mockery\Generator\MockDefinition;
 
 interface Loader
 {
+<<<<<<< HEAD
+=======
+    /**
+     * Load the given mock definition
+     *
+     * @return void
+     */
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function load(MockDefinition $definition);
 }

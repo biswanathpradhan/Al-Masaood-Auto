@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,6 +17,7 @@ namespace Psy\Command;
 
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\New_;
+<<<<<<< HEAD
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name\FullyQualified as FullyQualifiedName;
 use PhpParser\Node\Scalar\String_;
@@ -20,6 +25,14 @@ use PhpParser\Node\Stmt\Throw_;
 use PhpParser\PrettyPrinter\Standard as Printer;
 use Psy\Context;
 use Psy\ContextAware;
+=======
+use PhpParser\Node\Expr\Throw_;
+use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Name\FullyQualified as FullyQualifiedName;
+use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Stmt\Expression;
+use PhpParser\PrettyPrinter\Standard as Printer;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Psy\Exception\ThrowUpException;
 use Psy\Input\CodeArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,10 +41,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Throw an exception or error out of the Psy Shell.
  */
+<<<<<<< HEAD
 class ThrowUpCommand extends Command implements ContextAware
 {
     private $parser;
     private $printer;
+=======
+class ThrowUpCommand extends Command
+{
+    private CodeArgumentParser $parser;
+    private Printer $printer;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * {@inheritdoc}
@@ -45,6 +65,7 @@ class ThrowUpCommand extends Command implements ContextAware
     }
 
     /**
+<<<<<<< HEAD
      * @deprecated throwUp no longer needs to be ContextAware
      *
      * @param Context $context
@@ -55,6 +76,8 @@ class ThrowUpCommand extends Command implements ContextAware
     }
 
     /**
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * {@inheritdoc}
      */
     protected function configure()
@@ -87,6 +110,7 @@ HELP
      *
      * @throws \InvalidArgumentException if there is no exception to throw
      */
+<<<<<<< HEAD
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $args = $this->prepareArgs($input->getArgument('exception'));
@@ -94,6 +118,15 @@ HELP
         $throwCode = $this->printer->prettyPrint([$throwStmt]);
 
         $shell = $this->getApplication();
+=======
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $args = $this->prepareArgs($input->getArgument('exception'));
+        $throwStmt = new Expression(new Throw_(new New_(new FullyQualifiedName(ThrowUpException::class), $args)));
+        $throwCode = $this->printer->prettyPrint([$throwStmt]);
+
+        $shell = $this->getShell();
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $shell->addCode($throwCode, !$shell->hasCode());
 
         return 0;
@@ -106,11 +139,19 @@ HELP
      *
      * @throws \InvalidArgumentException if there is no exception to throw
      *
+<<<<<<< HEAD
      * @param string $code
      *
      * @return Arg[]
      */
     private function prepareArgs(string $code = null): array
+=======
+     * @param string|null $code
+     *
+     * @return Arg[]
+     */
+    private function prepareArgs(?string $code = null): array
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if (!$code) {
             // Default to last exception if nothing else was supplied
@@ -123,15 +164,23 @@ HELP
         }
 
         $node = $nodes[0];
+<<<<<<< HEAD
 
         // Make this work for PHP Parser v3.x
         $expr = isset($node->expr) ? $node->expr : $node;
+=======
+        $expr = $node->expr;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         $args = [new Arg($expr, false, false, $node->getAttributes())];
 
         // Allow throwing via a string, e.g. `throw-up "SUP"`
         if ($expr instanceof String_) {
+<<<<<<< HEAD
             return [new New_(new FullyQualifiedName(\Exception::class), $args)];
+=======
+            return [new Arg(new New_(new FullyQualifiedName(\Exception::class), $args))];
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         return $args;

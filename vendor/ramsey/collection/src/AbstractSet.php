@@ -20,7 +20,11 @@ namespace Ramsey\Collection;
  * this specific type of collection.
  *
  * @template T
+<<<<<<< HEAD
  * @template-extends AbstractCollection<T>
+=======
+ * @extends AbstractCollection<T>
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 abstract class AbstractSet extends AbstractCollection
 {

@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,19 +17,43 @@
  * @package    Mockery
  * @copyright  Copyright (c) 2017 Dave Marshall
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery\Matcher;
 
 class AnyArgs extends MatcherAbstract implements ArgumentListMatcher
 {
+<<<<<<< HEAD
     /**
      * @inheritdoc
+=======
+    public function __toString()
+    {
+        return '<Any Arguments>';
+    }
+
+    /**
+     * @template TMixed
+     *
+     * @param TMixed $actual
+     *
+     * @return bool
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function match(&$actual)
     {
         return true;
     }
+<<<<<<< HEAD
 
     /**
      * @inheritdoc
@@ -37,4 +62,6 @@ class AnyArgs extends MatcherAbstract implements ArgumentListMatcher
     {
         return '<Any Arguments>';
     }
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

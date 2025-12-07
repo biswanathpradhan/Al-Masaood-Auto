@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -74,6 +78,7 @@ class Theme
 
     const ERROR_STYLES = ['info', 'warning', 'error', 'whisper', 'class'];
 
+<<<<<<< HEAD
     private $compact = false;
 
     private $prompt = '> ';
@@ -84,6 +89,18 @@ class Theme
     private $grayFallback = 'blue';
 
     private $styles = [];
+=======
+    private bool $compact = false;
+
+    private string $prompt = '> ';
+    private string $bufferPrompt = '. ';
+    private string $replayPrompt = '- ';
+    private string $returnValue = '= ';
+
+    private string $grayFallback = 'blue';
+
+    private array $styles = [];
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * @param string|array $config theme name or config options
@@ -273,10 +290,68 @@ class Theme
         }
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Get a style definition as an array.
+     *
+     * @return array [foreground, background, options]
+     */
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     private function getStyle(string $name, bool $useGrayFallback): array
     {
         return \array_map(function ($style) use ($useGrayFallback) {
             return ($useGrayFallback && $style === 'gray') ? $this->grayFallback : $style;
         }, $this->styles[$name]);
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Get a style as inline style string for use with hrefs.
+     *
+     * Converts style array [fg, bg, options] to inline format: "fg=color;bg=color;options=opt1,opt2"
+     *
+     * @return string Inline style string (e.g., "fg=blue;options=underscore")
+     */
+    private function getStyleAsInline(string $name, bool $useGrayFallback = false): string
+    {
+        $style = $this->getStyle($name, $useGrayFallback) ?? static::DEFAULT_STYLES[$name] ?? [null, null, []];
+        $fg = $style[0] ?? null;
+        $bg = $style[1] ?? null;
+        $options = $style[2] ?? [];
+
+        $parts = [];
+
+        if ($fg !== null) {
+            $parts[] = \sprintf('fg=%s', $fg);
+        }
+
+        if ($bg !== null) {
+            $parts[] = \sprintf('bg=%s', $bg);
+        }
+
+        if (!empty($options)) {
+            $parts[] = \sprintf('options=%s', \implode(',', $options));
+        }
+
+        return \implode(';', $parts);
+    }
+
+    /**
+     * Get all styles as inline style strings, for use with hrefs or other manual formatting.
+     *
+     * @return array Map of style name to inline style string
+     */
+    public function getInlineStyles(bool $useGrayFallback = false): array
+    {
+        $inlineStyles = [];
+
+        foreach (\array_keys(static::DEFAULT_STYLES) as $name) {
+            $inlineStyles[$name] = $this->getStyleAsInline($name, $useGrayFallback);
+        }
+
+        return $inlineStyles;
+    }
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

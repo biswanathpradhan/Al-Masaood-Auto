@@ -21,7 +21,11 @@ namespace Ramsey\Collection;
  * and others unordered.
  *
  * @template T
+<<<<<<< HEAD
  * @template-extends ArrayInterface<T>
+=======
+ * @extends ArrayInterface<T>
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 interface CollectionInterface extends ArrayInterface
 {
@@ -151,6 +155,10 @@ interface CollectionInterface extends ArrayInterface
      *
      * @return CollectionInterface<T>
      */
+<<<<<<< HEAD
+=======
+    // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function where(string $propertyOrMethod, $value): self;
 
     /**

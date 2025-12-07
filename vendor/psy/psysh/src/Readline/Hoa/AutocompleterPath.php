@@ -62,8 +62,13 @@ class AutocompleterPath implements Autocompleter
      * Constructor.
      */
     public function __construct(
+<<<<<<< HEAD
         string $root = null,
         \Closure $iteratorFactory = null
+=======
+        ?string $root = null,
+        ?\Closure $iteratorFactory = null
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     ) {
         if (null === $root) {
             $root = static::PWD;

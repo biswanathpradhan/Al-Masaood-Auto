@@ -419,7 +419,11 @@ additional modifier:
     \Mockery::mock('MyClass')->shouldIgnoreMissing()->asUndefined();
 
 The returned object is nothing more than a placeholder so if, by some act of
+<<<<<<< HEAD
 fate, it's erroneously used somewhere it shouldn't it will likely not pass a
+=======
+fate, it's erroneously used somewhere it shouldn't, it will likely not pass a
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 logic check.
 
 We have encountered the ``makePartial()`` method before, as it is the method we

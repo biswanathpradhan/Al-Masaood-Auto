@@ -2,6 +2,7 @@
 
 namespace PhpParser;
 
+<<<<<<< HEAD
 use PhpParser\Lexer\Emulative;
 use PhpParser\Parser\Php7;
 
@@ -43,23 +44,51 @@ class ParserFactory
                     'Kind must be one of ::PREFER_PHP7, ::PREFER_PHP5, ::ONLY_PHP7 or ::ONLY_PHP5'
                 );
         }
+=======
+use PhpParser\Parser\Php7;
+use PhpParser\Parser\Php8;
+
+class ParserFactory {
+    /**
+     * Create a parser targeting the given version on a best-effort basis. The parser will generally
+     * accept code for the newest supported version, but will try to accommodate code that becomes
+     * invalid in newer versions or changes in interpretation.
+     */
+    public function createForVersion(PhpVersion $version): Parser {
+        if ($version->isHostVersion()) {
+            $lexer = new Lexer();
+        } else {
+            $lexer = new Lexer\Emulative($version);
+        }
+        if ($version->id >= 80000) {
+            return new Php8($lexer, $version);
+        }
+        return new Php7($lexer, $version);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
      * Create a parser targeting the newest version supported by this library. Code for older
      * versions will be accepted if there have been no relevant backwards-compatibility breaks in
      * PHP.
+<<<<<<< HEAD
      *
      * All supported lexer attributes (comments, startLine, endLine, startTokenPos, endTokenPos,
      * startFilePos, endFilePos) will be enabled.
      */
     public function createForNewestSupportedVersion(): Parser {
         return new Php7(new Emulative($this->getLexerOptions()));
+=======
+     */
+    public function createForNewestSupportedVersion(): Parser {
+        return $this->createForVersion(PhpVersion::getNewestSupported());
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
      * Create a parser targeting the host PHP version, that is the PHP version we're currently
      * running on. This parser will not use any token emulation.
+<<<<<<< HEAD
      *
      * All supported lexer attributes (comments, startLine, endLine, startTokenPos, endTokenPos,
      * startFilePos, endFilePos) will be enabled.
@@ -72,5 +101,10 @@ class ParserFactory
         return ['usedAttributes' => [
             'comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos', 'startFilePos', 'endFilePos',
         ]];
+=======
+     */
+    public function createForHostVersion(): Parser {
+        return $this->createForVersion(PhpVersion::getHostVersion());
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

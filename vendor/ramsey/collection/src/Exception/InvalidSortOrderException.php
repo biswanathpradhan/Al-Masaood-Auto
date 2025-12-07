@@ -14,9 +14,18 @@ declare(strict_types=1);
 
 namespace Ramsey\Collection\Exception;
 
+<<<<<<< HEAD
 /**
  * Thrown when attempting to use a sort order that is not recognized.
  */
 class InvalidSortOrderException extends \RuntimeException
+=======
+use RuntimeException;
+
+/**
+ * Thrown when attempting to use a sort order that is not recognized.
+ */
+class InvalidSortOrderException extends RuntimeException
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 {
 }

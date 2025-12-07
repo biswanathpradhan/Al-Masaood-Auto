@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,7 +26,11 @@ class ClassEnumerator extends Enumerator
     /**
      * {@inheritdoc}
      */
+<<<<<<< HEAD
     protected function listItems(InputInterface $input, \Reflector $reflector = null, $target = null): array
+=======
+    protected function listItems(InputInterface $input, ?\Reflector $reflector = null, $target = null): array
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         // if we have a reflector, ensure that it's a namespace reflector
         if (($target !== null || $reflector !== null) && !$reflector instanceof ReflectionNamespace) {
@@ -58,6 +66,7 @@ class ClassEnumerator extends Enumerator
      * If $internal or $user is defined, results will be limited to internal or
      * user-defined classes as appropriate.
      *
+<<<<<<< HEAD
      * @param string $key
      * @param array  $classes
      * @param bool   $internal
@@ -67,6 +76,17 @@ class ClassEnumerator extends Enumerator
      * @return array
      */
     protected function filterClasses(string $key, array $classes, bool $internal, bool $user, string $prefix = null): array
+=======
+     * @param string      $key
+     * @param array       $classes
+     * @param bool        $internal
+     * @param bool        $user
+     * @param string|null $prefix
+     *
+     * @return array
+     */
+    protected function filterClasses(string $key, array $classes, bool $internal, bool $user, ?string $prefix = null): array
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $ret = [];
 

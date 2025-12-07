@@ -29,9 +29,15 @@
             'dev_requirement' => false,
         ),
         'carbonphp/carbon-doctrine-types' => array(
+<<<<<<< HEAD
             'pretty_version' => '1.0.0',
             'version' => '1.0.0.0',
             'reference' => '3c430083d0b41ceed84ecccf9dac613241d7305d',
+=======
+            'pretty_version' => '2.1.0',
+            'version' => '2.1.0.0',
+            'reference' => '99f76ffa36cce3b70a4a6abce41dba15ca2e84cb',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../carbonphp/carbon-doctrine-types',
             'aliases' => array(),
@@ -104,18 +110,30 @@
             'dev_requirement' => true,
         ),
         'facade/ignition' => array(
+<<<<<<< HEAD
             'pretty_version' => '2.4.2',
             'version' => '2.4.2.0',
             'reference' => '2179568bdfddfa56c90c845a0be1a0b52adbf52a',
+=======
+            'pretty_version' => '2.17.7',
+            'version' => '2.17.7.0',
+            'reference' => 'b4f5955825bb4b74cba0f94001761c46335c33e9',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../facade/ignition',
             'aliases' => array(),
             'dev_requirement' => true,
         ),
         'facade/ignition-contracts' => array(
+<<<<<<< HEAD
             'pretty_version' => '1.0.1',
             'version' => '1.0.1.0',
             'reference' => 'aeab1ce8b68b188a43e81758e750151ad7da796b',
+=======
+            'pretty_version' => '1.0.2',
+            'version' => '1.0.2.0',
+            'reference' => '3c921a1cdba35b68a7f0ccffc6dffc1995b18267',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../facade/ignition-contracts',
             'aliases' => array(),
@@ -185,9 +203,15 @@
             'dev_requirement' => false,
         ),
         'hamcrest/hamcrest-php' => array(
+<<<<<<< HEAD
             'pretty_version' => 'v2.0.1',
             'version' => '2.0.1.0',
             'reference' => '8c3d0a3f6af734494ad8f6fbbee0ba92422859f3',
+=======
+            'pretty_version' => 'v2.1.1',
+            'version' => '2.1.1.0',
+            'reference' => 'f8b1c0173b22fa6ec77a81fe63e5b01eba7e6487',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../hamcrest/hamcrest-php',
             'aliases' => array(),
@@ -437,18 +461,30 @@
             'dev_requirement' => false,
         ),
         'league/mime-type-detection' => array(
+<<<<<<< HEAD
             'pretty_version' => '1.12.0',
             'version' => '1.12.0.0',
             'reference' => 'c7f2872fb273bf493811473dafc88d60ae829f48',
+=======
+            'pretty_version' => '1.16.0',
+            'version' => '1.16.0.0',
+            'reference' => '2d6702ff215bf922936ccc1ad31007edc76451b9',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../league/mime-type-detection',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
         'mockery/mockery' => array(
+<<<<<<< HEAD
             'pretty_version' => '1.3.6',
             'version' => '1.3.6.0',
             'reference' => 'dc206df4fa314a50bbb81cf72239a305c5bbd5c0',
+=======
+            'pretty_version' => '1.6.12',
+            'version' => '1.6.12.0',
+            'reference' => '1f4efdd7d3beafe9807b08156dfcb176d18f1699',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../mockery/mockery',
             'aliases' => array(),
@@ -482,9 +518,15 @@
             'dev_requirement' => false,
         ),
         'nikic/php-parser' => array(
+<<<<<<< HEAD
             'pretty_version' => 'v4.19.4',
             'version' => '4.19.4.0',
             'reference' => '715f4d25e225bc47b293a8b997fe6ce99bf987d2',
+=======
+            'pretty_version' => 'v5.6.2',
+            'version' => '5.6.2.0',
+            'reference' => '3a454ca033b9e06b63282ce19562e892747449bb',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../nikic/php-parser',
             'aliases' => array(),
@@ -572,9 +614,15 @@
             'dev_requirement' => true,
         ),
         'phpunit/php-token-stream' => array(
+<<<<<<< HEAD
             'pretty_version' => '3.1.3',
             'version' => '3.1.3.0',
             'reference' => '9c1da83261628cb24b6a6df371b6e312b3954768',
+=======
+            'pretty_version' => '4.0.4',
+            'version' => '4.0.4.0',
+            'reference' => 'a853a0e183b9db7eed023d7933a858fa1c8d25a3',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../phpunit/php-token-stream',
             'aliases' => array(),
@@ -605,9 +653,15 @@
             ),
         ),
         'psr/container' => array(
+<<<<<<< HEAD
             'pretty_version' => '1.1.1',
             'version' => '1.1.1.0',
             'reference' => '8622567409010282b7aeebe4bb841fe98b58dcaf',
+=======
+            'pretty_version' => '1.1.2',
+            'version' => '1.1.2.0',
+            'reference' => '513e0666f7216c7459170d56df27dfcefe1689ea',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../psr/container',
             'aliases' => array(),
@@ -675,9 +729,15 @@
             'dev_requirement' => false,
         ),
         'psy/psysh' => array(
+<<<<<<< HEAD
             'pretty_version' => 'v0.11.22',
             'version' => '0.11.22.0',
             'reference' => '128fa1b608be651999ed9789c95e6e2a31b5802b',
+=======
+            'pretty_version' => 'v0.12.15',
+            'version' => '0.12.15.0',
+            'reference' => '38953bc71491c838fcb6ebcbdc41ab7483cd549c',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../psy/psysh',
             'aliases' => array(),
@@ -693,9 +753,15 @@
             'dev_requirement' => false,
         ),
         'ramsey/collection' => array(
+<<<<<<< HEAD
             'pretty_version' => '1.1.4',
             'version' => '1.1.4.0',
             'reference' => 'ab2237657ad99667a5143e32ba2683c8029563d4',
+=======
+            'pretty_version' => '1.3.0',
+            'version' => '1.3.0.0',
+            'reference' => 'ad7475d1c9e70b190ecffc58f2d989416af339b4',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../ramsey/collection',
             'aliases' => array(),
@@ -716,6 +782,7 @@
                 0 => '4.2.3',
             ),
         ),
+<<<<<<< HEAD
         'scrivo/highlight.php' => array(
             'pretty_version' => 'v9.18.1.10',
             'version' => '9.18.1.10',
@@ -725,6 +792,8 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         'sebastian/code-unit-reverse-lookup' => array(
             'pretty_version' => '1.0.3',
             'version' => '1.0.3.0',
@@ -1010,6 +1079,18 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+<<<<<<< HEAD
+=======
+        'symfony/polyfill-php81' => array(
+            'pretty_version' => 'v1.33.0',
+            'version' => '1.33.0.0',
+            'reference' => '4a4cfc2d253c21a5ad0e53071df248ed48c6ce5c',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/polyfill-php81',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         'symfony/process' => array(
             'pretty_version' => 'v5.4.47',
             'version' => '5.4.47.0',
@@ -1089,9 +1170,15 @@
             'dev_requirement' => true,
         ),
         'tijsverkoyen/css-to-inline-styles' => array(
+<<<<<<< HEAD
             'pretty_version' => 'v2.2.7',
             'version' => '2.2.7.0',
             'reference' => '83ee6f38df0a63106a9e4536e3060458b74ccedb',
+=======
+            'pretty_version' => 'v2.3.0',
+            'version' => '2.3.0.0',
+            'reference' => '0d72ac1c00084279c1816675284073c5a337c20d',
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'type' => 'library',
             'install_path' => __DIR__ . '/../tijsverkoyen/css-to-inline-styles',
             'aliases' => array(),

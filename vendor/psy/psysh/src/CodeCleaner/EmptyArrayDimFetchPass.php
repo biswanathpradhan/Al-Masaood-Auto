@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,7 +29,11 @@ class EmptyArrayDimFetchPass extends CodeCleanerPass
 {
     const EXCEPTION_MESSAGE = 'Cannot use [] for reading';
 
+<<<<<<< HEAD
     private $theseOnesAreFine = [];
+=======
+    private array $theseOnesAreFine = [];
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * @return Node[]|null Array of nodes
@@ -33,6 +41,11 @@ class EmptyArrayDimFetchPass extends CodeCleanerPass
     public function beforeTraverse(array $nodes)
     {
         $this->theseOnesAreFine = [];
+<<<<<<< HEAD
+=======
+
+        return null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -59,8 +72,16 @@ class EmptyArrayDimFetchPass extends CodeCleanerPass
 
         if ($node instanceof ArrayDimFetch && $node->dim === null) {
             if (!\in_array($node, $this->theseOnesAreFine)) {
+<<<<<<< HEAD
                 throw new FatalErrorException(self::EXCEPTION_MESSAGE, $node->getLine());
             }
         }
+=======
+                throw new FatalErrorException(self::EXCEPTION_MESSAGE, $node->getStartLine());
+            }
+        }
+
+        return null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

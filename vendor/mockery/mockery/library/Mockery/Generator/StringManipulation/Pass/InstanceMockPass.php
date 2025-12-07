@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,15 +17,33 @@
  * @package    Mockery
  * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery\Generator\StringManipulation\Pass;
 
 use Mockery\Generator\MockConfiguration;
+<<<<<<< HEAD
 
 class InstanceMockPass
 {
     const INSTANCE_MOCK_CODE = <<<MOCK
+=======
+use function strrpos;
+use function substr;
+
+class InstanceMockPass implements Pass
+{
+    public const INSTANCE_MOCK_CODE = <<<MOCK
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     protected \$_mockery_ignoreVerification = true;
 
@@ -60,15 +79,30 @@ class InstanceMockPass
             }
         }
         \Mockery::getContainer()->rememberMock(\$this);
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         \$this->_mockery_constructorCalled(func_get_args());
     }
 MOCK;
 
+<<<<<<< HEAD
     public function apply($code, MockConfiguration $config)
     {
         if ($config->isInstanceMock()) {
             $code = $this->appendToClass($code, static::INSTANCE_MOCK_CODE);
+=======
+    /**
+     * @param  string $code
+     * @return string
+     */
+    public function apply($code, MockConfiguration $config)
+    {
+        if ($config->isInstanceMock()) {
+            return $this->appendToClass($code, static::INSTANCE_MOCK_CODE);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         return $code;
@@ -76,8 +110,13 @@ MOCK;
 
     protected function appendToClass($class, $code)
     {
+<<<<<<< HEAD
         $lastBrace = strrpos($class, "}");
         $class = substr($class, 0, $lastBrace) . $code . "\n    }\n";
         return $class;
+=======
+        $lastBrace = strrpos($class, '}');
+        return substr($class, 0, $lastBrace) . $code . "\n    }\n";
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

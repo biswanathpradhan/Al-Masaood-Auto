@@ -4,6 +4,7 @@ namespace PhpParser\Node\Expr;
 
 use PhpParser\Node\Expr;
 
+<<<<<<< HEAD
 class Include_ extends Expr
 {
     const TYPE_INCLUDE      = 1;
@@ -15,13 +16,31 @@ class Include_ extends Expr
     public $expr;
     /** @var int Type of include */
     public $type;
+=======
+class Include_ extends Expr {
+    public const TYPE_INCLUDE      = 1;
+    public const TYPE_INCLUDE_ONCE = 2;
+    public const TYPE_REQUIRE      = 3;
+    public const TYPE_REQUIRE_ONCE = 4;
+
+    /** @var Expr Expression */
+    public Expr $expr;
+    /** @var int Type of include */
+    public int $type;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Constructs an include node.
      *
+<<<<<<< HEAD
      * @param Expr  $expr       Expression
      * @param int   $type       Type of include
      * @param array $attributes Additional attributes
+=======
+     * @param Expr $expr Expression
+     * @param int $type Type of include
+     * @param array<string, mixed> $attributes Additional attributes
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function __construct(Expr $expr, int $type, array $attributes = []) {
         $this->attributes = $attributes;
@@ -29,11 +48,19 @@ class Include_ extends Expr
         $this->type = $type;
     }
 
+<<<<<<< HEAD
     public function getSubNodeNames() : array {
         return ['expr', 'type'];
     }
     
     public function getType() : string {
+=======
+    public function getSubNodeNames(): array {
+        return ['expr', 'type'];
+    }
+
+    public function getType(): string {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return 'Expr_Include';
     }
 }

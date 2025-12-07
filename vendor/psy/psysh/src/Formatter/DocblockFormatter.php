@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +23,11 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  */
 class DocblockFormatter implements ReflectorFormatter
 {
+<<<<<<< HEAD
     private static $vectorParamTemplates = [
+=======
+    private const VECTOR_PARAM_TEMPLATES = [
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         'type' => 'info',
         'var'  => 'strong',
     ];
@@ -134,11 +142,19 @@ class DocblockFormatter implements ReflectorFormatter
      */
     private static function getVectorParamTemplate(string $type, int $max): string
     {
+<<<<<<< HEAD
         if (!isset(self::$vectorParamTemplates[$type])) {
             return \sprintf('%%-%ds', $max);
         }
 
         return \sprintf('<%s>%%-%ds</%s>', self::$vectorParamTemplates[$type], $max, self::$vectorParamTemplates[$type]);
+=======
+        if (!isset(self::VECTOR_PARAM_TEMPLATES[$type])) {
+            return \sprintf('%%-%ds', $max);
+        }
+
+        return \sprintf('<%s>%%-%ds</%s>', self::VECTOR_PARAM_TEMPLATES[$type], $max, self::VECTOR_PARAM_TEMPLATES[$type]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**

@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,6 +17,11 @@ namespace Psy\CodeCleaner;
 
 use PhpParser\Node;
 use PhpParser\Node\Scalar\DNumber;
+<<<<<<< HEAD
+=======
+use PhpParser\Node\Scalar\Float_;
+use PhpParser\Node\Scalar\Int_;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt\Break_;
 use PhpParser\Node\Stmt\Continue_;
@@ -28,7 +37,11 @@ use Psy\Exception\FatalErrorException;
  */
 class LoopContextPass extends CodeCleanerPass
 {
+<<<<<<< HEAD
     private $loopDepth;
+=======
+    private int $loopDepth = 0;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * {@inheritdoc}
@@ -38,6 +51,11 @@ class LoopContextPass extends CodeCleanerPass
     public function beforeTraverse(array $nodes)
     {
         $this->loopDepth = 0;
+<<<<<<< HEAD
+=======
+
+        return null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -67,6 +85,7 @@ class LoopContextPass extends CodeCleanerPass
 
                 if ($this->loopDepth === 0) {
                     $msg = \sprintf("'%s' not in the 'loop' or 'switch' context", $operator);
+<<<<<<< HEAD
                     throw new FatalErrorException($msg, 0, \E_ERROR, null, $node->getLine());
                 }
 
@@ -75,10 +94,27 @@ class LoopContextPass extends CodeCleanerPass
                     if ($node->num instanceof DNumber || $num < 1) {
                         $msg = \sprintf("'%s' operator accepts only positive numbers", $operator);
                         throw new FatalErrorException($msg, 0, \E_ERROR, null, $node->getLine());
+=======
+                    throw new FatalErrorException($msg, 0, \E_ERROR, null, $node->getStartLine());
+                }
+
+                // @todo Remove LNumber and DNumber once we drop support for PHP-Parser 4.x
+                if (
+                    $node->num instanceof LNumber ||
+                    $node->num instanceof DNumber ||
+                    $node->num instanceof Int_ ||
+                    $node->num instanceof Float_
+                ) {
+                    $num = $node->num->value;
+                    if ($node->num instanceof DNumber || $num < 1) {
+                        $msg = \sprintf("'%s' operator accepts only positive numbers", $operator);
+                        throw new FatalErrorException($msg, 0, \E_ERROR, null, $node->getStartLine());
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                     }
 
                     if ($num > $this->loopDepth) {
                         $msg = \sprintf("Cannot '%s' %d levels", $operator, $num);
+<<<<<<< HEAD
                         throw new FatalErrorException($msg, 0, \E_ERROR, null, $node->getLine());
                     }
                 } elseif ($node->num) {
@@ -87,6 +123,18 @@ class LoopContextPass extends CodeCleanerPass
                 }
                 break;
         }
+=======
+                        throw new FatalErrorException($msg, 0, \E_ERROR, null, $node->getStartLine());
+                    }
+                } elseif ($node->num) {
+                    $msg = \sprintf("'%s' operator with non-constant operand is no longer supported", $operator);
+                    throw new FatalErrorException($msg, 0, \E_ERROR, null, $node->getStartLine());
+                }
+                break;
+        }
+
+        return null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -105,5 +153,10 @@ class LoopContextPass extends CodeCleanerPass
                 $this->loopDepth--;
                 break;
         }
+<<<<<<< HEAD
+=======
+
+        return null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

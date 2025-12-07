@@ -1,16 +1,25 @@
+<<<<<<< HEAD
 <?php
 /*
  * This file is part of php-token-stream.
+=======
+<?php declare(strict_types=1);
+/*
+ * This file is part of phpunit/php-token-stream.
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * (c) Sebastian Bergmann <sebastian@phpunit.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+<<<<<<< HEAD
 
 /**
  * A PHP token.
  */
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 abstract class PHP_Token
 {
     /**
@@ -34,10 +43,16 @@ abstract class PHP_Token
     protected $id;
 
     /**
+<<<<<<< HEAD
      * @param string           $text
      * @param int              $line
      * @param PHP_Token_Stream $tokenStream
      * @param int              $id
+=======
+     * @param string $text
+     * @param int    $line
+     * @param int    $id
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function __construct($text, $line, PHP_Token_Stream $tokenStream, $id)
     {
@@ -71,6 +86,7 @@ abstract class PHP_Token
         return $this->id;
     }
 }
+<<<<<<< HEAD
 
 abstract class PHP_TokenWithScope extends PHP_Token
 {
@@ -1359,3 +1375,5 @@ class PHP_Token_COALESCE_EQUAL extends PHP_Token
 class PHP_Token_FN extends PHP_Token
 {
 }
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1

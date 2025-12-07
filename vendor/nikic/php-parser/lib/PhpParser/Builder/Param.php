@@ -4,6 +4,7 @@ namespace PhpParser\Builder;
 
 use PhpParser;
 use PhpParser\BuilderHelpers;
+<<<<<<< HEAD
 use PhpParser\Node;
 
 class Param implements PhpParser\Builder
@@ -23,6 +24,21 @@ class Param implements PhpParser\Builder
 
     /** @var Node\AttributeGroup[] */
     protected $attributeGroups = [];
+=======
+use PhpParser\Modifiers;
+use PhpParser\Node;
+
+class Param implements PhpParser\Builder {
+    protected string $name;
+    protected ?Node\Expr $default = null;
+    /** @var Node\Identifier|Node\Name|Node\ComplexType|null */
+    protected ?Node $type = null;
+    protected bool $byRef = false;
+    protected int $flags = 0;
+    protected bool $variadic = false;
+    /** @var list<Node\AttributeGroup> */
+    protected array $attributeGroups = [];
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Creates a parameter builder.
@@ -63,6 +79,7 @@ class Param implements PhpParser\Builder
     }
 
     /**
+<<<<<<< HEAD
      * Sets type for the parameter.
      *
      * @param string|Node\Name|Node\Identifier|Node\ComplexType $type Parameter type
@@ -76,6 +93,8 @@ class Param implements PhpParser\Builder
     }
 
     /**
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * Make the parameter accept the value by reference.
      *
      * @return $this The builder instance (for fluid interface)
@@ -103,7 +122,11 @@ class Param implements PhpParser\Builder
      * @return $this The builder instance (for fluid interface)
      */
     public function makePublic() {
+<<<<<<< HEAD
         $this->flags = BuilderHelpers::addModifier($this->flags, Node\Stmt\Class_::MODIFIER_PUBLIC);
+=======
+        $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::PUBLIC);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         return $this;
     }
@@ -114,7 +137,11 @@ class Param implements PhpParser\Builder
      * @return $this The builder instance (for fluid interface)
      */
     public function makeProtected() {
+<<<<<<< HEAD
         $this->flags = BuilderHelpers::addModifier($this->flags, Node\Stmt\Class_::MODIFIER_PROTECTED);
+=======
+        $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::PROTECTED);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         return $this;
     }
@@ -125,7 +152,11 @@ class Param implements PhpParser\Builder
      * @return $this The builder instance (for fluid interface)
      */
     public function makePrivate() {
+<<<<<<< HEAD
         $this->flags = BuilderHelpers::addModifier($this->flags, Node\Stmt\Class_::MODIFIER_PRIVATE);
+=======
+        $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::PRIVATE);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         return $this;
     }
@@ -136,7 +167,33 @@ class Param implements PhpParser\Builder
      * @return $this The builder instance (for fluid interface)
      */
     public function makeReadonly() {
+<<<<<<< HEAD
         $this->flags = BuilderHelpers::addModifier($this->flags, Node\Stmt\Class_::MODIFIER_READONLY);
+=======
+        $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::READONLY);
+
+        return $this;
+    }
+
+    /**
+     * Gives the promoted property private(set) visibility.
+     *
+     * @return $this The builder instance (for fluid interface)
+     */
+    public function makePrivateSet() {
+        $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::PRIVATE_SET);
+
+        return $this;
+    }
+
+    /**
+     * Gives the promoted property protected(set) visibility.
+     *
+     * @return $this The builder instance (for fluid interface)
+     */
+    public function makeProtectedSet() {
+        $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::PROTECTED_SET);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         return $this;
     }
@@ -159,7 +216,11 @@ class Param implements PhpParser\Builder
      *
      * @return Node\Param The built parameter node
      */
+<<<<<<< HEAD
     public function getNode() : Node {
+=======
+    public function getNode(): Node {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return new Node\Param(
             new Node\Expr\Variable($this->name),
             $this->default, $this->type, $this->byRef, $this->variadic, [], $this->flags, $this->attributeGroups

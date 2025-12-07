@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,12 +29,16 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class WtfCommand extends TraceCommand implements ContextAware
 {
+<<<<<<< HEAD
     /**
      * Context instance (for ContextAware interface).
      *
      * @var Context
      */
     protected $context;
+=======
+    protected Context $context;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * ContextAware interface.
@@ -84,7 +92,11 @@ HELP
      *
      * @return int 0 if everything went fine, or an exit code
      */
+<<<<<<< HEAD
     protected function execute(InputInterface $input, OutputInterface $output)
+=======
+    protected function execute(InputInterface $input, OutputInterface $output): int
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $this->filter->bind($input);
 
@@ -96,8 +108,11 @@ HELP
         $exception = $this->context->getLastException();
         $count = $input->getOption('all') ? \PHP_INT_MAX : \max(3, \pow(2, \strlen($incredulity) + 1));
 
+<<<<<<< HEAD
         $shell = $this->getApplication();
 
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         if ($output instanceof ShellOutput) {
             $output->startPaging();
         }
@@ -113,7 +128,11 @@ HELP
             $trace = $this->getBacktrace($exception, $showLines);
             $moreLines = $traceCount - \count($trace);
 
+<<<<<<< HEAD
             $output->writeln($shell->formatException($exception));
+=======
+            $output->writeln($this->getShell()->formatException($exception));
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $output->writeln('--');
             $output->write($trace, true, ShellOutput::NUMBER_LINES);
             $output->writeln('');

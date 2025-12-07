@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,7 +15,10 @@
 
 namespace Psy\Command\ListCommand;
 
+<<<<<<< HEAD
 use Psy\Reflection\ReflectionClassConstant;
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
@@ -22,7 +29,11 @@ class ClassConstantEnumerator extends Enumerator
     /**
      * {@inheritdoc}
      */
+<<<<<<< HEAD
     protected function listItems(InputInterface $input, \Reflector $reflector = null, $target = null): array
+=======
+    protected function listItems(InputInterface $input, ?\Reflector $reflector = null, $target = null): array
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         // only list constants when a Reflector is present.
         if ($reflector === null) {
@@ -67,7 +78,11 @@ class ClassConstantEnumerator extends Enumerator
 
         $constants = [];
         foreach ($reflector->getConstants() as $name => $constant) {
+<<<<<<< HEAD
             $constReflector = ReflectionClassConstant::create($reflector->name, $name);
+=======
+            $constReflector = new \ReflectionClassConstant($reflector->name, $name);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
             if ($noInherit && $constReflector->getDeclaringClass()->getName() !== $className) {
                 continue;

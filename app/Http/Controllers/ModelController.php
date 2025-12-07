@@ -46,7 +46,10 @@ use App\User;
 use App\helpers;
 use App\customer;
 use App\service_package_enquiry;
+<<<<<<< HEAD
 use App\ValidationHelper;
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  
 
 
@@ -2204,6 +2207,7 @@ public function __construct()
 
  public static function getquotes(Request $request)
     {    
+<<<<<<< HEAD
             // XSS Protection: Validate and sanitize input parameters
             $validator = Validator::make($request->all(), [
                 'model_id_filter' => ['nullable', 'integer', 'min:1'],
@@ -2237,10 +2241,49 @@ public function __construct()
                                 ->orWhere('car_model.model_name', 'LIKE', "%$searchTerm%")
                                 ->orWhere('city_master.city', 'LIKE', "%$searchTerm%")
                                 ->orWhere('showroom.name', 'LIKE', "%$searchTerm%");
+=======
+     // $value = Session::get('model_id');
+      // dd(self::$version_image_url);
+      // dd("here in getcustomers".$value);
+      // $data = models::getallcarmodelsbytype(1);
+            if ($request->ajax()) {
+               // $image_url = config('app.url')."/images/model/";
+              
+              // dd($model_id,$request->model_id);
+            $data = quote::getquoteslistquery();
+            $dataupdate = quote::updatecountstatus();
+            
+               // dd($data);
+            return Datatables::of($data)
+                    ->addIndexColumn()
+                  ->filter(function ($instance) use ($request) {
+                          // dd($request->get('model_id_filter'),$instance);
+                        if ($request->get('model_id_filter') != '' && $request->get('model_id_filter') != 4) {
+                            $instance->where('testdrive.main_brand_id', $request->get('model_id_filter'));
+                        }
+                        if (!empty($request->get('search'))) {
+                             $instance->where(function($w) use($request){
+                                $search = $request->get('search');
+                                
+                                $w->orWhere('customer.username', 'LIKE', "%$search%")
+                                ->orWhere('customer.mobile_number', 'LIKE', "%$search%")
+                                ->orWhere('customer.email', 'LIKE', "%$search%")
+                                ->orWhere('car_model.model_name', 'LIKE', "%$search%")
+                                ->orWhere('city_master.city', 'LIKE', "%$search%")
+                                ->orWhere('showroom.name', 'LIKE', "%$search%");
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                                
                             });
                         }
                     })
+<<<<<<< HEAD
+=======
+
+
+                    
+                         
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                     ->make(true); 
        
     }   
@@ -2643,6 +2686,7 @@ public function __construct()
 
     public static function getmodelquotesave(Request $request)
     {
+<<<<<<< HEAD
         // XSS Protection: Using ValidationHelper for secure input validation
         $brand_id = getallBrands()->pluck('id')->toArray();
         $city_id = getallcities()->pluck('id')->toArray();
@@ -2659,6 +2703,28 @@ public function __construct()
             'showroom_id' => ['required', 'integer', Rule::in($showroom_id)],
             'language_id' => ValidationHelper::languageId()
         ], ValidationHelper::errorMessages());
+=======
+        $brand_id = getallBrands()->pluck('id'); // 
+        $city_id = getallcities()->pluck('id'); // 
+        $showroom_id = getallshowroom()->pluck('id'); // 
+        $device_id = [1,2]; // 
+        $language_id = [1,2]; // 
+        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
+
+        $validator = Validator::make($request->all(), [
+            'session_id' => 'required',
+            'customer_id' => 'required',
+            'main_brand_id' => ['required',Rule::in($brand_id)],
+            'model_id' => 'required',
+            'version_id' => 'required',
+      //'no_of_years' => 'required',
+            'car_owned_type' => ['required',Rule::in($car_owned_type)],
+            'city_id' => ['required',Rule::in($city_id)],
+            'showroom_id' => ['required',Rule::in($showroom_id)],
+      'language_id' => ['required',Rule::in($language_id)]
+
+        ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
          if ($validator->fails()) {
             // return $validator->errors();
@@ -2711,6 +2777,7 @@ public function __construct()
 
     public static function getmodeltestdrivesave(Request $request)
     {
+<<<<<<< HEAD
         // XSS Protection: Using ValidationHelper for secure input validation
         $brand_id = getallBrands()->pluck('id')->toArray();
         $city_id = getallcities()->pluck('id')->toArray();
@@ -2729,6 +2796,30 @@ public function __construct()
             'date' => ['required', 'date', 'after:yesterday'],
             'time' => ['required', 'date_format:H:i']
         ], ValidationHelper::errorMessages());
+=======
+        $brand_id = getallBrands()->pluck('id'); // 
+        $city_id = getallcities()->pluck('id'); // 
+        $showroom_id = getallshowroom()->pluck('id'); // 
+        $device_id = [1,2]; // 
+        $language_id = [1,2]; // 
+        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
+
+        $validator = Validator::make($request->all(), [
+            'session_id' => 'required',
+            'customer_id' => 'required',
+            'main_brand_id' => ['required',Rule::in($brand_id)],
+            'model_id' => 'required',
+            'version_id' => 'required',
+            'car_owned_type' => ['required',Rule::in($car_owned_type)],
+            'city_id' => ['required',Rule::in($city_id)],
+            'showroom_id' => ['required',Rule::in($showroom_id)],
+      'language_id' => ['required',Rule::in($language_id)],
+            'date' => ['required','date','after:yesterday'],
+            'time' => ['required','time' => 'date_format:H:i']
+            //]
+
+        ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
          if ($validator->fails()) {
             // return $validator->errors();
@@ -3184,6 +3275,7 @@ public static function editcarApi(Request $request)
 
      public static function getmodelversiondetails(Request $request)
     {
+<<<<<<< HEAD
         // XSS Protection: Using ValidationHelper for secure input validation
         $brand_id = getallBrands()->pluck('id')->toArray();
 
@@ -3196,6 +3288,24 @@ public static function editcarApi(Request $request)
             'language_id' => ValidationHelper::languageId(),
             'car_owned_type' => ValidationHelper::carOwnedType()
         ], ValidationHelper::errorMessages());
+=======
+        $brand_id = getallBrands()->pluck('id'); // 
+  
+        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
+        $language_id = [1,2]; // 1 EN 2 Ar 
+
+        $validator = Validator::make($request->all(), [
+            'session_id' => 'required',
+            'customer_id' => 'required',
+            'main_brand_id' => ['required',Rule::in($brand_id)],
+            'model_id' => 'required',
+            'version_id' => 'required',
+      'language_id' => ['required',Rule::in($language_id)],
+            'car_owned_type' => ['required',Rule::in($car_owned_type)]
+            //]
+
+        ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
          if ($validator->fails()) {
             // return $validator->errors();
@@ -3456,6 +3566,7 @@ public static function versionaccessoriesenquiry(Request $request)
 
     public static function getmodeltradeinsave(Request $request)
     {
+<<<<<<< HEAD
         // XSS Protection: Using ValidationHelper for secure input validation
         $brand_id = getallBrands()->pluck('id')->toArray();
 
@@ -3472,6 +3583,38 @@ public static function versionaccessoriesenquiry(Request $request)
             'customer_mobile_number' => ValidationHelper::mobileNumber(),
             'customer_email' => ValidationHelper::email()
         ], ValidationHelper::errorMessages());
+=======
+
+
+        $brand_id = getallBrands()->pluck('id'); // 
+        //$city_id = getallcities()->pluck('id'); // 
+        //$showroom_id = getallshowroom()->pluck('id'); // 
+        $device_id = [1,2]; // 
+        $language_id = [1,2]; // 
+        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
+
+        $validator = Validator::make($request->all(), [
+            'session_id' => 'required',
+            'customer_id' => 'required',
+            'customer_vehicles_id' => 'required',
+            'main_brand_id' => ['required',Rule::in($brand_id)],
+            'model_id' => 'required',
+            //'version_id' => 'required',
+            'car_owned_type' => ['required',Rule::in($car_owned_type)],
+      'language_id' => ['required',Rule::in($language_id)],
+            'mileage' => 'required',
+            'customer_name' => 'required',
+            'customer_mobile_number' => 'required',
+            'customer_email' => 'required'
+            // 'model_id' => 'required'
+            //'city_id' => ['required',Rule::in($city_id)],
+            //'showroom_id' => ['required',Rule::in($showroom_id)],
+            //'date' => ['required','date','after:yesterday'],
+            //'time' => ['required','time' => 'date_format:H:i']
+            //]
+
+        ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         
          if ($validator->fails()) {
             // return $validator->errors();
@@ -6639,10 +6782,19 @@ public static function editspecification(Request $request)
 
     public static function getcityApi(Request $request)
     {
+<<<<<<< HEAD
         // XSS Protection: Using ValidationHelper for secure input validation
         $validator = Validator::make($request->all(), [
             'language_id' => ValidationHelper::languageId()
         ], ValidationHelper::errorMessages());
+=======
+
+       $language_id = [1,2]; // 
+        $validator = Validator::make($request->all(), [
+            'language_id' => ['required',Rule::in($language_id)]
+   
+        ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         if ($validator->fails()) {
             // return $validator->errors();
@@ -6657,6 +6809,7 @@ public static function editspecification(Request $request)
 
             // return  $getallcities;
         }
+<<<<<<< HEAD
     }
 
     public static function getshowroomApi(Request $request)
@@ -6669,6 +6822,28 @@ public static function editspecification(Request $request)
             'main_brand_id' => ValidationHelper::brandId(false),
             'city_id' => ['nullable', 'integer', Rule::in($city_ids)]
         ], ValidationHelper::errorMessages());
+=======
+      
+       
+
+    }
+
+    public static function getshowroomApi(Request $request)
+    { //echo 'hi';exit;
+
+      
+      $language_id = [1,2];  
+      $main_brand_id = [1,2,3]; 
+      $city_id=($request->city_id);
+    
+        $validator = Validator::make($request->all(), [
+        
+            'language_id' => ['required',Rule::in($language_id)],
+            'main_brand_id' => [Rule::in($main_brand_id)],
+            'city_id' => [Rule::in($city_id)]
+   
+        ]);
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         if ($validator->fails()) {
             // return $validator->errors();
@@ -6680,6 +6855,12 @@ public static function editspecification(Request $request)
 
             return ["status" => "1","response_message" => "success","display_message" => "Showroom List","showroom_list" =>  $getallshowroom];
         }
+<<<<<<< HEAD
+=======
+      
+      
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
     public static function getallshowroomApi(Request $request)
     {

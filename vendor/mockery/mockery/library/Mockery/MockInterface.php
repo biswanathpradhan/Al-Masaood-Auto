@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Mockery
  *
@@ -16,10 +17,20 @@
  * @package    Mockery
  * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
  * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
+=======
+
+/**
+ * Mockery (https://docs.mockery.io/)
+ *
+ * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
+ * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
+ * @link https://github.com/mockery/mockery for the canonical source repository
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery;
 
+<<<<<<< HEAD
 use Mockery\LegacyMockInterface;
 
 interface MockInterface extends LegacyMockInterface
@@ -27,12 +38,26 @@ interface MockInterface extends LegacyMockInterface
     /**
      * @param mixed $something  String method name or map of method => return
      * @return self|\Mockery\ExpectationInterface|\Mockery\Expectation|\Mockery\HigherOrderMessage
+=======
+interface MockInterface extends LegacyMockInterface
+{
+    /**
+     * @param mixed $something String method name or map of method => return
+     *
+     * @return Expectation|ExpectationInterface|HigherOrderMessage|self
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function allows($something = []);
 
     /**
+<<<<<<< HEAD
      * @param mixed $something  String method name (optional)
      * @return \Mockery\ExpectationInterface|\Mockery\Expectation|\Mockery\ExpectsHigherOrderMessage
+=======
+     * @param mixed $something String method name (optional)
+     *
+     * @return Expectation|ExpectationInterface|ExpectsHigherOrderMessage
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function expects($something = null);
 }

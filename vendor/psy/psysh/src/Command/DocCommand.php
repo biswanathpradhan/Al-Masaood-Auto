@@ -3,7 +3,11 @@
 /*
  * This file is part of Psy Shell.
  *
+<<<<<<< HEAD
  * (c) 2012-2023 Justin Hileman
+=======
+ * (c) 2012-2025 Justin Hileman
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,6 +15,7 @@
 
 namespace Psy\Command;
 
+<<<<<<< HEAD
 use Psy\Formatter\DocblockFormatter;
 use Psy\Formatter\SignatureFormatter;
 use Psy\Input\CodeArgument;
@@ -18,6 +23,20 @@ use Psy\Output\ShellOutput;
 use Psy\Reflection\ReflectionClassConstant;
 use Psy\Reflection\ReflectionConstant_;
 use Psy\Reflection\ReflectionLanguageConstruct;
+=======
+use Psy\Configuration;
+use Psy\Formatter\DocblockFormatter;
+use Psy\Formatter\ManualFormatter;
+use Psy\Formatter\SignatureFormatter;
+use Psy\Input\CodeArgument;
+use Psy\ManualUpdater\ManualUpdate;
+use Psy\Output\ShellOutput;
+use Psy\Reflection\ReflectionConstant;
+use Psy\Reflection\ReflectionLanguageConstruct;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputDefinition;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,6 +48,21 @@ class DocCommand extends ReflectingCommand
 {
     const INHERIT_DOC_TAG = '{@inheritdoc}';
 
+<<<<<<< HEAD
+=======
+    private ?Configuration $config = null;
+
+    /**
+     * Set the configuration instance.
+     *
+     * @param \Psy\Configuration $config
+     */
+    public function setConfiguration(Configuration $config)
+    {
+        $this->config = $config;
+    }
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     /**
      * {@inheritdoc}
      */
@@ -39,7 +73,12 @@ class DocCommand extends ReflectingCommand
             ->setAliases(['rtfm', 'man'])
             ->setDefinition([
                 new InputOption('all', 'a', InputOption::VALUE_NONE, 'Show documentation for superclasses as well as the current class.'),
+<<<<<<< HEAD
                 new CodeArgument('target', CodeArgument::REQUIRED, 'Function, class, instance, constant, method or property to document.'),
+=======
+                new InputOption('update-manual', null, InputOption::VALUE_OPTIONAL, 'Download and install the latest PHP manual (optional language code)', false),
+                new CodeArgument('target', CodeArgument::OPTIONAL, 'Function, class, instance, constant, method or property to document.'),
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             ])
             ->setDescription('Read the documentation for an object, class, constant, method or property.')
             ->setHelp(
@@ -54,6 +93,11 @@ e.g.
 <return>>>> doc Psy\Shell::debug</return>
 <return>>>> \$s = new Psy\Shell</return>
 <return>>>> doc \$s->run</return>
+<<<<<<< HEAD
+=======
+<return>>>> doc --update-manual</return>
+<return>>>> doc --update-manual=fr</return>
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 HELP
             );
     }
@@ -63,18 +107,40 @@ HELP
      *
      * @return int 0 if everything went fine, or an exit code
      */
+<<<<<<< HEAD
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $value = $input->getArgument('target');
+=======
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        if ($input->getOption('update-manual') !== false) {
+            return $this->handleUpdateManual($input, $output);
+        }
+
+        $value = $input->getArgument('target');
+        if (!$value) {
+            throw new RuntimeException('Not enough arguments (missing: "target").');
+        }
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         if (ReflectionLanguageConstruct::isLanguageConstruct($value)) {
             $reflector = new ReflectionLanguageConstruct($value);
             $doc = $this->getManualDocById($value);
         } else {
+<<<<<<< HEAD
             list($target, $reflector) = $this->getTargetAndReflector($value);
             $doc = $this->getManualDoc($reflector) ?: DocblockFormatter::format($reflector);
         }
 
         $db = $this->getApplication()->getManualDb();
+=======
+            list($target, $reflector) = $this->getTargetAndReflector($value, $output);
+            $doc = $this->getManualDoc($reflector) ?: DocblockFormatter::format($reflector);
+        }
+
+        $hasManual = $this->getShell()->getManual() !== null;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         if ($output instanceof ShellOutput) {
             $output->startPaging();
@@ -88,7 +154,11 @@ HELP
         $output->writeln(SignatureFormatter::format($reflector));
         $output->writeln('');
 
+<<<<<<< HEAD
         if (empty($doc) && !$db) {
+=======
+        if (empty($doc) && !$hasManual) {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $output->writeln('<warning>PHP manual not found</warning>');
             $output->writeln('    To document core PHP functionality, download the PHP reference manual:');
             $output->writeln('    https://github.com/bobthecow/psysh/wiki/PHP-manual');
@@ -97,7 +167,11 @@ HELP
         }
 
         // Implicit --all if the original docblock has an {@inheritdoc} tag.
+<<<<<<< HEAD
         if ($input->getOption('all') || \stripos($doc, self::INHERIT_DOC_TAG) !== false) {
+=======
+        if ($input->getOption('all') || ($doc && \stripos($doc, self::INHERIT_DOC_TAG) !== false)) {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $parent = $reflector;
             foreach ($this->getParentReflectors($reflector) as $parent) {
                 $output->writeln('');
@@ -128,6 +202,54 @@ HELP
         return 0;
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Handle the manual update operation.
+     *
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int 0 if everything went fine, or an exit code
+     */
+    private function handleUpdateManual(InputInterface $input, OutputInterface $output): int
+    {
+        if (!$this->config) {
+            $output->writeln('<error>Configuration not available for manual updates.</error>');
+
+            return 1;
+        }
+
+        // Create a synthetic input with the update-manual option
+        $definition = new InputDefinition([
+            new InputOption('update-manual', null, InputOption::VALUE_OPTIONAL, '', false),
+        ]);
+
+        // Get the language value: if true (no value), use null to preserve current language
+        $lang = $input->getOption('update-manual');
+        $updateValue = ($lang === true) ? null : $lang;
+
+        $updateInput = new ArrayInput(['--update-manual' => $updateValue], $definition);
+        $updateInput->setInteractive($input->isInteractive());
+
+        try {
+            $manualUpdate = ManualUpdate::fromConfig($this->config, $updateInput, $output);
+            $result = $manualUpdate->run($updateInput, $output);
+
+            if ($result === 0) {
+                $output->writeln('');
+                $output->writeln('Restart PsySH to use the updated manual.');
+            }
+
+            return $result;
+        } catch (\RuntimeException $e) {
+            $output->writeln(\sprintf('<error>%s</error>', $e->getMessage()));
+
+            return 1;
+        }
+    }
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     private function getManualDoc($reflector)
     {
         switch (\get_class($reflector)) {
@@ -146,14 +268,21 @@ HELP
                 break;
 
             case \ReflectionClassConstant::class:
+<<<<<<< HEAD
             case ReflectionClassConstant::class:
+=======
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 // @todo this is going to collide with ReflectionMethod ids
                 // someday... start running the query by id + type if the DB
                 // supports it.
                 $id = $reflector->class.'::'.$reflector->name;
                 break;
 
+<<<<<<< HEAD
             case ReflectionConstant_::class:
+=======
+            case ReflectionConstant::class:
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 $id = $reflector->name;
                 break;
 
@@ -244,11 +373,63 @@ HELP
 
     private function getManualDocById($id)
     {
+<<<<<<< HEAD
         if ($db = $this->getApplication()->getManualDb()) {
             $result = $db->query(\sprintf('SELECT doc FROM php_manual WHERE id = %s', $db->quote($id)));
             if ($result !== false) {
                 return $result->fetchColumn(0);
             }
         }
+=======
+        if ($manual = $this->getShell()->getManual()) {
+            switch ($manual->getVersion()) {
+                case 2:
+                    // v2 manual docs are pre-formatted and should be rendered as-is
+                    return $manual->get($id);
+
+                case 3:
+                    if ($doc = $manual->get($id)) {
+                        $width = $this->getTerminalWidth();
+                        $formatter = new ManualFormatter($width, $manual);
+
+                        return $formatter->format($doc);
+                    }
+                    break;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the current terminal width for text wrapping.
+     *
+     * @return int Terminal width in columns
+     */
+    private function getTerminalWidth(): int
+    {
+        // Query terminal size directly
+        if (\function_exists('shell_exec')) {
+            // Output format: "rows cols"
+            $output = @\shell_exec('stty size </dev/tty 2>/dev/null');
+            if ($output && \preg_match('/^\d+ (\d+)$/', \trim($output), $matches)) {
+                return (int) $matches[1];
+            }
+
+            $width = @\shell_exec('tput cols </dev/tty 2>/dev/null');
+            if ($width && \is_numeric(\trim($width))) {
+                return (int) \trim($width);
+            }
+        }
+
+        // Check COLUMNS environment variable (may be stale after resize)
+        $width = \getenv('COLUMNS');
+        if ($width && \is_numeric(\trim($width))) {
+            return (int) \trim($width);
+        }
+
+        // Fallback to 100 if we can't detect
+        return 100;
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

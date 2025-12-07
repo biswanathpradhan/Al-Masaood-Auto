@@ -34,6 +34,16 @@ class ViewNotFoundSolutionProvider implements HasSolutionsForThrowable
 
         $suggestedView = $this->findRelatedView($missingView);
 
+<<<<<<< HEAD
+=======
+        if ($suggestedView == $missingView) {
+            return [
+                BaseSolution::create("{$missingView} was not found.")
+                    ->setSolutionDescription('View names should not contain the . character!'),
+            ];
+        }
+
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         if ($suggestedView) {
             return [
                 BaseSolution::create("{$missingView} was not found.")

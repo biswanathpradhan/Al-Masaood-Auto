@@ -11,7 +11,11 @@ jobs:
         name: psalm
         runs-on: ubuntu-latest
         steps:
+<<<<<<< HEAD
             - uses: actions/checkout@v1
+=======
+            - uses: actions/checkout@v2
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2

@@ -2,6 +2,7 @@
 
 namespace PhpParser\Node\Stmt;
 
+<<<<<<< HEAD
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
 
@@ -48,5 +49,18 @@ class UseUse extends Node\Stmt
     
     public function getType() : string {
         return 'Stmt_UseUse';
+=======
+use PhpParser\Node\UseItem;
+
+require __DIR__ . '/../UseItem.php';
+
+if (false) {
+    /**
+     * For classmap-authoritative support.
+     *
+     * @deprecated use \PhpParser\Node\UseItem instead.
+     */
+    class UseUse extends UseItem {
+>>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }
