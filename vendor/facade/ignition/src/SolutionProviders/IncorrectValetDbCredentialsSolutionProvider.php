@@ -9,11 +9,7 @@ use Throwable;
 
 class IncorrectValetDbCredentialsSolutionProvider implements HasSolutionsForThrowable
 {
-<<<<<<< HEAD
-    const MYSQL_ACCESS_DENIED_CODE = 1045;
-=======
     public const MYSQL_ACCESS_DENIED_CODE = 1045;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     public function canSolve(Throwable $throwable): bool
     {

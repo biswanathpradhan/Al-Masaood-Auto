@@ -54,11 +54,7 @@ class FactoryParameter
     }
 
     /**
-<<<<<<< HEAD
-     * Compute the type code for the paramater.
-=======
      * Compute the type code for the parameter.
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      *
      * @return string
      */

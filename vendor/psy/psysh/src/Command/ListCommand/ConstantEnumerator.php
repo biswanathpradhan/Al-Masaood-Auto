@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -24,11 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 class ConstantEnumerator extends Enumerator
 {
     // Because `Json` is ugly.
-<<<<<<< HEAD
-    private static $categoryLabels = [
-=======
     private const CATEGORY_LABELS = [
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         'libxml'   => 'libxml',
         'openssl'  => 'OpenSSL',
         'pcre'     => 'PCRE',
@@ -57,11 +49,7 @@ class ConstantEnumerator extends Enumerator
     /**
      * {@inheritdoc}
      */
-<<<<<<< HEAD
-    protected function listItems(InputInterface $input, \Reflector $reflector = null, $target = null): array
-=======
     protected function listItems(InputInterface $input, ?\Reflector $reflector = null, $target = null): array
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         // if we have a reflector, ensure that it's a namespace reflector
         if (($target !== null || $reflector !== null) && !$reflector instanceof ReflectionNamespace) {
@@ -100,11 +88,7 @@ class ConstantEnumerator extends Enumerator
         }
 
         if ($category) {
-<<<<<<< HEAD
-            $caseCategory = \array_key_exists($category, self::$categoryLabels) ? self::$categoryLabels[$category] : \ucfirst($category);
-=======
             $caseCategory = \array_key_exists($category, self::CATEGORY_LABELS) ? self::CATEGORY_LABELS[$category] : \ucfirst($category);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $label = $caseCategory.' Constants';
             $ret[$label] = $this->getConstants($category);
         }
@@ -134,19 +118,11 @@ class ConstantEnumerator extends Enumerator
      * Optionally restrict constants to a given category, e.g. "date". If the
      * category is "internal", include all non-user-defined constants.
      *
-<<<<<<< HEAD
-     * @param string $category
-     *
-     * @return array
-     */
-    protected function getConstants(string $category = null): array
-=======
      * @param string|null $category
      *
      * @return array
      */
     protected function getConstants(?string $category = null): array
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if (!$category) {
             return \get_defined_constants();
@@ -156,14 +132,9 @@ class ConstantEnumerator extends Enumerator
 
         if ($category === 'internal') {
             unset($consts['user']);
-<<<<<<< HEAD
-
-            return \array_merge(...\array_values($consts));
-=======
             $values = \array_values($consts);
 
             return $values ? \array_merge(...$values) : [];
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         foreach ($consts as $key => $value) {

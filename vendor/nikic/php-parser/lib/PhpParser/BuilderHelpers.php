@@ -16,12 +16,7 @@ use PhpParser\Node\Stmt;
  *
  * @internal
  */
-<<<<<<< HEAD
-final class BuilderHelpers
-{
-=======
 final class BuilderHelpers {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     /**
      * Normalizes a node: Converts builder objects to nodes.
      *
@@ -29,11 +24,7 @@ final class BuilderHelpers {
      *
      * @return Node The normalized node
      */
-<<<<<<< HEAD
-    public static function normalizeNode($node) : Node {
-=======
     public static function normalizeNode($node): Node {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         if ($node instanceof Builder) {
             return $node->getNode();
         }
@@ -54,11 +45,7 @@ final class BuilderHelpers {
      *
      * @return Stmt The normalized statement node
      */
-<<<<<<< HEAD
-    public static function normalizeStmt($node) : Stmt {
-=======
     public static function normalizeStmt($node): Stmt {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $node = self::normalizeNode($node);
         if ($node instanceof Stmt) {
             return $node;
@@ -78,11 +65,7 @@ final class BuilderHelpers {
      *
      * @return Identifier The normalized identifier
      */
-<<<<<<< HEAD
-    public static function normalizeIdentifier($name) : Identifier {
-=======
     public static function normalizeIdentifier($name): Identifier {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         if ($name instanceof Identifier) {
             return $name;
         }
@@ -120,11 +103,7 @@ final class BuilderHelpers {
      *
      * @return Name The normalized name
      */
-<<<<<<< HEAD
-    public static function normalizeName($name) : Name {
-=======
     public static function normalizeName($name): Name {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         if ($name instanceof Name) {
             return $name;
         }
@@ -240,11 +219,7 @@ final class BuilderHelpers {
      *
      * @return Expr The normalized value
      */
-<<<<<<< HEAD
-    public static function normalizeValue($value) : Expr {
-=======
     public static function normalizeValue($value): Expr {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         if ($value instanceof Node\Expr) {
             return $value;
         }
@@ -262,19 +237,11 @@ final class BuilderHelpers {
         }
 
         if (is_int($value)) {
-<<<<<<< HEAD
-            return new Scalar\LNumber($value);
-        }
-
-        if (is_float($value)) {
-            return new Scalar\DNumber($value);
-=======
             return new Scalar\Int_($value);
         }
 
         if (is_float($value)) {
             return new Scalar\Float_($value);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         if (is_string($value)) {
@@ -287,20 +254,12 @@ final class BuilderHelpers {
             foreach ($value as $itemKey => $itemValue) {
                 // for consecutive, numeric keys don't generate keys
                 if (null !== $lastKey && ++$lastKey === $itemKey) {
-<<<<<<< HEAD
-                    $items[] = new Expr\ArrayItem(
-=======
                     $items[] = new Node\ArrayItem(
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                         self::normalizeValue($itemValue)
                     );
                 } else {
                     $lastKey = null;
-<<<<<<< HEAD
-                    $items[] = new Expr\ArrayItem(
-=======
                     $items[] = new Node\ArrayItem(
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                         self::normalizeValue($itemValue),
                         self::normalizeValue($itemKey)
                     );
@@ -324,11 +283,7 @@ final class BuilderHelpers {
      *
      * @return Comment\Doc The normalized doc comment
      */
-<<<<<<< HEAD
-    public static function normalizeDocComment($docComment) : Comment\Doc {
-=======
     public static function normalizeDocComment($docComment): Comment\Doc {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         if ($docComment instanceof Comment\Doc) {
             return $docComment;
         }
@@ -347,12 +302,7 @@ final class BuilderHelpers {
      *
      * @return Node\AttributeGroup The Attribute Group
      */
-<<<<<<< HEAD
-    public static function normalizeAttribute($attribute) : Node\AttributeGroup
-    {
-=======
     public static function normalizeAttribute($attribute): Node\AttributeGroup {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         if ($attribute instanceof Node\AttributeGroup) {
             return $attribute;
         }
@@ -368,21 +318,12 @@ final class BuilderHelpers {
      * Adds a modifier and returns new modifier bitmask.
      *
      * @param int $modifiers Existing modifiers
-<<<<<<< HEAD
-     * @param int $modifier  Modifier to set
-     *
-     * @return int New modifiers
-     */
-    public static function addModifier(int $modifiers, int $modifier) : int {
-        Stmt\Class_::verifyModifier($modifiers, $modifier);
-=======
      * @param int $modifier Modifier to set
      *
      * @return int New modifiers
      */
     public static function addModifier(int $modifiers, int $modifier): int {
         Modifiers::verifyModifier($modifiers, $modifier);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return $modifiers | $modifier;
     }
 
@@ -390,13 +331,8 @@ final class BuilderHelpers {
      * Adds a modifier and returns new modifier bitmask.
      * @return int New modifiers
      */
-<<<<<<< HEAD
-    public static function addClassModifier(int $existingModifiers, int $modifierToSet) : int {
-        Stmt\Class_::verifyClassModifier($existingModifiers, $modifierToSet);
-=======
     public static function addClassModifier(int $existingModifiers, int $modifierToSet): int {
         Modifiers::verifyClassModifier($existingModifiers, $modifierToSet);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return $existingModifiers | $modifierToSet;
     }
 }

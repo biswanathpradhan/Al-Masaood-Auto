@@ -1,6 +1,4 @@
 <?php
-// Load ValidationHelper class
-require_once __DIR__ . '/ValidationHelper.php';
 
 use Illuminate\Http\Request;
 use App\models;

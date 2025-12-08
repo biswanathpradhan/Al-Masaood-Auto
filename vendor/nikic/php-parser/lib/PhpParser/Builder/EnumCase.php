@@ -10,16 +10,6 @@ use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt;
 
-<<<<<<< HEAD
-class EnumCase implements PhpParser\Builder
-{
-    protected $name;
-    protected $value = null;
-    protected $attributes = [];
-
-    /** @var Node\AttributeGroup[] */
-    protected $attributeGroups = [];
-=======
 class EnumCase implements PhpParser\Builder {
     /** @var Identifier|string */
     protected $name;
@@ -29,16 +19,11 @@ class EnumCase implements PhpParser\Builder {
 
     /** @var list<Node\AttributeGroup> */
     protected array $attributeGroups = [];
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Creates an enum case builder.
      *
-<<<<<<< HEAD
-     * @param string|Identifier $name  Name
-=======
      * @param string|Identifier $name Name
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function __construct($name) {
         $this->name = $name;

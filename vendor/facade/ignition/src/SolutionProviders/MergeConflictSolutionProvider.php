@@ -16,11 +16,7 @@ class MergeConflictSolutionProvider implements HasSolutionsForThrowable
             return false;
         }
 
-<<<<<<< HEAD
-        if (! Str::startsWith($throwable->getMessage(), 'syntax error, unexpected \'<<\'')) {
-=======
         if (! $this->hasMergeConflictExceptionMessage($throwable)) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             return false;
         }
 
@@ -51,26 +47,16 @@ class MergeConflictSolutionProvider implements HasSolutionsForThrowable
         ];
     }
 
-<<<<<<< HEAD
-    private function getCurrentBranch(string $directory): string
-    {
-        $branch = "'".trim(shell_exec("cd ${directory}; git branch | grep \\* | cut -d ' ' -f2"))."'";
-
-        if (! isset($branch) || $branch === "''") {
-=======
     protected function getCurrentBranch(string $directory): string
     {
         $branch = "'".trim(shell_exec("cd {$directory}; git branch | grep \\* | cut -d ' ' -f2"))."'";
 
         if ($branch === "''") {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $branch = 'current branch';
         }
 
         return $branch;
     }
-<<<<<<< HEAD
-=======
 
     protected function hasMergeConflictExceptionMessage(Throwable $throwable): bool
     {
@@ -86,5 +72,4 @@ class MergeConflictSolutionProvider implements HasSolutionsForThrowable
 
         return false;
     }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

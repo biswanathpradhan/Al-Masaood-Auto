@@ -5,10 +5,7 @@ namespace Facade\Ignition\Context;
 use Facade\FlareClient\Context\ContextDetectorInterface;
 use Facade\FlareClient\Context\ContextInterface;
 use Illuminate\Http\Request;
-<<<<<<< HEAD
-=======
 use Livewire\LivewireManager;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 class LaravelContextDetector implements ContextDetectorInterface
 {
@@ -18,9 +15,6 @@ class LaravelContextDetector implements ContextDetectorInterface
             return new LaravelConsoleContext($_SERVER['argv'] ?? []);
         }
 
-<<<<<<< HEAD
-        return new LaravelRequestContext(app(Request::class));
-=======
         $request = app(Request::class);
 
         if ($this->isRunningLiveWire($request)) {
@@ -33,6 +27,5 @@ class LaravelContextDetector implements ContextDetectorInterface
     protected function isRunningLiveWire(Request $request)
     {
         return $request->hasHeader('x-livewire') && $request->hasHeader('referer');
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

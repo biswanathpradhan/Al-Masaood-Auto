@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,17 +14,6 @@ namespace Psy\CodeCleaner;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified as FullyQualifiedName;
-<<<<<<< HEAD
-use PhpParser\Node\Stmt\Namespace_;
-
-/**
- * Abstract namespace-aware code cleaner pass.
- */
-abstract class NamespaceAwarePass extends CodeCleanerPass
-{
-    protected $namespace;
-    protected $currentScope;
-=======
 use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
@@ -53,7 +38,6 @@ abstract class NamespaceAwarePass extends CodeCleanerPass
     {
         $this->cleaner = $cleaner;
     }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * @todo should this be final? Extending classes should be sure to either
@@ -67,11 +51,8 @@ abstract class NamespaceAwarePass extends CodeCleanerPass
     {
         $this->namespace = [];
         $this->currentScope = [];
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -85,10 +66,6 @@ abstract class NamespaceAwarePass extends CodeCleanerPass
     public function enterNode(Node $node)
     {
         if ($node instanceof Namespace_) {
-<<<<<<< HEAD
-            $this->namespace = isset($node->name) ? $node->name->parts : [];
-        }
-=======
             $this->namespace = isset($node->name) ? $this->getParts($node->name) : [];
 
             // Only restore use statement aliases for PsySH re-injected namespaces.
@@ -142,27 +119,18 @@ abstract class NamespaceAwarePass extends CodeCleanerPass
         }
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
      * Get a fully-qualified name (class, function, interface, etc).
      *
-<<<<<<< HEAD
-=======
      * Resolves use statement aliases before applying namespace.
      *
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * @param mixed $name
      */
     protected function getFullyQualifiedName($name): string
     {
         if ($name instanceof FullyQualifiedName) {
-<<<<<<< HEAD
-            return \implode('\\', $name->parts);
-        } elseif ($name instanceof Name) {
-            $name = $name->parts;
-=======
             return \implode('\\', $this->getParts($name));
         }
 
@@ -182,15 +150,12 @@ abstract class NamespaceAwarePass extends CodeCleanerPass
 
         if ($name instanceof Name) {
             $name = $this->getParts($name);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         } elseif (!\is_array($name)) {
             $name = [$name];
         }
 
         return \implode('\\', \array_merge($this->namespace, $name));
     }
-<<<<<<< HEAD
-=======
 
     /**
      * Backwards compatibility shim for PHP-Parser 4.x.
@@ -201,5 +166,4 @@ abstract class NamespaceAwarePass extends CodeCleanerPass
     {
         return \method_exists($name, 'getParts') ? $name->getParts() : $name->parts;
     }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

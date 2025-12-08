@@ -2,35 +2,6 @@
 
 namespace PhpParser\NodeVisitor;
 
-<<<<<<< HEAD
-use function array_pop;
-use function count;
-use PhpParser\Node;
-use PhpParser\NodeVisitorAbstract;
-
-/**
- * Visitor that connects a child node to its parent node.
- *
- * On the child node, the parent node can be accessed through
- * <code>$node->getAttribute('parent')</code>.
- */
-final class ParentConnectingVisitor extends NodeVisitorAbstract
-{
-    /**
-     * @var Node[]
-     */
-    private $stack = [];
-
-    public function beforeTraverse(array $nodes)
-    {
-        $this->stack = [];
-    }
-
-    public function enterNode(Node $node)
-    {
-        if (!empty($this->stack)) {
-            $node->setAttribute('parent', $this->stack[count($this->stack) - 1]);
-=======
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -69,18 +40,12 @@ final class ParentConnectingVisitor extends NodeVisitorAbstract {
             } else {
                 $node->setAttribute('parent', $parent);
             }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         $this->stack[] = $node;
     }
 
-<<<<<<< HEAD
-    public function leaveNode(Node $node)
-    {
-=======
     public function leaveNode(Node $node) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         array_pop($this->stack);
     }
 }

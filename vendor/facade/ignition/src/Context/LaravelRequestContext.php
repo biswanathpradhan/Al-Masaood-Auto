@@ -3,13 +3,9 @@
 namespace Facade\Ignition\Context;
 
 use Facade\FlareClient\Context\RequestContext;
-<<<<<<< HEAD
-use Illuminate\Http\Request;
-=======
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Throwable;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 class LaravelRequestContext extends RequestContext
 {
@@ -29,11 +25,7 @@ class LaravelRequestContext extends RequestContext
             if (! $user) {
                 return [];
             }
-<<<<<<< HEAD
-        } catch (\Throwable $e) {
-=======
         } catch (Throwable $e) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             return [];
         }
 
@@ -45,11 +37,7 @@ class LaravelRequestContext extends RequestContext
             if (method_exists($user, 'toArray')) {
                 return $user->toArray();
             }
-<<<<<<< HEAD
-        } catch (\Throwable $e) {
-=======
         } catch (Throwable $e) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             return [];
         }
 
@@ -71,10 +59,6 @@ class LaravelRequestContext extends RequestContext
     protected function getRouteParameters(): array
     {
         try {
-<<<<<<< HEAD
-            return collect(optional($this->request->route())->parameters ?? [])->toArray();
-        } catch (\Throwable $e) {
-=======
             return collect(optional($this->request->route())->parameters ?? [])
                 ->map(function ($parameter) {
                     return $parameter instanceof Model ? $parameter->withoutRelations() : $parameter;
@@ -84,7 +68,6 @@ class LaravelRequestContext extends RequestContext
                 })
                 ->toArray();
         } catch (Throwable $e) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             return [];
         }
     }

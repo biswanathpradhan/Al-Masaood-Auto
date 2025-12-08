@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -26,16 +22,6 @@ class TraceFormatter
     /**
      * Format the trace of the given exception.
      *
-<<<<<<< HEAD
-     * @param \Throwable    $throwable  The error or exception with a backtrace
-     * @param FilterOptions $filter     (default: null)
-     * @param int           $count      (default: PHP_INT_MAX)
-     * @param bool          $includePsy (default: true)
-     *
-     * @return string[] Formatted stacktrace lines
-     */
-    public static function formatTrace(\Throwable $throwable, FilterOptions $filter = null, int $count = null, bool $includePsy = true): array
-=======
      * @param \Throwable         $throwable  The error or exception with a backtrace
      * @param FilterOptions|null $filter     (default: null)
      * @param int|null           $count      (default: PHP_INT_MAX)
@@ -44,7 +30,6 @@ class TraceFormatter
      * @return string[] Formatted stacktrace lines
      */
     public static function formatTrace(\Throwable $throwable, ?FilterOptions $filter = null, ?int $count = null, bool $includePsy = true): array
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if ($cwd = \getcwd()) {
             $cwd = \rtrim($cwd, \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR;

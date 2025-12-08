@@ -4,16 +4,6 @@ namespace PhpParser\Node\Expr\Cast;
 
 use PhpParser\Node\Expr\Cast;
 
-<<<<<<< HEAD
-class Double extends Cast
-{
-    // For use in "kind" attribute
-    const KIND_DOUBLE = 1; // "double" syntax
-    const KIND_FLOAT = 2;  // "float" syntax
-    const KIND_REAL = 3; // "real" syntax
-
-    public function getType() : string {
-=======
 class Double extends Cast {
     // For use in "kind" attribute
     public const KIND_DOUBLE = 1; // "double" syntax
@@ -21,7 +11,6 @@ class Double extends Cast {
     public const KIND_REAL = 3; // "real" syntax
 
     public function getType(): string {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return 'Expr_Cast_Double';
     }
 }

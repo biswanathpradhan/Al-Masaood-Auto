@@ -1,23 +1,4 @@
 <?php
-<<<<<<< HEAD
-/**
- * Mockery
- *
- * LICENSE
- *
- * This source file is subject to the new BSD license that is bundled
- * with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://github.com/padraic/mockery/blob/master/LICENSE
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to padraic@php.net so we can send you a copy immediately.
- *
- * @category   Mockery
- * @package    Mockery
- * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
- * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
-=======
 
 /**
  * Mockery (https://docs.mockery.io/)
@@ -25,19 +6,11 @@
  * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
  * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
  * @link https://github.com/mockery/mockery for the canonical source repository
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery\Generator\StringManipulation\Pass;
 
 use Mockery\Generator\Method;
-<<<<<<< HEAD
-use Mockery\Generator\Parameter;
-use Mockery\Generator\MockConfiguration;
-
-class MethodDefinitionPass implements Pass
-{
-=======
 use Mockery\Generator\MockConfiguration;
 use Mockery\Generator\Parameter;
 use function array_values;
@@ -62,7 +35,6 @@ class MethodDefinitionPass implements Pass
      * @param  string $code
      * @return string
      */
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function apply($code, MockConfiguration $config)
     {
         foreach ($config->getMethodsToMock() as $method) {
@@ -91,15 +63,12 @@ class MethodDefinitionPass implements Pass
         return $code;
     }
 
-<<<<<<< HEAD
-=======
     protected function appendToClass($class, $code)
     {
         $lastBrace = strrpos($class, '}');
         return substr($class, 0, $lastBrace) . $code . "\n    }\n";
     }
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     protected function renderParams(Method $method, $config)
     {
         $class = $method->getDeclaringClass();
@@ -111,25 +80,15 @@ class MethodDefinitionPass implements Pass
             }
         }
 
-<<<<<<< HEAD
-        $methodParams = array();
-        $params = $method->getParameters();
-=======
         $methodParams = [];
         $params = $method->getParameters();
         $isPhp81 = PHP_VERSION_ID >= 80100;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         foreach ($params as $param) {
             $paramDef = $this->renderTypeHint($param);
             $paramDef .= $param->isPassedByReference() ? '&' : '';
             $paramDef .= $param->isVariadic() ? '...' : '';
             $paramDef .= '$' . $param->getName();
 
-<<<<<<< HEAD
-            if (!$param->isVariadic()) {
-                if (false !== $param->isDefaultValueAvailable()) {
-                    $paramDef .= ' = ' . var_export($param->getDefaultValue(), true);
-=======
             if (! $param->isVariadic()) {
                 if ($param->isDefaultValueAvailable() !== false) {
                     $defaultValue = $param->getDefaultValue();
@@ -156,7 +115,6 @@ class MethodDefinitionPass implements Pass
                     }
 
                     $paramDef .= ' = ' . $prefix;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 } elseif ($param->isOptional()) {
                     $paramDef .= ' = null';
                 }
@@ -164,10 +122,7 @@ class MethodDefinitionPass implements Pass
 
             $methodParams[] = $paramDef;
         }
-<<<<<<< HEAD
-=======
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return '(' . implode(', ', $methodParams) . ')';
     }
 
@@ -178,16 +133,6 @@ class MethodDefinitionPass implements Pass
         return $type ? sprintf(': %s', $type) : '';
     }
 
-<<<<<<< HEAD
-    protected function appendToClass($class, $code)
-    {
-        $lastBrace = strrpos($class, "}");
-        $class = substr($class, 0, $lastBrace) . $code . "\n    }\n";
-        return $class;
-    }
-
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     protected function renderTypeHint(Parameter $param)
     {
         $typeHint = $param->getTypeHint();
@@ -218,13 +163,8 @@ BODY;
                 $param = $params[$i];
                 if (strpos($param, '&') !== false) {
                     $body .= <<<BODY
-<<<<<<< HEAD
-if (\$argc > $i) {
-    \$argv[$i] = {$param};
-=======
 if (\$argc > {$i}) {
     \$argv[{$i}] = {$param};
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }
 
 BODY;
@@ -235,14 +175,6 @@ BODY;
             $paramCount = count($params);
             for ($i = 0; $i < $paramCount; ++$i) {
                 $param = $params[$i];
-<<<<<<< HEAD
-                if (!$param->isPassedByReference()) {
-                    continue;
-                }
-                $body .= <<<BODY
-if (\$argc > $i) {
-    \$argv[$i] =& \${$param->getName()};
-=======
                 if (! $param->isPassedByReference()) {
                     continue;
                 }
@@ -250,7 +182,6 @@ if (\$argc > $i) {
                 $body .= <<<BODY
 if (\$argc > {$i}) {
     \$argv[{$i}] =& \${$param->getName()};
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }
 
 BODY;
@@ -259,19 +190,10 @@ BODY;
 
         $body .= "\$ret = {$invoke}(__FUNCTION__, \$argv);\n";
 
-<<<<<<< HEAD
-        if ($method->getReturnType() !== "void") {
-            $body .= "return \$ret;\n";
-        }
-
-        $body .= "}\n";
-        return $body;
-=======
         if (! in_array($method->getReturnType(), ['never', 'void'], true)) {
             $body .= "return \$ret;\n";
         }
 
         return $body . "}\n";
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

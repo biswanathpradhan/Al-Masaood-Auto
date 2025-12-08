@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -30,21 +26,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ShowCommand extends ReflectingCommand
 {
-<<<<<<< HEAD
-    private $lastException;
-    private $lastExceptionIndex;
-
-    /**
-     * @param string|null $colorMode (deprecated and ignored)
-     */
-    public function __construct($colorMode = null)
-    {
-        parent::__construct();
-    }
-=======
     private ?\Throwable $lastException = null;
     private ?int $lastExceptionIndex = null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * {@inheritdoc}
@@ -63,11 +46,7 @@ class ShowCommand extends ReflectingCommand
 Show the code for an object, class, constant, method or property, or the context
 of the last exception.
 
-<<<<<<< HEAD
-<return>cat --ex</return> defaults to showing the lines surrounding the location of the last
-=======
 <return>show --ex</return> defaults to showing the lines surrounding the location of the last
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 exception. Invoking it more than once travels up the exception's stack trace,
 and providing a number shows the context of the given index of the trace.
 
@@ -85,11 +64,7 @@ HELP
      *
      * @return int 0 if everything went fine, or an exit code
      */
-<<<<<<< HEAD
-    protected function execute(InputInterface $input, OutputInterface $output)
-=======
     protected function execute(InputInterface $input, OutputInterface $output): int
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         // n.b. As far as I can tell, InputInterface doesn't want to tell me
         // whether an option with an optional value was actually passed. If you
@@ -128,11 +103,7 @@ HELP
     private function writeCodeContext(InputInterface $input, OutputInterface $output)
     {
         try {
-<<<<<<< HEAD
-            list($target, $reflector) = $this->getTargetAndReflector($input->getArgument('target'));
-=======
             list($target, $reflector) = $this->getTargetAndReflector($input->getArgument('target'), $output);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         } catch (UnexpectedTargetException $e) {
             // If we didn't get a target and Reflector, maybe we got a filename?
             $target = $e->getTarget();
@@ -196,11 +167,7 @@ HELP
         $this->lastException = $exception;
         $this->lastExceptionIndex = $index;
 
-<<<<<<< HEAD
-        $output->writeln($this->getApplication()->formatException($exception));
-=======
         $output->writeln($this->getShell()->formatException($exception));
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $output->writeln('--');
         $this->writeTraceLine($output, $trace, $index);
         $this->writeTraceCodeSnippet($output, $trace, $index);

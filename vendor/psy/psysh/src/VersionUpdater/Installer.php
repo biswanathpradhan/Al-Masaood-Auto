@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -29,11 +25,7 @@ class Installer
      */
     protected $tempDirectory;
 
-<<<<<<< HEAD
-    public function __construct(string $tempDirectory = null)
-=======
     public function __construct(?string $tempDirectory = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $this->tempDirectory = $tempDirectory ?: \sys_get_temp_dir();
         $this->installLocation = \Phar::running(false);
@@ -65,11 +57,6 @@ class Installer
 
     /**
      * Verifies the downloaded archive can be extracted with \PharData.
-<<<<<<< HEAD
-     *
-     * @param string $sourceArchive
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function isValidSource(string $sourceArchive): bool
     {
@@ -83,11 +70,6 @@ class Installer
 
     /**
      * Extract the "psysh" phar from the archive and move it, replacing the currently installed phar.
-<<<<<<< HEAD
-     *
-     * @param string $sourceArchive
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function install(string $sourceArchive): bool
     {
@@ -111,11 +93,6 @@ class Installer
 
     /**
      * Create a backup of the currently installed PsySH phar in the temporary directory with a version number postfix.
-<<<<<<< HEAD
-     *
-     * @param string $version
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function createBackup(string $version): bool
     {
@@ -131,11 +108,6 @@ class Installer
     /**
      * Restore the backup file to the original PsySH install location.
      *
-<<<<<<< HEAD
-     * @param string $version
-     *
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * @throws ErrorException If the backup file could not be found
      */
     public function restoreFromBackup(string $version): bool
@@ -151,11 +123,6 @@ class Installer
 
     /**
      * Get the full path for the backup target file location.
-<<<<<<< HEAD
-     *
-     * @param string $version
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function getBackupFilename(string $version): string
     {

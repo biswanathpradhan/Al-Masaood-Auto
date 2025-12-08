@@ -53,11 +53,7 @@ class IteratorFileSystem extends \FilesystemIterator
      * Please, see \FileSystemIterator::__construct() method.
      * We add the $splFileInfoClass parameter.
      */
-<<<<<<< HEAD
-    public function __construct(string $path, int $flags = null, string $splFileInfoClass = null)
-=======
     public function __construct(string $path, ?int $flags = null, ?string $splFileInfoClass = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $this->_splFileInfoClass = $splFileInfoClass;
 

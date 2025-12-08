@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -35,13 +31,8 @@ abstract class Enumerator
     const IS_CLASS = 'class';
     const IS_FUNCTION = 'function';
 
-<<<<<<< HEAD
-    private $filter;
-    private $presenter;
-=======
     private FilterOptions $filter;
     private Presenter $presenter;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Enumerator constructor.
@@ -63,11 +54,7 @@ abstract class Enumerator
      *
      * @return array
      */
-<<<<<<< HEAD
-    public function enumerate(InputInterface $input, \Reflector $reflector = null, $target = null): array
-=======
     public function enumerate(InputInterface $input, ?\Reflector $reflector = null, $target = null): array
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $this->filter->bind($input);
 
@@ -95,11 +82,7 @@ abstract class Enumerator
      *
      * @return array
      */
-<<<<<<< HEAD
-    abstract protected function listItems(InputInterface $input, \Reflector $reflector = null, $target = null): array;
-=======
     abstract protected function listItems(InputInterface $input, ?\Reflector $reflector = null, $target = null): array;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     protected function showItem($name)
     {

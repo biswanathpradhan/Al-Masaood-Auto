@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,11 +16,7 @@ namespace Psy\Exception;
  */
 class ErrorException extends \ErrorException implements Exception
 {
-<<<<<<< HEAD
-    private $rawMessage;
-=======
     private string $rawMessage;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Construct a Psy ErrorException.
@@ -36,11 +28,7 @@ class ErrorException extends \ErrorException implements Exception
      * @param int|null        $lineno   (default: null)
      * @param \Throwable|null $previous (default: null)
      */
-<<<<<<< HEAD
-    public function __construct($message = '', $code = 0, $severity = 1, $filename = null, $lineno = null, \Throwable $previous = null)
-=======
     public function __construct($message = '', $code = 0, $severity = 1, $filename = null, $lineno = null, ?\Throwable $previous = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $this->rawMessage = $message;
 
@@ -49,13 +37,6 @@ class ErrorException extends \ErrorException implements Exception
         }
 
         switch ($severity) {
-<<<<<<< HEAD
-            case \E_STRICT:
-                $type = 'Strict error';
-                break;
-
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             case \E_NOTICE:
             case \E_USER_NOTICE:
                 $type = 'Notice';
@@ -78,24 +59,16 @@ class ErrorException extends \ErrorException implements Exception
                 break;
 
             default:
-<<<<<<< HEAD
-=======
                 if (\PHP_VERSION_ID < 80400 && $severity === \E_STRICT) {
                     $type = 'Strict error';
                     break;
                 }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 $type = 'Error';
                 break;
         }
 
-<<<<<<< HEAD
-        $message = \sprintf('PHP %s:  %s%s on line %d', $type, $message, $filename ? ' in '.$filename : '', $lineno);
-        parent::__construct($message, $code, $severity, $filename, $lineno, $previous);
-=======
         $message = \sprintf('PHP %s:  %s%s on line %d', $type, $message, $filename ? ' in '.$filename : '', $lineno ?? 0);
         parent::__construct($message, $code, $severity, $filename ?? '', $lineno ?? 0, $previous);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -132,14 +105,8 @@ class ErrorException extends \ErrorException implements Exception
      *
      * @param \Error $e
      */
-<<<<<<< HEAD
-    public static function fromError(\Error $e): self
-    {
-        return new self($e->getMessage(), $e->getCode(), 1, $e->getFile(), $e->getLine(), $e);
-=======
     public static function fromError(\Error $e)
     {
         @\trigger_error('PsySH no longer wraps Errors', \E_USER_DEPRECATED);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

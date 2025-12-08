@@ -137,11 +137,7 @@ class Readline
     /**
      * Read a line from the input.
      */
-<<<<<<< HEAD
-    public function readLine(string $prefix = null)
-=======
     public function readLine(?string $prefix = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $input = Console::getInput();
 
@@ -274,11 +270,7 @@ class Readline
     /**
      * Add an entry in the history.
      */
-<<<<<<< HEAD
-    public function addHistory(string $line = null)
-=======
     public function addHistory(?string $line = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if (empty($line)) {
             return;
@@ -302,11 +294,7 @@ class Readline
     /**
      * Get an entry in the history.
      */
-<<<<<<< HEAD
-    public function getHistory(int $i = null)
-=======
     public function getHistory(?int $i = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if (null === $i) {
             $i = $this->_historyCurrent;

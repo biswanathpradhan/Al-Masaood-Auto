@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,12 +18,6 @@ namespace Psy\Reflection;
  */
 class ReflectionLanguageConstructParameter extends \ReflectionParameter
 {
-<<<<<<< HEAD
-    private $function;
-    private $parameter;
-    private $opts;
-
-=======
     /** @var string|array|object */
     private $function;
     /** @var int|string */
@@ -39,7 +29,6 @@ class ReflectionLanguageConstructParameter extends \ReflectionParameter
      * @param int|string          $parameter
      * @param array               $opts
      */
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function __construct($function, $parameter, array $opts)
     {
         $this->function = $function;
@@ -49,20 +38,10 @@ class ReflectionLanguageConstructParameter extends \ReflectionParameter
 
     /**
      * No class here.
-<<<<<<< HEAD
-     *
-     * @todo remove \ReturnTypeWillChange attribute after dropping support for PHP 7.0 (when we can use nullable types)
-     */
-    #[\ReturnTypeWillChange]
-    public function getClass()
-    {
-        return;
-=======
      */
     public function getClass(): ?\ReflectionClass
     {
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**

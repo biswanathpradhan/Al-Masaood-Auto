@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /.github        export-ignore
 /.phive         export-ignore
 /.php_cs.dist   export-ignore
@@ -11,5 +9,4 @@
 /tools          export-ignore
 /tools/*        binary
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 *.php diff=php

@@ -36,11 +36,7 @@ namespace Ramsey\Collection;
  * ```
  *
  * @template T
-<<<<<<< HEAD
- * @template-extends AbstractSet<T>
-=======
  * @extends AbstractSet<T>
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 class Set extends AbstractSet
 {
@@ -48,15 +44,8 @@ class Set extends AbstractSet
      * The type of elements stored in this set
      *
      * A set's type is immutable. For this reason, this property is private.
-<<<<<<< HEAD
-     *
-     * @var string
-     */
-    private $setType;
-=======
      */
     private string $setType;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Constructs a set object of the specified type, optionally with the

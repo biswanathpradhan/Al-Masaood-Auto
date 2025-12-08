@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -34,19 +30,12 @@ abstract class Command extends BaseCommand
      *
      * @api
      */
-<<<<<<< HEAD
-    public function setApplication(Application $application = null)
-=======
     public function setApplication(?Application $application = null): void
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if ($application !== null && !$application instanceof Shell) {
             throw new \InvalidArgumentException('PsySH Commands require an instance of Psy\Shell');
         }
 
-<<<<<<< HEAD
-        return parent::setApplication($application);
-=======
         parent::setApplication($application);
     }
 
@@ -61,7 +50,6 @@ abstract class Command extends BaseCommand
         }
 
         return $shell;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -165,11 +153,6 @@ abstract class Command extends BaseCommand
                     $default = '';
                 }
 
-<<<<<<< HEAD
-                $description = \str_replace("\n", "\n".\str_pad('', $max + 2, ' '), $argument->getDescription());
-
-                $messages[] = \sprintf(" <info>%-{$max}s</info> %s%s", $argument->getName(), $description, $default);
-=======
                 $name = $argument->getName();
                 // @phan-suppress-next-line PhanParamSuspiciousOrder - intentionally padding empty string to create spaces
                 $pad = \str_pad('', $max - \strlen($name));
@@ -177,7 +160,6 @@ abstract class Command extends BaseCommand
                 $description = \str_replace("\n", "\n".\str_pad('', $max + 2, ' '), $argument->getDescription());
 
                 $messages[] = \sprintf(' <info>%s</info>%s %s%s', $name, $pad, $description, $default);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             }
 
             $messages[] = '';
@@ -206,10 +188,7 @@ abstract class Command extends BaseCommand
                 }
 
                 $multiple = $option->isArray() ? '<comment> (multiple values allowed)</comment>' : '';
-<<<<<<< HEAD
-=======
                 // @phan-suppress-next-line PhanParamSuspiciousOrder - intentionally padding empty string to create spaces
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 $description = \str_replace("\n", "\n".\str_pad('', $max + 2, ' '), $option->getDescription());
 
                 $optionMax = $max - \strlen($option->getName()) - 2;

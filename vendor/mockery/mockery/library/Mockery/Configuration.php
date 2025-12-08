@@ -1,23 +1,4 @@
 <?php
-<<<<<<< HEAD
-/**
- * Mockery
- *
- * LICENSE
- *
- * This source file is subject to the new BSD license that is bundled
- * with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://github.com/padraic/mockery/blob/master/LICENSE
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to padraic@php.net so we can send you a copy immediately.
- *
- * @category   Mockery
- * @package    Mockery
- * @copyright  Copyright (c) 2010 Pádraic Brady (http://blog.astrumfutura.com)
- * @license    http://github.com/padraic/mockery/blob/master/LICENSE New BSD License
-=======
 
 /**
  * Mockery (https://docs.mockery.io/)
@@ -25,24 +6,10 @@
  * @copyright https://github.com/mockery/mockery/blob/HEAD/COPYRIGHT.md
  * @license https://github.com/mockery/mockery/blob/HEAD/LICENSE BSD 3-Clause License
  * @link https://github.com/mockery/mockery for the canonical source repository
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 
 namespace Mockery;
 
-<<<<<<< HEAD
-class Configuration
-{
-    /**
-     * Boolean assertion of whether we can mock methods which do not actually
-     * exist for the given class or object (ignored for unreal mocks)
-     *
-     * @var bool
-     */
-    protected $_allowMockingNonExistentMethod = true;
-
-    /**
-=======
 use Closure;
 use Hamcrest\Matcher;
 use Hamcrest_Matcher;
@@ -65,7 +32,6 @@ use const PHP_MAJOR_VERSION;
 class Configuration
 {
     /**
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * Boolean assertion of whether we ignore unnecessary mocking of methods,
      * i.e. when method expectations are made, set using a zeroOrMoreTimes()
      * constraint, and then never called. Essentially such expectations are
@@ -76,15 +42,6 @@ class Configuration
     protected $_allowMockingMethodsUnnecessarily = true;
 
     /**
-<<<<<<< HEAD
-     * Parameter map for use with PHP internal classes.
-     *
-     * @var array
-     */
-    protected $_internalClassParamMap = array();
-
-    protected $_constantsMap = array();
-=======
      * Boolean assertion of whether we can mock methods which do not actually
      * exist for the given class or object (ignored for unreal mocks)
      *
@@ -132,7 +89,6 @@ class Configuration
      * @var QuickDefinitionsConfiguration
      */
     protected $_quickDefinitionsConfiguration;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Boolean assertion is reflection caching enabled or not. It should be
@@ -142,38 +98,6 @@ class Configuration
      */
     protected $_reflectionCacheEnabled = true;
 
-<<<<<<< HEAD
-    /**
-     * Set boolean to allow/prevent mocking of non-existent methods
-     *
-     * @param bool $flag
-     */
-    public function allowMockingNonExistentMethods($flag = true)
-    {
-        $this->_allowMockingNonExistentMethod = (bool) $flag;
-    }
-
-    /**
-     * Return flag indicating whether mocking non-existent methods allowed
-     *
-     * @return bool
-     */
-    public function mockingNonExistentMethodsAllowed()
-    {
-        return $this->_allowMockingNonExistentMethod;
-    }
-
-    /**
-     * @deprecated
-     *
-     * Set boolean to allow/prevent unnecessary mocking of methods
-     *
-     * @param bool $flag
-     */
-    public function allowMockingMethodsUnnecessarily($flag = true)
-    {
-        trigger_error(sprintf("The %s method is deprecated and will be removed in a future version of Mockery", __METHOD__), E_USER_DEPRECATED);
-=======
     public function __construct()
     {
         $this->_quickDefinitionsConfiguration = new QuickDefinitionsConfiguration();
@@ -194,78 +118,11 @@ class Configuration
             sprintf('The %s method is deprecated and will be removed in a future version of Mockery', __METHOD__),
             E_USER_DEPRECATED
         );
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         $this->_allowMockingMethodsUnnecessarily = (bool) $flag;
     }
 
     /**
-<<<<<<< HEAD
-     * Return flag indicating whether mocking non-existent methods allowed
-     *
-     * @return bool
-     */
-    public function mockingMethodsUnnecessarilyAllowed()
-    {
-        trigger_error(sprintf("The %s method is deprecated and will be removed in a future version of Mockery", __METHOD__), E_USER_DEPRECATED);
-
-        return $this->_allowMockingMethodsUnnecessarily;
-    }
-
-    /**
-     * Set a parameter map (array of param signature strings) for the method
-     * of an internal PHP class.
-     *
-     * @param string $class
-     * @param string $method
-     * @param array $map
-     */
-    public function setInternalClassMethodParamMap($class, $method, array $map)
-    {
-        if (\PHP_MAJOR_VERSION > 7) {
-            throw new \LogicException('Internal class parameter overriding is not available in PHP 8. Incompatible signatures have been reclassified as fatal errors.');
-        }
-
-        if (!isset($this->_internalClassParamMap[strtolower($class)])) {
-            $this->_internalClassParamMap[strtolower($class)] = array();
-        }
-        $this->_internalClassParamMap[strtolower($class)][strtolower($method)] = $map;
-    }
-
-    /**
-     * Remove all overridden parameter maps from internal PHP classes.
-     */
-    public function resetInternalClassMethodParamMaps()
-    {
-        $this->_internalClassParamMap = array();
-    }
-
-    /**
-     * Get the parameter map of an internal PHP class method
-     *
-     * @return array|null
-     */
-    public function getInternalClassMethodParamMap($class, $method)
-    {
-        if (isset($this->_internalClassParamMap[strtolower($class)][strtolower($method)])) {
-            return $this->_internalClassParamMap[strtolower($class)][strtolower($method)];
-        }
-    }
-
-    public function getInternalClassMethodParamMaps()
-    {
-        return $this->_internalClassParamMap;
-    }
-
-    public function setConstantsMap(array $map)
-    {
-        $this->_constantsMap = $map;
-    }
-
-    public function getConstantsMap()
-    {
-        return $this->_constantsMap;
-=======
      * Set boolean to allow/prevent mocking of non-existent methods
      *
      * @param bool $flag
@@ -275,7 +132,6 @@ class Configuration
     public function allowMockingNonExistentMethods($flag = true)
     {
         $this->_allowMockingNonExistentMethod = (bool) $flag;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -285,11 +141,8 @@ class Configuration
      * PHPUnit's --static-backup option.
      *
      * @see https://github.com/mockery/mockery/issues/268
-<<<<<<< HEAD
-=======
      *
      * @return void
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function disableReflectionCache()
     {
@@ -303,11 +156,8 @@ class Configuration
      * PHPUnit's --static-backup option.
      *
      * @see https://github.com/mockery/mockery/issues/268
-<<<<<<< HEAD
-=======
      *
      * @return void
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function enableReflectionCache()
     {
@@ -315,9 +165,6 @@ class Configuration
     }
 
     /**
-<<<<<<< HEAD
-     * Is reflection cache enabled?
-=======
      * Get the map of constants to be used in the mock generator
      *
      * @return array<class-string,array<string,array<scalar>|scalar>>
@@ -458,14 +305,11 @@ class Configuration
      * Is reflection cache enabled?
      *
      * @return bool
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function reflectionCacheEnabled()
     {
         return $this->_reflectionCacheEnabled;
     }
-<<<<<<< HEAD
-=======
 
     /**
      * Remove all overridden parameter maps from internal PHP classes.
@@ -559,5 +403,4 @@ class Configuration
     {
         $this->_objectFormatters[$class] = $formatterCallback;
     }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

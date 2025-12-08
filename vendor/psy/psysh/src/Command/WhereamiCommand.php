@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,10 +11,7 @@
 
 namespace Psy\Command;
 
-<<<<<<< HEAD
-=======
 use Psy\ConfigPaths;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Psy\Formatter\CodeFormatter;
 use Psy\Output\ShellOutput;
 use Psy\Shell;
@@ -31,18 +24,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class WhereamiCommand extends Command
 {
-<<<<<<< HEAD
-    private $backtrace;
-
-    /**
-     * @param string|null $colorMode (deprecated and ignored)
-     */
-    public function __construct($colorMode = null)
-=======
     private array $backtrace;
 
     public function __construct()
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $this->backtrace = \debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS);
 
@@ -126,11 +110,7 @@ HELP
      *
      * @return int 0 if everything went fine, or an exit code
      */
-<<<<<<< HEAD
-    protected function execute(InputInterface $input, OutputInterface $output)
-=======
     protected function execute(InputInterface $input, OutputInterface $output): int
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $info = $this->fileInfo();
         $num = $input->getOption('num');
@@ -148,11 +128,7 @@ HELP
             $output->startPaging();
         }
 
-<<<<<<< HEAD
-        $output->writeln(\sprintf('From <info>%s:%s</info>:', $this->replaceCwd($info['file']), $lineNum));
-=======
         $output->writeln(\sprintf('From <info>%s:%s</info>:', ConfigPaths::prettyPath($info['file']), $lineNum));
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $output->write(CodeFormatter::formatCode($code, $startLine, $endLine, $lineNum), false);
 
         if ($output instanceof ShellOutput) {
@@ -161,24 +137,4 @@ HELP
 
         return 0;
     }
-<<<<<<< HEAD
-
-    /**
-     * Replace the given directory from the start of a filepath.
-     *
-     * @param string $file
-     */
-    private function replaceCwd(string $file): string
-    {
-        $cwd = \getcwd();
-        if ($cwd === false) {
-            return $file;
-        }
-
-        $cwd = \rtrim($cwd, \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR;
-
-        return \preg_replace('/^'.\preg_quote($cwd, '/').'/', '', $file);
-    }
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

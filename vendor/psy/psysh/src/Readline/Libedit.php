@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,10 +11,7 @@
 
 namespace Psy\Readline;
 
-<<<<<<< HEAD
-=======
 use Psy\ConfigPaths;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Psy\Util\Str;
 
 /**
@@ -33,11 +26,7 @@ use Psy\Util\Str;
  */
 class Libedit extends GNUReadline
 {
-<<<<<<< HEAD
-    private $hasWarnedOwnership = false;
-=======
     private bool $hasWarnedOwnership = false;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Let's emulate GNU Readline by manually reading and parsing the history file!
@@ -60,13 +49,10 @@ class Libedit extends GNUReadline
      */
     public function listHistory(): array
     {
-<<<<<<< HEAD
-=======
         if ($this->historyFile === false) {
             return [];
         }
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $history = \file_get_contents($this->historyFile);
         if (!$history) {
             return [];
@@ -82,10 +68,7 @@ class Libedit extends GNUReadline
 
         // decode the line
         $history = \array_map([$this, 'parseHistoryLine'], $history);
-<<<<<<< HEAD
-=======
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         // filter empty lines & comments
         return \array_values(\array_filter($history));
     }
@@ -104,11 +87,7 @@ class Libedit extends GNUReadline
         if ($res === false && !$this->hasWarnedOwnership) {
             if (\is_file($this->historyFile) && \is_writable($this->historyFile)) {
                 $this->hasWarnedOwnership = true;
-<<<<<<< HEAD
-                $msg = \sprintf('Error writing history file, check file ownership: %s', $this->historyFile);
-=======
                 $msg = \sprintf('Error writing history file, check file ownership: %s', ConfigPaths::prettyPath($this->historyFile));
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 \trigger_error($msg, \E_USER_NOTICE);
             }
         }
@@ -130,11 +109,7 @@ class Libedit extends GNUReadline
     {
         // empty line, comment or timestamp
         if (!$line || $line[0] === "\0") {
-<<<<<<< HEAD
-            return;
-=======
             return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
         // if "\0" is found in an entry, then
         // everything from it until the end of line is a comment.

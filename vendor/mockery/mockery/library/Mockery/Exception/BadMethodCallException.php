@@ -1,11 +1,5 @@
 <?php
 
-<<<<<<< HEAD
-namespace Mockery\Exception;
-
-class BadMethodCallException extends \BadMethodCallException
-{
-=======
 /**
  * Mockery (https://docs.mockery.io/)
  *
@@ -21,21 +15,11 @@ class BadMethodCallException extends \BadMethodCallException implements MockeryE
     /**
      * @var bool
      */
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     private $dismissed = false;
 
     public function dismiss()
     {
         $this->dismissed = true;
-<<<<<<< HEAD
-
-        // we sometimes stack them
-        if ($this->getPrevious() && $this->getPrevious() instanceof BadMethodCallException) {
-            $this->getPrevious()->dismiss();
-        }
-    }
-
-=======
         // we sometimes stack them
         $previous = $this->getPrevious();
         if (! $previous instanceof self) {
@@ -48,7 +32,6 @@ class BadMethodCallException extends \BadMethodCallException implements MockeryE
     /**
      * @return bool
      */
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function dismissed()
     {
         return $this->dismissed;

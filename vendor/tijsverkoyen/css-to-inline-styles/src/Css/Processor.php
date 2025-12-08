@@ -35,11 +35,7 @@ class Processor
     {
         $css = '';
         $matches = array();
-<<<<<<< HEAD
-        $htmlNoComments = preg_replace('|<!--.*?-->|s', '', $html);
-=======
         $htmlNoComments = preg_replace('|<!--.*?-->|s', '', $html) ?? $html;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         preg_match_all('|<style(?:\s.*)?>(.*)</style>|isU', $htmlNoComments, $matches);
 
         if (!empty($matches[1])) {
@@ -59,26 +55,15 @@ class Processor
     private function doCleanup($css)
     {
         // remove charset
-<<<<<<< HEAD
-        $css = preg_replace('/@charset "[^"]++";/', '', $css);
-        // remove media queries
-        $css = preg_replace('/@media [^{]*+{([^{}]++|{[^{}]*+})*+}/', '', $css);
-=======
         $css = preg_replace('/@charset "[^"]++";/', '', $css) ?? $css;
         // remove media queries
         $css = preg_replace('/@media [^{]*+{([^{}]++|{[^{}]*+})*+}/', '', $css) ?? $css;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         $css = str_replace(array("\r", "\n"), '', $css);
         $css = str_replace(array("\t"), ' ', $css);
         $css = str_replace('"', '\'', $css);
-<<<<<<< HEAD
-        $css = preg_replace('|/\*.*?\*/|', '', $css);
-        $css = preg_replace('/\s\s++/', ' ', $css);
-=======
         $css = preg_replace('|/\*.*?\*/|', '', $css) ?? $css;
         $css = preg_replace('/\s\s++/', ' ', $css) ?? $css;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $css = trim($css);
 
         return $css;

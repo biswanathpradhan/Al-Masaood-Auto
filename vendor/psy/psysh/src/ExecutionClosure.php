@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,11 +18,7 @@ class ExecutionClosure
 {
     const NOOP_INPUT = 'return null;';
 
-<<<<<<< HEAD
-    private $closure;
-=======
     private \Closure $closure;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * @param Shell $__psysh__
@@ -36,10 +28,7 @@ class ExecutionClosure
         $this->setClosure($__psysh__, function () use ($__psysh__) {
             try {
                 // Restore execution scope variables
-<<<<<<< HEAD
-=======
                 // @phan-suppress-next-line PhanTypeNonVarPassByRef assigning to a temp variable pollutes scope
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 \extract($__psysh__->getScopeVariables(false));
 
                 // Buffer stdout; we'll need it later

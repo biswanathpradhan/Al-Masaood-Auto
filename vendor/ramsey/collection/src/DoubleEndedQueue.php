@@ -22,27 +22,15 @@ use Ramsey\Collection\Exception\NoSuchElementException;
  * minimize the effort required to implement this interface.
  *
  * @template T
-<<<<<<< HEAD
- * @template-extends Queue<T>
- * @template-implements DoubleEndedQueueInterface<T>
-=======
  * @extends Queue<T>
  * @implements DoubleEndedQueueInterface<T>
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 class DoubleEndedQueue extends Queue implements DoubleEndedQueueInterface
 {
     /**
      * Index of the last element in the queue.
-<<<<<<< HEAD
-     *
-     * @var int
-     */
-    private $tail = -1;
-=======
      */
     private int $tail = -1;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * @inheritDoc
@@ -52,11 +40,7 @@ class DoubleEndedQueue extends Queue implements DoubleEndedQueueInterface
         if ($this->checkType($this->getType(), $value) === false) {
             throw new InvalidArgumentException(
                 'Value must be of type ' . $this->getType() . '; value is '
-<<<<<<< HEAD
-                . $this->toolValueToString($value)
-=======
                 . $this->toolValueToString($value),
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             );
         }
 
@@ -66,11 +50,8 @@ class DoubleEndedQueue extends Queue implements DoubleEndedQueueInterface
     }
 
     /**
-<<<<<<< HEAD
-=======
      * @throws InvalidArgumentException if $element is of the wrong type
      *
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * @inheritDoc
      */
     public function addFirst($element): bool
@@ -78,11 +59,7 @@ class DoubleEndedQueue extends Queue implements DoubleEndedQueueInterface
         if ($this->checkType($this->getType(), $element) === false) {
             throw new InvalidArgumentException(
                 'Value must be of type ' . $this->getType() . '; value is '
-<<<<<<< HEAD
-                . $this->toolValueToString($element)
-=======
                 . $this->toolValueToString($element),
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             );
         }
 

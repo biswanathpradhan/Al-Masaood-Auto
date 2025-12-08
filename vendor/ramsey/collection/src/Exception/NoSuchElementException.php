@@ -14,18 +14,11 @@ declare(strict_types=1);
 
 namespace Ramsey\Collection\Exception;
 
-<<<<<<< HEAD
-/**
- * Thrown when attempting to access an element that does not exist.
- */
-class NoSuchElementException extends \RuntimeException
-=======
 use RuntimeException;
 
 /**
  * Thrown when attempting to access an element that does not exist.
  */
 class NoSuchElementException extends RuntimeException
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 {
 }

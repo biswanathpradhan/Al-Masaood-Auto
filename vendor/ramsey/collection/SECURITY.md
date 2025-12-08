@@ -1,11 +1,4 @@
 <!--
-<<<<<<< HEAD
-    This policy was created using the HackerOne Policy Builder:
-    https://hackerone.com/policy-builder/
- -->
-
-# Vulnerability Disclosure Policy
-=======
     This policy template was created using the HackerOne Policy Builder [1],
     with guidance from the National Telecommunications and Information
     Administration Coordinated Vulnerability Disclosure Template [2].
@@ -20,15 +13,12 @@
     faith commitment to customers and other stakeholders potentially impacted by
     security vulnerabilities" [2].
 -->
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 Keeping user information safe and secure is a top priority, and we welcome the
 contribution of external security researchers.
 
 ## Scope
 
-<<<<<<< HEAD
-=======
 <!--
     This is your initial scope. It tells vulnerability finders and reporters
     "which systems and capabilities are 'fair game' versus 'off limits'" [2].
@@ -36,23 +26,15 @@ contribution of external security researchers.
     of the package.
 -->
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 If you believe you've found a security issue in software that is maintained in
 this repository, we encourage you to notify us.
 
 | Version | In scope | Source code |
-<<<<<<< HEAD
-| :-----: | :------: | :---------- |
-=======
 | ------- | :------: | ----------- |
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 | latest  | ✅        | https://github.com/ramsey/collection |
 
 ## How to Submit a Report
 
-<<<<<<< HEAD
-To submit a vulnerability report, please contact us at <security@ramsey.dev>.
-=======
 <!--
     This is your communication process. It tells security researchers how to
     contact you to report a vulnerability. It may be a link to a web form that
@@ -62,20 +44,16 @@ To submit a vulnerability report, please contact us at <security@ramsey.dev>.
 -->
 
 To submit a vulnerability report, please contact us at security@ramsey.dev.
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 Your submission will be reviewed and validated by a member of our team.
 
 ## Safe Harbor
 
-<<<<<<< HEAD
-=======
 <!--
     This section assures vulnerability finders and reporters that they will
     receive good faith responses to their good faith acts. In other words,
     "we will not take legal action if..." [2].
 -->
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 We support safe harbor for security researchers who:
 
 * Make a good faith effort to avoid privacy violations, destruction of data, and
@@ -85,11 +63,7 @@ We support safe harbor for security researchers who:
   us immediately, do not proceed with access, and immediately purge any local
   information.
 * Provide us with a reasonable amount of time to resolve vulnerabilities prior
-<<<<<<< HEAD
-  to any disclosure to the public or a third-party.
-=======
   to any disclosure to the public or a third party.
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 We will consider activities conducted consistent with this policy to constitute
 "authorized" conduct and will not pursue civil action or initiate a complaint to
@@ -101,8 +75,6 @@ with or unaddressed by this policy.
 
 ## Preferences
 
-<<<<<<< HEAD
-=======
 <!--
     The preferences section sets expectations based on priority and submission
     volume, rather than legal objection or restriction [2].
@@ -119,18 +91,11 @@ with or unaddressed by this policy.
         or not.
 -->
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 * Please provide detailed reports with reproducible steps and a clearly defined
   impact.
 * Include the version number of the vulnerable package in your report
 * Social engineering (e.g. phishing, vishing, smishing) is prohibited.
 
-<<<<<<< HEAD
-## Encryption Key for security@ramsey.dev
-
-For increased privacy when reporting sensitive issues, you may encrypt your
-messages using the following key:
-=======
 <!--
     References
 
@@ -145,7 +110,6 @@ messages using the following key:
 
 For increased privacy when reporting sensitive issues, you may encrypt your
 message using the following public key:
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----

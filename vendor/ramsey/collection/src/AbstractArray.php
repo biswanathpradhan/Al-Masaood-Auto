@@ -17,10 +17,7 @@ namespace Ramsey\Collection;
 use ArrayIterator;
 use Traversable;
 
-<<<<<<< HEAD
-=======
 use function count;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use function serialize;
 use function unserialize;
 
@@ -29,11 +26,7 @@ use function unserialize;
  * the effort required to implement this interface.
  *
  * @template T
-<<<<<<< HEAD
- * @template-implements ArrayInterface<T>
-=======
  * @implements ArrayInterface<T>
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 abstract class AbstractArray implements ArrayInterface
 {
@@ -42,11 +35,7 @@ abstract class AbstractArray implements ArrayInterface
      *
      * @var array<array-key, T>
      */
-<<<<<<< HEAD
-    protected $data = [];
-=======
     protected array $data = [];
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Constructs a new array object.
@@ -67,11 +56,7 @@ abstract class AbstractArray implements ArrayInterface
      *
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php IteratorAggregate::getIterator()
      *
-<<<<<<< HEAD
-     * @return Traversable<T>
-=======
      * @return Traversable<array-key, T>
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function getIterator(): Traversable
     {
@@ -100,10 +85,7 @@ abstract class AbstractArray implements ArrayInterface
      * @return T|null the value stored at the offset, or null if the offset
      *     does not exist.
      */
-<<<<<<< HEAD
-=======
     #[\ReturnTypeWillChange] // phpcs:ignore
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function offsetGet($offset)
     {
         return $this->data[$offset] ?? null;
@@ -143,11 +125,8 @@ abstract class AbstractArray implements ArrayInterface
     /**
      * Returns a serialized string representation of this array object.
      *
-<<<<<<< HEAD
-=======
      * @deprecated The Serializable interface will go away in PHP 9.
      *
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * @link http://php.net/manual/en/serializable.serialize.php Serializable::serialize()
      *
      * @return string a PHP serialized string.
@@ -158,10 +137,6 @@ abstract class AbstractArray implements ArrayInterface
     }
 
     /**
-<<<<<<< HEAD
-     * Converts a serialized string representation into an instance object.
-     *
-=======
      * Returns data suitable for PHP serialization.
      *
      * @link https://www.php.net/manual/en/language.oop5.magic.php#language.oop5.magic.serialize
@@ -179,7 +154,6 @@ abstract class AbstractArray implements ArrayInterface
      *
      * @deprecated The Serializable interface will go away in PHP 9.
      *
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * @link http://php.net/manual/en/serializable.unserialize.php Serializable::unserialize()
      *
      * @param string $serialized A PHP serialized string to unserialize.
@@ -195,8 +169,6 @@ abstract class AbstractArray implements ArrayInterface
     }
 
     /**
-<<<<<<< HEAD
-=======
      * Adds unserialized data to the object.
      *
      * @param array<array-key, T> $data
@@ -207,7 +179,6 @@ abstract class AbstractArray implements ArrayInterface
     }
 
     /**
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * Returns the number of items in this array.
      *
      * @link http://php.net/manual/en/countable.count.php Countable::count()

@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,10 +11,7 @@
 
 namespace Psy\ExecutionLoop;
 
-<<<<<<< HEAD
-=======
 use PhpParser\Parser;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Psy\Exception\ParseErrorException;
 use Psy\ParserFactory;
 use Psy\Shell;
@@ -30,13 +23,8 @@ use Psy\Shell;
  */
 class RunkitReloader extends AbstractListener
 {
-<<<<<<< HEAD
-    private $parser;
-    private $timestamps = [];
-=======
     private Parser $parser;
     private array $timestamps = [];
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Only enabled if Runkit is installed.
@@ -49,20 +37,10 @@ class RunkitReloader extends AbstractListener
 
     /**
      * Construct a Runkit Reloader.
-<<<<<<< HEAD
-     *
-     * @todo Pass in Parser Factory instance for dependency injection?
-     */
-    public function __construct()
-    {
-        $parserFactory = new ParserFactory();
-        $this->parser = $parserFactory->createParser();
-=======
      */
     public function __construct()
     {
         $this->parser = (new ParserFactory())->createParser();
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -74,11 +52,8 @@ class RunkitReloader extends AbstractListener
     public function onInput(Shell $shell, string $input)
     {
         $this->reload($shell);
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**

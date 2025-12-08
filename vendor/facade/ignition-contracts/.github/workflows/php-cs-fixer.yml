@@ -8,11 +8,7 @@ jobs:
 
         steps:
             -   name: Checkout code
-<<<<<<< HEAD
-                uses: actions/checkout@v1
-=======
                 uses: actions/checkout@v2
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
             -   name: Fix style
                 uses: docker://oskarstark/php-cs-fixer-ga

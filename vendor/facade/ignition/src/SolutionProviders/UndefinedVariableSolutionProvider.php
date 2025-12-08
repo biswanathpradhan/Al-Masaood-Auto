@@ -45,22 +45,6 @@ class UndefinedVariableSolutionProvider implements HasSolutionsForThrowable
         string $variableName,
         string $viewFile
     ): array {
-<<<<<<< HEAD
-        return collect($throwable->getViewData())->map(function ($value, $key) use ($variableName) {
-            similar_text($variableName, $key, $percentage);
-
-            return ['match' => $percentage, 'value' => $value];
-        })->sortByDesc('match')->filter(function ($var, $key) {
-            return $var['match'] > 40;
-        })->keys()->map(function ($suggestion) use ($variableName, $viewFile) {
-            return new SuggestCorrectVariableNameSolution($variableName, $viewFile, $suggestion);
-        })->map(function ($solution) {
-            return $solution->isRunnable()
-                ? $solution
-                : BaseSolution::create($solution->getSolutionTitle())
-                    ->setSolutionDescription($solution->getSolutionDescription());
-        })->toArray();
-=======
         return collect($throwable->getViewData())
             ->map(function ($value, $key) use ($variableName) {
                 similar_text($variableName, $key, $percentage);
@@ -81,7 +65,6 @@ class UndefinedVariableSolutionProvider implements HasSolutionsForThrowable
                         ->setSolutionDescription($solution->getSolutionDescription());
             })
             ->toArray();
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     protected function findOptionalVariableSolution(string $variableName, string $viewFile)
@@ -96,20 +79,13 @@ class UndefinedVariableSolutionProvider implements HasSolutionsForThrowable
 
     protected function getNameAndView(Throwable $throwable): ?array
     {
-<<<<<<< HEAD
-        $pattern = '/Undefined variable: (.*?) \(View: (.*?)\)/';
-=======
         $pattern = '/Undefined variable:? (.*?) \(View: (.*?)\)/';
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         preg_match($pattern, $throwable->getMessage(), $matches);
 
         if (count($matches) === 3) {
             [, $variableName, $viewFile] = $matches;
-<<<<<<< HEAD
-=======
             $variableName = ltrim($variableName, '$');
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
             return compact('variableName', 'viewFile');
         }

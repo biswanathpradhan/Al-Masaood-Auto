@@ -71,8 +71,6 @@ class MakeViewVariableOptionalSolution implements RunnableSolution
         }
     }
 
-<<<<<<< HEAD
-=======
     protected function isSafePath(string $path): bool
     {
         if (! Str::startsWith($path, ['/', './'])) {
@@ -85,7 +83,6 @@ class MakeViewVariableOptionalSolution implements RunnableSolution
         return true;
     }
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function makeOptional(array $parameters = [])
     {
         if (! $this->isSafePath($parameters['viewFile'])) {
@@ -107,22 +104,6 @@ class MakeViewVariableOptionalSolution implements RunnableSolution
         return $newContents;
     }
 
-<<<<<<< HEAD
-    protected function isSafePath(string $path): bool
-    {
-        if (! Str::startsWith($path, ['/', './'])) {
-            return false;
-        }
-
-        if (! Str::endsWith($path, '.blade.php')) {
-            return false;
-        }
-
-        return true;
-    }
-
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     protected function generateExpectedTokens(array $originalTokens, string $variableName): array
     {
         $expectedTokens = [];

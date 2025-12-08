@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -30,11 +26,7 @@ use Psy\Exception\ErrorException;
  */
 class CalledClassPass extends CodeCleanerPass
 {
-<<<<<<< HEAD
-    private $inClass;
-=======
     private bool $inClass = false;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * @param array $nodes
@@ -44,11 +36,8 @@ class CalledClassPass extends CodeCleanerPass
     public function beforeTraverse(array $nodes)
     {
         $this->inClass = false;
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -68,36 +57,22 @@ class CalledClassPass extends CodeCleanerPass
             //
             // @todo switch this to actually validate args when we get context-aware code cleaner passes.
             if (!empty($node->args) && !$this->isNull($node->args[0])) {
-<<<<<<< HEAD
-                return;
-=======
                 return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             }
 
             // We'll ignore name expressions as well (things like `$foo()`)
             if (!($node->name instanceof Name)) {
-<<<<<<< HEAD
-                return;
-=======
                 return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             }
 
             $name = \strtolower($node->name);
             if (\in_array($name, ['get_class', 'get_called_class'])) {
                 $msg = \sprintf('%s() called without object from outside a class', $name);
-<<<<<<< HEAD
-                throw new ErrorException($msg, 0, \E_USER_WARNING, null, $node->getLine());
-            }
-        }
-=======
                 throw new ErrorException($msg, 0, \E_USER_WARNING, null, $node->getStartLine());
             }
         }
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -110,11 +85,8 @@ class CalledClassPass extends CodeCleanerPass
         if ($node instanceof Class_) {
             $this->inClass = false;
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     private function isNull(Node $node): bool
@@ -123,13 +95,10 @@ class CalledClassPass extends CodeCleanerPass
             return false;
         }
 
-<<<<<<< HEAD
-=======
         if (!\property_exists($node, 'value')) {
             return false;
         }
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return $node->value instanceof ConstFetch && \strtolower($node->value->name) === 'null';
     }
 }

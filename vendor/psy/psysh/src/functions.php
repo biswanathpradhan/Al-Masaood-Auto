@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,12 +11,6 @@
 
 namespace Psy;
 
-<<<<<<< HEAD
-use Psy\ExecutionLoop\ProcessForker;
-use Psy\VersionUpdater\GitHubChecker;
-use Psy\VersionUpdater\Installer;
-use Psy\VersionUpdater\SelfUpdate;
-=======
 use Psy\Exception\BreakException;
 use Psy\Exception\InvalidManualException;
 use Psy\ExecutionLoop\ProcessForker;
@@ -30,7 +20,6 @@ use Psy\VersionUpdater\GitHubChecker;
 use Psy\VersionUpdater\Installer;
 use Psy\VersionUpdater\SelfUpdate;
 use Symfony\Component\Console\Formatter\OutputFormatter;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -44,11 +33,7 @@ if (!\function_exists('Psy\\sh')) {
      */
     function sh(): string
     {
-<<<<<<< HEAD
-        if (\version_compare(\PHP_VERSION, '8.0', '<')) {
-=======
         if (\PHP_VERSION_ID < 80000) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             return '\extract(\Psy\debug(\get_defined_vars(), isset($this) ? $this : @\get_called_class()));';
         }
 
@@ -148,37 +133,13 @@ if (!\function_exists('Psy\\info')) {
      *
      * @return array|null
      */
-<<<<<<< HEAD
-    function info(Configuration $config = null)
-=======
     function info(?Configuration $config = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         static $lastConfig;
         if ($config !== null) {
             $lastConfig = $config;
 
-<<<<<<< HEAD
-            return;
-        }
-
-        $prettyPath = function ($path) {
-            return $path;
-        };
-
-        $homeDir = (new ConfigPaths())->homeDir();
-        if ($homeDir && $homeDir = \rtrim($homeDir, '/')) {
-            $homePattern = '#^'.\preg_quote($homeDir, '#').'/#';
-            $prettyPath = function ($path) use ($homePattern) {
-                if (\is_string($path)) {
-                    return \preg_replace($homePattern, '~/', $path);
-                } else {
-                    return $path;
-                }
-            };
-=======
             return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         $config = $lastConfig ?: new Configuration();
@@ -199,15 +160,9 @@ if (!\function_exists('Psy\\info')) {
             'strict types'        => $config->strictTypes(),
             'error logging level' => $config->errorLoggingLevel(),
             'config file'         => [
-<<<<<<< HEAD
-                'default config file' => $prettyPath($config->getConfigFile()),
-                'local config file'   => $prettyPath($config->getLocalConfigFile()),
-                'PSYSH_CONFIG env'    => $prettyPath($configEnv),
-=======
                 'default config file' => ConfigPaths::prettyPath($config->getConfigFile()),
                 'local config file'   => ConfigPaths::prettyPath($config->getLocalConfigFile()),
                 'PSYSH_CONFIG env'    => ConfigPaths::prettyPath($configEnv),
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             ],
             // 'config dir'  => $config->getConfigDir(),
             // 'data dir'    => $config->getDataDir(),
@@ -228,11 +183,7 @@ if (!\function_exists('Psy\\info')) {
             'update available'       => $updateAvailable,
             'latest release version' => $latest,
             'update check interval'  => $config->getUpdateCheck(),
-<<<<<<< HEAD
-            'update cache file'      => $prettyPath($config->getUpdateCheckCacheFile()),
-=======
             'update cache file'      => ConfigPaths::prettyPath($config->getUpdateCheckCacheFile()),
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         ];
 
         $input = [
@@ -271,11 +222,7 @@ if (!\function_exists('Psy\\info')) {
         ];
 
         $theme = $config->theme();
-<<<<<<< HEAD
-        // TODO: show styles (but only if they're different than default?)
-=======
         // @todo show styles (but only if they're different than default?)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $output['theme'] = [
             'compact'      => $theme->compact(),
             'prompt'       => $theme->prompt(),
@@ -285,17 +232,6 @@ if (!\function_exists('Psy\\info')) {
         ];
 
         $pcntl = [
-<<<<<<< HEAD
-            'pcntl available' => ProcessForker::isPcntlSupported(),
-            'posix available' => ProcessForker::isPosixSupported(),
-        ];
-
-        if ($disabledPcntl = ProcessForker::disabledPcntlFunctions()) {
-            $pcntl['disabled pcntl functions'] = $disabledPcntl;
-        }
-
-        if ($disabledPosix = ProcessForker::disabledPosixFunctions()) {
-=======
             'pcntl available' => DependencyChecker::functionsAvailable(ProcessForker::PCNTL_FUNCTIONS),
             'posix available' => DependencyChecker::functionsAvailable(ProcessForker::POSIX_FUNCTIONS),
         ];
@@ -305,54 +241,17 @@ if (!\function_exists('Psy\\info')) {
         }
 
         if ($disabledPosix = DependencyChecker::functionsDisabled(ProcessForker::POSIX_FUNCTIONS)) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $pcntl['disabled posix functions'] = $disabledPosix;
         }
 
         $pcntl['use pcntl'] = $config->usePcntl();
 
         $history = [
-<<<<<<< HEAD
-            'history file'     => $prettyPath($config->getHistoryFile()),
-=======
             'history file'     => ConfigPaths::prettyPath($config->getHistoryFile()),
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             'history size'     => $config->getHistorySize(),
             'erase duplicates' => $config->getEraseDuplicates(),
         ];
 
-<<<<<<< HEAD
-        $docs = [
-            'manual db file'   => $prettyPath($config->getManualDbFile()),
-            'sqlite available' => true,
-        ];
-
-        try {
-            if ($db = $config->getManualDb()) {
-                if ($q = $db->query('SELECT * FROM meta;')) {
-                    $q->setFetchMode(\PDO::FETCH_KEY_PAIR);
-                    $meta = $q->fetchAll();
-
-                    foreach ($meta as $key => $val) {
-                        switch ($key) {
-                            case 'built_at':
-                                $d = new \DateTime('@'.$val);
-                                $val = $d->format(\DateTime::RFC2822);
-                                break;
-                        }
-                        $key = 'db '.\str_replace('_', ' ', $key);
-                        $docs[$key] = $val;
-                    }
-                } else {
-                    $docs['db schema'] = '0.1.0';
-                }
-            }
-        } catch (Exception\RuntimeException $e) {
-            if ($e->getMessage() === 'SQLite PDO driver not found') {
-                $docs['sqlite available'] = false;
-            } else {
-                throw $e;
-=======
         $manualDbFile = $config->getManualDbFile();
         $manual = null;
         $manualError = null;
@@ -388,7 +287,6 @@ if (!\function_exists('Psy\\info')) {
                 }
                 $key = 'manual '.\str_replace('_', ' ', $key);
                 $docs[$key] = $val;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             }
         }
 
@@ -397,8 +295,6 @@ if (!\function_exists('Psy\\info')) {
             'bracketed paste'        => $config->useBracketedPaste(),
         ];
 
-<<<<<<< HEAD
-=======
         $warmers = $config->getAutoloadWarmers();
         $autoload = [
             'autoload warming enabled' => !empty($warmers),
@@ -458,7 +354,6 @@ if (!\function_exists('Psy\\info')) {
             $implicitUse = false;
         }
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         // Shenanigans, but totally justified.
         try {
             if ($shell = Sudo::fetchProperty($config, 'shell')) {
@@ -490,9 +385,6 @@ if (!\function_exists('Psy\\info')) {
 
         // @todo Show Presenter / custom casters.
 
-<<<<<<< HEAD
-        return \array_merge($shellInfo, $core, \compact('updates', 'pcntl', 'input', 'readline', 'output', 'history', 'docs', 'autocomplete'));
-=======
         return \array_merge(
             $shellInfo,
             $core,
@@ -511,7 +403,6 @@ if (!\function_exists('Psy\\info')) {
                 'implicit use' => $implicitUse,
             ],
         );
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }
 
@@ -530,13 +421,8 @@ if (!\function_exists('Psy\\bin')) {
                     exit(1);
                 }
 
-<<<<<<< HEAD
-                if (\PHP_VERSION_ID < 70000) {
-                    \fwrite(\STDERR, 'PHP 7.0.0 or higher is required. You can set the environment variable PSYSH_IGNORE_ENV=1 to override this restriction and proceed anyway.'.\PHP_EOL);
-=======
                 if (\PHP_VERSION_ID < 70400) {
                     \fwrite(\STDERR, 'PHP 7.4.0 or higher is required. You can set the environment variable PSYSH_IGNORE_ENV=1 to override this restriction and proceed anyway.'.\PHP_EOL);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                     exit(1);
                 }
 
@@ -565,11 +451,8 @@ if (!\function_exists('Psy\\bin')) {
                     new InputOption('help', 'h', InputOption::VALUE_NONE),
                     new InputOption('version', 'V', InputOption::VALUE_NONE),
                     new InputOption('self-update', 'u', InputOption::VALUE_NONE),
-<<<<<<< HEAD
-=======
                     new InputOption('update-manual', null, InputOption::VALUE_OPTIONAL, '', false),
                     new InputOption('info', null, InputOption::VALUE_NONE),
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
                     new InputArgument('include', InputArgument::IS_ARRAY),
                 ])));
@@ -585,8 +468,6 @@ if (!\function_exists('Psy\\bin')) {
 
             // Handle --help
             if (!isset($config) || $usageException !== null || $input->getOption('help')) {
-<<<<<<< HEAD
-=======
                 // Determine if we should use colors
                 $useColors = true;
                 if ($input->hasParameterOption(['--no-color'])) {
@@ -598,7 +479,6 @@ if (!\function_exists('Psy\\bin')) {
                 // Create output formatter for proper tag rendering
                 $formatter = new OutputFormatter($useColors);
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 if ($usageException !== null) {
                     echo $usageException->getMessage().\PHP_EOL.\PHP_EOL;
                 }
@@ -607,39 +487,6 @@ if (!\function_exists('Psy\\bin')) {
                 $argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
                 $name = $argv ? \basename(\reset($argv)) : 'psysh';
 
-<<<<<<< HEAD
-                echo <<<EOL
-$version
-
-Usage:
-  $name [--version] [--help] [files...]
-
-Options:
-  -h, --help            Display this help message.
-  -c, --config FILE     Use an alternate PsySH config file location.
-      --cwd PATH        Use an alternate working directory.
-  -V, --version         Display the PsySH version.
-
-EOL;
-                if ($shellIsPhar) {
-                    echo <<<EOL
-  -u, --self-update     Install a newer version if available.
-
-EOL;
-                }
-                echo <<<EOL
-      --color           Force colors in output.
-      --no-color        Disable colors in output.
-  -i, --interactive     Force PsySH to run in interactive mode.
-  -n, --no-interactive  Run PsySH without interactive input. Requires input from stdin.
-  -r, --raw-output      Print var_export-style return values (for non-interactive input)
-      --compact         Run PsySH with compact output.
-  -q, --quiet           Shhhhhh.
-  -v|vv|vvv, --verbose  Increase the verbosity of messages.
-      --yolo            Run PsySH without input validation. You don't want this.
-
-EOL;
-=======
                 $selfUpdateOption = $shellIsPhar ? "\n  <info>-u, --self-update</info>       Install a newer version if available" : '';
 
                 $helpText = <<<EOL
@@ -690,7 +537,6 @@ $version
 EOL;
 
                 echo $formatter->format($helpText);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
                 exit($usageException === null ? 0 : 1);
             }
@@ -701,8 +547,6 @@ EOL;
                 exit(0);
             }
 
-<<<<<<< HEAD
-=======
             // Handle --info
             if ($input->getOption('info')) {
                 // Store config for info() function
@@ -720,7 +564,6 @@ EOL;
                 exit(0);
             }
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             // Handle --self-update
             if ($input->getOption('self-update')) {
                 if (!$shellIsPhar) {
@@ -732,8 +575,6 @@ EOL;
                 exit($result);
             }
 
-<<<<<<< HEAD
-=======
             // Handle --update-manual
             if ($input->getOption('update-manual') !== false) {
                 try {
@@ -746,7 +587,6 @@ EOL;
                 }
             }
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $shell = new Shell($config);
 
             // Pass additional arguments to Shell as 'includes'
@@ -754,17 +594,6 @@ EOL;
 
             try {
                 // And go!
-<<<<<<< HEAD
-                $shell->run();
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, $e->getMessage().\PHP_EOL);
-
-                // @todo this triggers the "exited unexpectedly" logic in the
-                // ForkingLoop, so we can't exit(1) after starting the shell...
-                // fix this :)
-
-                // exit(1);
-=======
                 $exitCode = $shell->run();
                 if ($exitCode !== 0) {
                     exit($exitCode);
@@ -776,7 +605,6 @@ EOL;
             } catch (\Throwable $e) {
                 \fwrite(\STDERR, $e->getMessage().\PHP_EOL);
                 exit(1);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             }
         };
     }

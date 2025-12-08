@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -31,11 +27,7 @@ use Psy\Exception\FatalErrorException;
  */
 class ValidFunctionNamePass extends NamespaceAwarePass
 {
-<<<<<<< HEAD
-    private $conditionalScopes = 0;
-=======
     private int $conditionalScopes = 0;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Store newly defined function names on the way in, to allow recursion.
@@ -61,21 +53,14 @@ class ValidFunctionNamePass extends NamespaceAwarePass
                 if (\function_exists($name) ||
                     isset($this->currentScope[\strtolower($name)])) {
                     $msg = \sprintf('Cannot redeclare %s()', $name);
-<<<<<<< HEAD
-                    throw new FatalErrorException($msg, 0, \E_ERROR, null, $node->getLine());
-=======
                     throw new FatalErrorException($msg, 0, \E_ERROR, null, $node->getStartLine());
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 }
             }
 
             $this->currentScope[\strtolower($name)] = true;
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -88,11 +73,8 @@ class ValidFunctionNamePass extends NamespaceAwarePass
         if (self::isConditional($node)) {
             $this->conditionalScopes--;
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     private static function isConditional(Node $node)

@@ -1,11 +1,7 @@
 This is the PHP port of Hamcrest Matchers
 =========================================
 
-<<<<<<< HEAD
-[![Build Status](https://travis-ci.org/hamcrest/hamcrest-php.png?branch=master)](https://travis-ci.org/hamcrest/hamcrest-php)
-=======
 [![tests](https://github.com/hamcrest/hamcrest-php/actions/workflows/tests.yml/badge.svg)](https://github.com/hamcrest/hamcrest-php/actions/workflows/tests.yml)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 Hamcrest is a matching library originally written for Java, but
 subsequently ported to many other languages.  hamcrest-php is the
@@ -137,11 +133,7 @@ assertThat(['name'=> 'foobar'], hasKeyInArray('name'));
 
 * `hasKey` - alias of hasKeyInArray
 
-<<<<<<< HEAD
-* `hasKeyValuePair` - check if arary has given key, value pair
-=======
 * `hasKeyValuePair` - check if array has given key, value pair
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 ```php
 assertThat(['name'=> 'foobar'], hasKeyValuePair('name', 'foobar'));
 ```
@@ -151,11 +143,7 @@ assertThat(['name'=> 'foobar'], hasKeyValuePair('name', 'foobar'));
 ```php
 assertthat([2, 4, 6], arrayWithSize(3));
 ```
-<<<<<<< HEAD
-* `emptyArray` - check if array is emtpy
-=======
 * `emptyArray` - check if array is empty
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 ```php
 assertThat([], emptyArray());
 ```
@@ -234,11 +222,7 @@ assertThat([2, 4, 6], everyItem(notNullValue()));
 assertThat([2, 4, 6], hasItem(equalTo(2)));
 ```
 
-<<<<<<< HEAD
-* `hasItems` - check array has givem items, it can take multiple matcher as arguments
-=======
 * `hasItems` - check array has given items, it can take multiple matcher as arguments
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 ```php
 assertThat([1, 3, 5], hasItems(equalTo(1), equalTo(3)));
 ```
@@ -472,11 +456,7 @@ $fp = fopen("/tmp/foo", "w+");
 assertThat($fp, resourceValue());
 ```
 
-<<<<<<< HEAD
-* `scalarValue` - check for scaler value
-=======
 * `scalarValue` - check for scalar value
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 ```php
 assertThat(1, scalarValue());
 ```

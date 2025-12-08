@@ -15,10 +15,7 @@ declare(strict_types=1);
 namespace Ramsey\Collection;
 
 use Ramsey\Collection\Exception\NoSuchElementException;
-<<<<<<< HEAD
-=======
 use RuntimeException;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 /**
  * A linear collection that supports element insertion and removal at both ends.
@@ -164,11 +161,7 @@ use RuntimeException;
  * empty.
  *
  * @template T
-<<<<<<< HEAD
- * @template-extends QueueInterface<T>
-=======
  * @extends QueueInterface<T>
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  */
 interface DoubleEndedQueueInterface extends QueueInterface
 {
@@ -183,11 +176,7 @@ interface DoubleEndedQueueInterface extends QueueInterface
      *
      * @return bool `true` if this queue changed as a result of the call.
      *
-<<<<<<< HEAD
-     * @throws \RuntimeException if a queue refuses to add a particular element
-=======
      * @throws RuntimeException if a queue refuses to add a particular element
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      *     for any reason other than that it already contains the element.
      *     Implementations should use a more-specific exception that extends
      *     `\RuntimeException`.
@@ -208,11 +197,7 @@ interface DoubleEndedQueueInterface extends QueueInterface
      *
      * @return bool `true` if this queue changed as a result of the call.
      *
-<<<<<<< HEAD
-     * @throws \RuntimeException if a queue refuses to add a particular element
-=======
      * @throws RuntimeException if a queue refuses to add a particular element
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      *     for any reason other than that it already contains the element.
      *     Implementations should use a more-specific exception that extends
      *     `\RuntimeException`.

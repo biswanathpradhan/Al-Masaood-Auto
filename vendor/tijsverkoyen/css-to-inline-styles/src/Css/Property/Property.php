@@ -17,11 +17,7 @@ final class Property
     private $value;
 
     /**
-<<<<<<< HEAD
-     * @var Specificity
-=======
      * @var Specificity|null
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     private $originalSpecificity;
 
@@ -31,11 +27,7 @@ final class Property
      * @param string           $value
      * @param Specificity|null $specificity
      */
-<<<<<<< HEAD
-    public function __construct($name, $value, Specificity $specificity = null)
-=======
     public function __construct($name, $value, ?Specificity $specificity = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $this->name = $name;
         $this->value = $value;
@@ -65,11 +57,7 @@ final class Property
     /**
      * Get originalSpecificity
      *
-<<<<<<< HEAD
-     * @return Specificity
-=======
      * @return Specificity|null
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function getOriginalSpecificity()
     {

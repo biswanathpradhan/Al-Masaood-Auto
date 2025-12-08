@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -35,19 +31,9 @@ use Psy\Exception\FatalErrorException;
  */
 class LabelContextPass extends CodeCleanerPass
 {
-<<<<<<< HEAD
-    /** @var int */
-    private $functionDepth;
-
-    /** @var array */
-    private $labelDeclarations;
-    /** @var array */
-    private $labelGotos;
-=======
     private int $functionDepth = 0;
     private array $labelDeclarations = [];
     private array $labelGotos = [];
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * @param array $nodes
@@ -59,11 +45,8 @@ class LabelContextPass extends CodeCleanerPass
         $this->functionDepth = 0;
         $this->labelDeclarations = [];
         $this->labelGotos = [];
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -74,25 +57,11 @@ class LabelContextPass extends CodeCleanerPass
         if ($node instanceof FunctionLike) {
             $this->functionDepth++;
 
-<<<<<<< HEAD
-            return;
-=======
             return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         // node is inside function context
         if ($this->functionDepth !== 0) {
-<<<<<<< HEAD
-            return;
-        }
-
-        if ($node instanceof Goto_) {
-            $this->labelGotos[\strtolower($node->name)] = $node->getLine();
-        } elseif ($node instanceof Label) {
-            $this->labelDeclarations[\strtolower($node->name)] = $node->getLine();
-        }
-=======
             return null;
         }
 
@@ -103,7 +72,6 @@ class LabelContextPass extends CodeCleanerPass
         }
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -116,11 +84,8 @@ class LabelContextPass extends CodeCleanerPass
         if ($node instanceof FunctionLike) {
             $this->functionDepth--;
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -134,10 +99,7 @@ class LabelContextPass extends CodeCleanerPass
                 throw new FatalErrorException($msg, 0, \E_ERROR, null, $line);
             }
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

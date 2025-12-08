@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,10 +11,7 @@
 
 namespace Psy\Output;
 
-<<<<<<< HEAD
-=======
 use Psy\Formatter\LinkFormatter;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -30,19 +23,9 @@ class ShellOutput extends ConsoleOutput
 {
     const NUMBER_LINES = 128;
 
-<<<<<<< HEAD
-    private $paging = 0;
-
-    /** @var OutputPager */
-    private $pager;
-
-    /** @var Theme */
-    private $theme;
-=======
     private int $paging = 0;
     private OutputPager $pager;
     private Theme $theme;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Construct a ShellOutput instance.
@@ -52,11 +35,7 @@ class ShellOutput extends ConsoleOutput
      * @param OutputFormatterInterface|null $formatter (default: null)
      * @param string|OutputPager|null       $pager     (default: null)
      */
-<<<<<<< HEAD
-    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null, $pager = null, $theme = null)
-=======
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, ?OutputFormatterInterface $formatter = null, $pager = null, $theme = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         parent::__construct($verbosity, $decorated, $formatter);
 
@@ -137,11 +116,7 @@ class ShellOutput extends ConsoleOutput
      * @param bool         $newline  Whether to add a newline or not
      * @param int          $type     The type of output
      */
-<<<<<<< HEAD
-    public function write($messages, $newline = false, $type = 0)
-=======
     public function write($messages, $newline = false, $type = 0): void
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if ($this->getVerbosity() === self::VERBOSITY_QUIET) {
             return;
@@ -176,16 +151,10 @@ class ShellOutput extends ConsoleOutput
      * @param string $message A message to write to the output
      * @param bool   $newline Whether to add a newline or not
      */
-<<<<<<< HEAD
-    public function doWrite($message, $newline)
-    {
-        if ($this->paging > 0) {
-=======
     public function doWrite($message, $newline): void
     {
         // @todo Update OutputPager interface to require doWrite
         if ($this->paging > 0 && ($this->pager instanceof ProcOutputPager || $this->pager instanceof PassthruPager)) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $this->pager->doWrite($message, $newline);
         } else {
             parent::doWrite($message, $newline);
@@ -219,12 +188,9 @@ class ShellOutput extends ConsoleOutput
         $useGrayFallback = !$this->grayExists();
         $this->theme->applyStyles($this->getFormatter(), $useGrayFallback);
         $this->theme->applyErrorStyles($this->getErrorOutput()->getFormatter(), $useGrayFallback);
-<<<<<<< HEAD
-=======
 
         // Set inline styles for hyperlinks
         LinkFormatter::setStyles($this->theme->getInlineStyles($useGrayFallback));
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**

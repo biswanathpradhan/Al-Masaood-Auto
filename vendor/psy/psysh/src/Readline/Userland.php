@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -29,23 +25,11 @@ use Psy\Readline\Hoa\Ustring as HoaUstring;
  */
 class Userland implements Readline
 {
-<<<<<<< HEAD
-    /** @var HoaReadline */
-    private $hoaReadline;
-
-    /** @var string|null */
-    private $lastPrompt;
-
-    private $tput;
-    private $input;
-    private $output;
-=======
     private HoaReadline $hoaReadline;
     private ?string $lastPrompt = null;
     private HoaConsoleTput $tput;
     private HoaConsoleInput $input;
     private HoaConsoleOutput $output;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     public static function isSupported(): bool
     {
@@ -150,11 +134,7 @@ class Userland implements Readline
      *
      * @return string
      */
-<<<<<<< HEAD
-    public function readline(string $prompt = null)
-=======
     public function readline(?string $prompt = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $this->lastPrompt = $prompt;
 

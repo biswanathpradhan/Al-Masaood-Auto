@@ -32,11 +32,7 @@ class HasXPath extends DiagnosingMatcher
      */
     private $_matcher;
 
-<<<<<<< HEAD
-    public function __construct($xpath, Matcher $matcher = null)
-=======
     public function __construct($xpath, ?Matcher $matcher = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $this->_xpath = $xpath;
         $this->_matcher = $matcher;

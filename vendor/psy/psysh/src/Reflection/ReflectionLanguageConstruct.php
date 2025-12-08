@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,11 +21,7 @@ class ReflectionLanguageConstruct extends \ReflectionFunctionAbstract
     /**
      * Language construct parameter definitions.
      */
-<<<<<<< HEAD
-    private static $languageConstructs = [
-=======
     private const LANGUAGE_CONSTRUCTS = [
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         'isset' => [
             'var' => [],
             '...' => [
@@ -125,11 +117,7 @@ class ReflectionLanguageConstruct extends \ReflectionFunctionAbstract
     public function getParameters(): array
     {
         $params = [];
-<<<<<<< HEAD
-        foreach (self::$languageConstructs[$this->keyword] as $parameter => $opts) {
-=======
         foreach (self::LANGUAGE_CONSTRUCTS[$this->keyword] as $parameter => $opts) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $params[] = new ReflectionLanguageConstructParameter($this->keyword, $parameter, $opts);
         }
 
@@ -166,10 +154,6 @@ class ReflectionLanguageConstruct extends \ReflectionFunctionAbstract
      */
     public static function isLanguageConstruct(string $keyword): bool
     {
-<<<<<<< HEAD
-        return \array_key_exists($keyword, self::$languageConstructs);
-=======
         return \array_key_exists($keyword, self::LANGUAGE_CONSTRUCTS);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

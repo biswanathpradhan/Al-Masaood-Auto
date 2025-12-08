@@ -3,13 +3,9 @@
 namespace Facade\Ignition\Logger;
 
 use Facade\FlareClient\Flare;
-<<<<<<< HEAD
-use Facade\Ignition\Ignition;
-=======
 use Facade\FlareClient\Report;
 use Facade\Ignition\Ignition;
 use Facade\Ignition\Support\SentReports;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Facade\Ignition\Tabs\Tab;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
@@ -20,14 +16,6 @@ class FlareHandler extends AbstractProcessingHandler
     /** @var \Facade\FlareClient\Flare */
     protected $flare;
 
-<<<<<<< HEAD
-    protected $minimumReportLogLevel = Logger::ERROR;
-
-    public function __construct(Flare $flare, $level = Logger::DEBUG, $bubble = true)
-    {
-        $this->flare = $flare;
-
-=======
     /** @var \Facade\Ignition\Support\SentReports */
     protected $sentReports;
 
@@ -39,7 +27,6 @@ class FlareHandler extends AbstractProcessingHandler
 
         $this->sentReports = $sentReports;
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         parent::__construct($level, $bubble);
     }
 
@@ -52,17 +39,6 @@ class FlareHandler extends AbstractProcessingHandler
         $this->minimumReportLogLevel = $level;
     }
 
-<<<<<<< HEAD
-    protected function write(array $report): void
-    {
-        if (! $this->shouldReport($report)) {
-            return;
-        }
-
-        if ($this->hasException($report)) {
-            /** @var Throwable $throwable */
-            $throwable = $report['context']['exception'];
-=======
     protected function write(array $record): void
     {
         if (! $this->shouldReport($record)) {
@@ -72,31 +48,22 @@ class FlareHandler extends AbstractProcessingHandler
         if ($this->hasException($record)) {
             /** @var Throwable $throwable */
             $throwable = $record['context']['exception'];
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
             collect(Ignition::$tabs)
                 ->each(function (Tab $tab) use ($throwable) {
                     $tab->beforeRenderingErrorPage($this->flare, $throwable);
                 });
 
-<<<<<<< HEAD
-            $this->flare->report($report['context']['exception']);
-=======
             $report = $this->flare->report($record['context']['exception']);
 
             if ($report) {
                 $this->sentReports->add($report);
             }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
             return;
         }
 
         if (config('flare.send_logs_as_events')) {
-<<<<<<< HEAD
-            if ($this->hasValidLogLevel($report)) {
-                $this->flare->reportMessage($report['message'], 'Log '.Logger::getLevelName($report['level']));
-=======
             if ($this->hasValidLogLevel($record)) {
                 $this->flare->reportMessage(
                     $record['message'],
@@ -107,20 +74,16 @@ class FlareHandler extends AbstractProcessingHandler
                         }
                     }
                 );
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             }
         }
     }
 
     protected function shouldReport(array $report): bool
     {
-<<<<<<< HEAD
-=======
         if (! config('flare.key')) {
             return false;
         }
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return $this->hasException($report) || $this->hasValidLogLevel($report);
     }
 

@@ -1,10 +1,7 @@
 /.idea
-<<<<<<< HEAD
-=======
 /.php_cs
 /.php_cs.cache
 /.phpunit.result.cache
 /.psalm/cache
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 /composer.lock
 /vendor

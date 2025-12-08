@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -48,11 +44,7 @@ class FunctionsMatcher extends AbstractMatcher
         $prevToken = \array_pop($tokens);
 
         switch (true) {
-<<<<<<< HEAD
-            case self::tokenIs($prevToken, self::T_NEW):
-=======
             case self::hasToken([self::T_NEW, self::T_OBJECT_OPERATOR], $prevToken):
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 return false;
             case self::hasToken([self::T_OPEN_TAG, self::T_STRING], $token):
             case self::isOperator($token):

@@ -14,18 +14,11 @@ declare(strict_types=1);
 
 namespace Ramsey\Collection\Exception;
 
-<<<<<<< HEAD
-/**
- * Thrown when attempting to extract a value for a method or property that does not exist.
- */
-class ValueExtractionException extends \RuntimeException
-=======
 use RuntimeException;
 
 /**
  * Thrown when attempting to extract a value for a method or property that does not exist.
  */
 class ValueExtractionException extends RuntimeException
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 {
 }

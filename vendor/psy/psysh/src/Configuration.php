@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,10 +12,6 @@
 namespace Psy;
 
 use Psy\Exception\DeprecatedException;
-<<<<<<< HEAD
-use Psy\Exception\RuntimeException;
-use Psy\ExecutionLoop\ProcessForker;
-=======
 use Psy\Exception\InvalidManualException;
 use Psy\Exception\RuntimeException;
 use Psy\ExecutionLoop\ExecutionLoggingListener;
@@ -30,7 +22,6 @@ use Psy\Logger\CallbackLogger;
 use Psy\Manual\ManualInterface;
 use Psy\Manual\V2Manual;
 use Psy\Manual\V3Manual;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Psy\Output\OutputPager;
 use Psy\Output\ShellOutput;
 use Psy\Output\Theme;
@@ -64,11 +55,7 @@ class Configuration
     const VERBOSITY_VERY_VERBOSE = 'very_verbose';
     const VERBOSITY_DEBUG = 'debug';
 
-<<<<<<< HEAD
-    private static $AVAILABLE_OPTIONS = [
-=======
     private const AVAILABLE_OPTIONS = [
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         'codeCleaner',
         'colorMode',
         'configDir',
@@ -80,13 +67,9 @@ class Configuration
         'formatterStyles',
         'historyFile',
         'historySize',
-<<<<<<< HEAD
-        'interactiveMode',
-=======
         'implicitUse',
         'interactiveMode',
         'logging',
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         'manualDbFile',
         'pager',
         'prompt',
@@ -97,78 +80,18 @@ class Configuration
         'strictTypes',
         'theme',
         'updateCheck',
-<<<<<<< HEAD
-=======
         'updateManualCheck',
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         'useBracketedPaste',
         'usePcntl',
         'useReadline',
         'useTabCompletion',
         'useUnicode',
         'verbosity',
-<<<<<<< HEAD
-=======
         'warmAutoload',
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         'warnOnMultipleConfigs',
         'yolo',
     ];
 
-<<<<<<< HEAD
-    private $defaultIncludes;
-    private $configDir;
-    private $dataDir;
-    private $runtimeDir;
-    private $configFile;
-    /** @var string|false */
-    private $historyFile;
-    private $historySize;
-    private $eraseDuplicates;
-    private $manualDbFile;
-    private $hasReadline;
-    private $useReadline;
-    private $useBracketedPaste;
-    private $hasPcntl;
-    private $usePcntl;
-    private $newCommands = [];
-    private $pipedInput;
-    private $pipedOutput;
-    private $rawOutput = false;
-    private $requireSemicolons = false;
-    private $strictTypes = false;
-    private $useUnicode;
-    private $useTabCompletion;
-    private $newMatchers = [];
-    private $errorLoggingLevel = \E_ALL;
-    private $warnOnMultipleConfigs = false;
-    private $colorMode = self::COLOR_MODE_AUTO;
-    private $interactiveMode = self::INTERACTIVE_MODE_AUTO;
-    private $updateCheck;
-    private $startupMessage;
-    private $forceArrayIndexes = false;
-    /** @deprecated */
-    private $formatterStyles = [];
-    private $verbosity = self::VERBOSITY_NORMAL;
-    private $yolo = false;
-    /** @var Theme */
-    private $theme;
-
-    // services
-    private $readline;
-    /** @var ShellOutput */
-    private $output;
-    private $shell;
-    private $cleaner;
-    private $pager;
-    private $manualDb;
-    private $presenter;
-    private $autoCompleter;
-    private $checker;
-    /** @deprecated */
-    private $prompt;
-    private $configPaths;
-=======
     private ?array $defaultIncludes = null;
     private ?string $configDir = null;
     private ?string $dataDir = null;
@@ -225,7 +148,6 @@ class Configuration
     /** @deprecated */
     private ?string $prompt = null;
     private ConfigPaths $configPaths;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Construct a Configuration instance.
@@ -313,14 +235,11 @@ class Configuration
             }
         }
 
-<<<<<<< HEAD
-=======
         // Handle --warm-autoload
         if (self::getOptionFromInput($input, ['warm-autoload'])) {
             $config->setWarmAutoload(true);
         }
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         // Handle --yolo
         if (self::getOptionFromInput($input, ['yolo'])) {
             $config->setYolo(true);
@@ -412,11 +331,6 @@ class Configuration
                     return self::VERBOSITY_VERY_VERBOSE;
                 case '3':
                 case 'vv': // `-vvv`
-<<<<<<< HEAD
-                    return self::VERBOSITY_DEBUG;
-                default: // implicitly normal, config file default wins
-                    return;
-=======
                 case 'vvv':
                 case 'vvvv':
                 case 'vvvvv':
@@ -425,7 +339,6 @@ class Configuration
                     return self::VERBOSITY_DEBUG;
                 default: // implicitly normal, config file default wins
                     return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             }
         }
 
@@ -450,11 +363,8 @@ class Configuration
         if ($input->hasParameterOption('-v', true) || $input->hasParameterOption('--verbose=1', true) || $input->hasParameterOption('--verbose', true)) {
             return self::VERBOSITY_VERBOSE;
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -489,11 +399,8 @@ class Configuration
             new InputOption('self-update', 'u', InputOption::VALUE_NONE, 'Update to the latest version'),
 
             new InputOption('yolo', null, InputOption::VALUE_NONE, 'Run PsySH with minimal input validation. You probably don\'t want this.'),
-<<<<<<< HEAD
-=======
             new InputOption('warm-autoload', null, InputOption::VALUE_NONE, 'Enable autoload warming for better tab completion.'),
             new InputOption('info', null, InputOption::VALUE_NONE, 'Display PsySH environment and configuration info.'),
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         ];
     }
 
@@ -552,22 +459,15 @@ class Configuration
 
         if (!empty($files)) {
             if ($this->warnOnMultipleConfigs && \count($files) > 1) {
-<<<<<<< HEAD
-                $msg = \sprintf('Multiple configuration files found: %s. Using %s', \implode(', ', $files), $files[0]);
-=======
                 $prettyFiles = \array_map([ConfigPaths::class, 'prettyPath'], $files);
                 $msg = \sprintf('Multiple configuration files found: %s. Using %s', \implode(', ', $prettyFiles), $prettyFiles[0]);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 \trigger_error($msg, \E_USER_NOTICE);
             }
 
             return $files[0];
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -585,11 +485,8 @@ class Configuration
         if (@\is_file($localConfig)) {
             return $localConfig;
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -599,11 +496,7 @@ class Configuration
      */
     public function loadConfig(array $options)
     {
-<<<<<<< HEAD
-        foreach (self::$AVAILABLE_OPTIONS as $option) {
-=======
         foreach (self::AVAILABLE_OPTIONS as $option) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             if (isset($options[$option])) {
                 $method = 'set'.\ucfirst($option);
                 $this->$method($options[$option]);
@@ -648,11 +541,7 @@ class Configuration
     public function loadConfigFile(string $file)
     {
         if (!\is_file($file)) {
-<<<<<<< HEAD
-            throw new \InvalidArgumentException(\sprintf('Invalid configuration file specified, %s does not exist', $file));
-=======
             throw new \InvalidArgumentException(\sprintf('Invalid configuration file specified, %s does not exist', ConfigPaths::prettyPath($file)));
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         $__psysh_config_file__ = $file;
@@ -764,19 +653,6 @@ class Configuration
     /**
      * Get the shell's temporary directory location.
      *
-<<<<<<< HEAD
-     * Defaults to  `/psysh` inside the system's temp dir unless explicitly
-     * overridden.
-     *
-     * @throws RuntimeException if no temporary directory is set and it is not possible to create one
-     */
-    public function getRuntimeDir(): string
-    {
-        $runtimeDir = $this->configPaths->runtimeDir();
-
-        if (!\is_dir($runtimeDir)) {
-            if (!@\mkdir($runtimeDir, 0700, true)) {
-=======
      * Defaults to `/psysh` inside the system's temp dir unless explicitly
      * overridden.
      *
@@ -790,7 +666,6 @@ class Configuration
 
         if ($create) {
             if (!@ConfigPaths::ensureDir($runtimeDir)) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 throw new RuntimeException(\sprintf('Unable to create PsySH runtime directory. Make sure PHP is able to write to %s in order to continue.', \dirname($runtimeDir)));
             }
         }
@@ -814,11 +689,7 @@ class Configuration
      * Defaults to `/history` inside the shell's base config dir unless
      * explicitly overridden.
      */
-<<<<<<< HEAD
-    public function getHistoryFile(): string
-=======
     public function getHistoryFile(): ?string
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if (isset($this->historyFile)) {
             return $this->historyFile;
@@ -828,28 +699,20 @@ class Configuration
 
         if (!empty($files)) {
             if ($this->warnOnMultipleConfigs && \count($files) > 1) {
-<<<<<<< HEAD
-                $msg = \sprintf('Multiple history files found: %s. Using %s', \implode(', ', $files), $files[0]);
-=======
                 $prettyFiles = \array_map([ConfigPaths::class, 'prettyPath'], $files);
                 $msg = \sprintf('Multiple history files found: %s. Using %s', \implode(', ', $prettyFiles), $prettyFiles[0]);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 \trigger_error($msg, \E_USER_NOTICE);
             }
 
             $this->setHistoryFile($files[0]);
         } else {
             // fallback: create our own history file
-<<<<<<< HEAD
-            $this->setHistoryFile($this->configPaths->currentConfigDir().'/psysh_history');
-=======
             $configDir = $this->configPaths->currentConfigDir();
             if ($configDir === null) {
                 return null;
             }
 
             $this->setHistoryFile($configDir.'/psysh_history');
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         return $this->historyFile;
@@ -882,11 +745,7 @@ class Configuration
      */
     public function setEraseDuplicates(bool $value)
     {
-<<<<<<< HEAD
-        $this->eraseDuplicates = (bool) $value;
-=======
         $this->eraseDuplicates = $value;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -992,11 +851,7 @@ class Configuration
             $this->readline = new $className(
                 $this->getHistoryFile(),
                 $this->getHistorySize(),
-<<<<<<< HEAD
-                $this->getEraseDuplicates()
-=======
                 $this->getEraseDuplicates() ?? false
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             );
         }
 
@@ -1206,15 +1061,11 @@ class Configuration
      */
     public function setErrorLoggingLevel($errorLoggingLevel)
     {
-<<<<<<< HEAD
-        $this->errorLoggingLevel = (\E_ALL | \E_STRICT) & $errorLoggingLevel;
-=======
         if (\PHP_VERSION_ID < 80400) {
             $this->errorLoggingLevel = (\E_ALL | \E_STRICT) & $errorLoggingLevel;
         } else {
             $this->errorLoggingLevel = \E_ALL & $errorLoggingLevel;
         }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -1252,11 +1103,7 @@ class Configuration
     public function getCodeCleaner(): CodeCleaner
     {
         if (!isset($this->cleaner)) {
-<<<<<<< HEAD
-            $this->cleaner = new CodeCleaner(null, null, null, $this->yolo(), $this->strictTypes());
-=======
             $this->cleaner = new CodeCleaner(null, null, null, $this->yolo(), $this->strictTypes(), $this->implicitUse);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         return $this->cleaner;
@@ -1297,11 +1144,8 @@ class Configuration
      */
     public function setTabCompletion(bool $useTabCompletion)
     {
-<<<<<<< HEAD
-=======
         @\trigger_error('`setTabCompletion` is deprecated; call `setUseTabCompletion` instead.', \E_USER_DEPRECATED);
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $this->setUseTabCompletion($useTabCompletion);
     }
 
@@ -1323,11 +1167,8 @@ class Configuration
      */
     public function getTabCompletion(): bool
     {
-<<<<<<< HEAD
-=======
         @\trigger_error('`getTabCompletion` is deprecated; call `useTabCompletion` instead.', \E_USER_DEPRECATED);
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return $this->useTabCompletion();
     }
 
@@ -1372,11 +1213,7 @@ class Configuration
             // output stream to figure out if it's piped or not, so create it
             // first, then update after we have a stream.
             $decorated = $this->getOutputDecorated();
-<<<<<<< HEAD
-            if ($decorated !== null) {
-=======
             if ($decorated !== null && $this->output !== null) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 $this->output->setDecorated($decorated);
             }
         }
@@ -1463,8 +1300,6 @@ class Configuration
                 $this->pager = $pager;
             } elseif ($less = $this->configPaths->which('less')) {
                 // check for the presence of less...
-<<<<<<< HEAD
-=======
 
                 // n.b. The busybox less implementation is a bit broken, so
                 // let's not use it by default.
@@ -1477,7 +1312,6 @@ class Configuration
                     }
                 }
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 $this->pager = $less.' -R -F -X';
             }
         }
@@ -1512,11 +1346,8 @@ class Configuration
      */
     public function getTabCompletionMatchers(): array
     {
-<<<<<<< HEAD
-=======
         @\trigger_error('`getTabCompletionMatchers` is no longer used.', \E_USER_DEPRECATED);
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return [];
     }
 
@@ -1551,8 +1382,6 @@ class Configuration
     }
 
     /**
-<<<<<<< HEAD
-=======
      * Configure autoload warming.
      *
      * @param bool|array $config False to disable, true for defaults, or array for custom config
@@ -1863,18 +1692,14 @@ class Configuration
     }
 
     /**
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * @deprecated Use `addMatchers` instead
      *
      * @param array $matchers
      */
     public function addTabCompletionMatchers(array $matchers)
     {
-<<<<<<< HEAD
-=======
         @\trigger_error('`addTabCompletionMatchers` is deprecated; call `addMatchers` instead.', \E_USER_DEPRECATED);
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $this->addMatchers($matchers);
     }
 
@@ -1918,12 +1743,9 @@ class Configuration
         $this->shell = $shell;
         $this->doAddCommands();
         $this->doAddMatchers();
-<<<<<<< HEAD
-=======
 
         // Configure SignatureFormatter for hyperlinks
         SignatureFormatter::setManual($this->getManual());
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -1937,8 +1759,6 @@ class Configuration
     public function setManualDbFile(string $filename)
     {
         $this->manualDbFile = (string) $filename;
-<<<<<<< HEAD
-=======
 
         // Reconfigure SignatureFormatter with new manual database
         try {
@@ -1947,21 +1767,16 @@ class Configuration
             // Show user-friendly error for invalid explicitly configured manual
             throw new \InvalidArgumentException($e->getMessage(), 0, $e);
         }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
      * Get the current PHP manual database file.
      *
-<<<<<<< HEAD
-     * @return string|null Default: '~/.local/share/psysh/php_manual.sqlite'
-=======
      * Searches for manual files in order of preference:
      *  1. php_manual.php (v3 format)
      *  2. php_manual.sqlite (v2 format, legacy)
      *
      * @return string|null Default: '~/.local/share/psysh/php_manual.*'
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     public function getManualDbFile()
     {
@@ -1969,50 +1784,32 @@ class Configuration
             return $this->manualDbFile;
         }
 
-<<<<<<< HEAD
-        $files = $this->configPaths->dataFiles(['php_manual.sqlite']);
-        if (!empty($files)) {
-            if ($this->warnOnMultipleConfigs && \count($files) > 1) {
-                $msg = \sprintf('Multiple manual database files found: %s. Using %s', \implode(', ', $files), $files[0]);
-=======
         // Prefer v3 format over v2
         $files = $this->configPaths->dataFiles(['php_manual.php', 'php_manual.sqlite']);
         if (!empty($files)) {
             if ($this->warnOnMultipleConfigs && \count($files) > 1) {
                 $prettyFiles = \array_map([ConfigPaths::class, 'prettyPath'], $files);
                 $msg = \sprintf('Multiple manual database files found: %s. Using %s', \implode(', ', $prettyFiles), $prettyFiles[0]);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 \trigger_error($msg, \E_USER_NOTICE);
             }
 
             return $this->manualDbFile = $files[0];
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
      * Get a PHP manual database connection.
      *
-<<<<<<< HEAD
-=======
      * @deprecated Use getManual() instead for unified access to all manual formats
      *
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * @return \PDO|null
      */
     public function getManualDb()
     {
         if (!isset($this->manualDb)) {
             $dbFile = $this->getManualDbFile();
-<<<<<<< HEAD
-            if ($dbFile !== null && \is_file($dbFile)) {
-                try {
-                    $this->manualDb = new \PDO('sqlite:'.$dbFile);
-=======
             if ($dbFile !== null && \is_file($dbFile) && \substr($dbFile, -7) === '.sqlite') {
                 try {
                     $this->manualDb = new \PDO('sqlite:'.$dbFile);
@@ -2022,16 +1819,11 @@ class Configuration
                     if ($result === false || $result->fetchColumn() === false) {
                         throw new InvalidManualException('Manual database is missing required tables', $dbFile);
                     }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 } catch (\PDOException $e) {
                     if ($e->getMessage() === 'could not find driver') {
                         throw new RuntimeException('SQLite PDO driver not found', 0, $e);
                     } else {
-<<<<<<< HEAD
-                        throw $e;
-=======
                         throw new InvalidManualException('Invalid SQLite manual database: '.$e->getMessage(), $dbFile, 0, $e);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                     }
                 }
             }
@@ -2041,8 +1833,6 @@ class Configuration
     }
 
     /**
-<<<<<<< HEAD
-=======
      * Get a PHP manual instance.
      *
      * Automatically detects the manual format and returns the appropriate manual type.
@@ -2160,7 +1950,6 @@ class Configuration
     }
 
     /**
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * Add an array of casters definitions.
      *
      * @param array $casters
@@ -2355,9 +2144,6 @@ class Configuration
      */
     public function getUpdateCheckCacheFile()
     {
-<<<<<<< HEAD
-        return ConfigPaths::touchFileWithMkdir($this->configPaths->currentConfigDir().'/update_check.json');
-=======
         $configDir = $this->configPaths->currentConfigDir();
         if ($configDir === null) {
             return false;
@@ -2492,7 +2278,6 @@ class Configuration
         }
 
         return $dataDir;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**

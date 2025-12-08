@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,11 +36,7 @@ class ValidClassNamePass extends NamespaceAwarePass
     const INTERFACE_TYPE = 'interface';
     const TRAIT_TYPE = 'trait';
 
-<<<<<<< HEAD
-    private $conditionalScopes = 0;
-=======
     private int $conditionalScopes = 0;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Validate class, interface and trait definitions.
@@ -64,11 +56,7 @@ class ValidClassNamePass extends NamespaceAwarePass
         if (self::isConditional($node)) {
             $this->conditionalScopes++;
 
-<<<<<<< HEAD
-            return;
-=======
             return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         if ($this->conditionalScopes === 0) {
@@ -80,11 +68,8 @@ class ValidClassNamePass extends NamespaceAwarePass
                 $this->validateTraitStatement($node);
             }
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -96,15 +81,9 @@ class ValidClassNamePass extends NamespaceAwarePass
     {
         if (self::isConditional($node)) {
             $this->conditionalScopes--;
-<<<<<<< HEAD
-
-            return;
-        }
-=======
         }
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     private static function isConditional(Node $node): bool
@@ -162,11 +141,7 @@ class ValidClassNamePass extends NamespaceAwarePass
     protected function ensureCanDefine(Stmt $stmt, string $scopeType = self::CLASS_TYPE)
     {
         // Anonymous classes don't have a name, and uniqueness shouldn't be enforced.
-<<<<<<< HEAD
-        if ($stmt->name === null) {
-=======
         if (!\property_exists($stmt, 'name') || $stmt->name === null) {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             return;
         }
 
@@ -289,33 +264,6 @@ class ValidClassNamePass extends NamespaceAwarePass
     }
 
     /**
-<<<<<<< HEAD
-     * Get a symbol type key for storing in the scope name cache.
-     *
-     * @deprecated No longer used. Scope type should be passed into ensureCanDefine directly.
-     *
-     * @codeCoverageIgnore
-     *
-     * @throws FatalErrorException
-     *
-     * @param Stmt $stmt
-     */
-    protected function getScopeType(Stmt $stmt): string
-    {
-        if ($stmt instanceof Class_) {
-            return self::CLASS_TYPE;
-        } elseif ($stmt instanceof Interface_) {
-            return self::INTERFACE_TYPE;
-        } elseif ($stmt instanceof Trait_) {
-            return self::TRAIT_TYPE;
-        }
-
-        throw $this->createError('Unsupported statement type', $stmt);
-    }
-
-    /**
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * Check whether a class exists, or has been defined in the current code snippet.
      *
      * Gives `self`, `static` and `parent` a free pass.
@@ -367,11 +315,8 @@ class ValidClassNamePass extends NamespaceAwarePass
         if (isset($this->currentScope[$name])) {
             return $this->currentScope[$name];
         }
-<<<<<<< HEAD
-=======
 
         return null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 
     /**
@@ -382,10 +327,6 @@ class ValidClassNamePass extends NamespaceAwarePass
      */
     protected function createError(string $msg, Stmt $stmt): FatalErrorException
     {
-<<<<<<< HEAD
-        return new FatalErrorException($msg, 0, \E_ERROR, null, $stmt->getLine());
-=======
         return new FatalErrorException($msg, 0, \E_ERROR, null, $stmt->getStartLine());
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
 }

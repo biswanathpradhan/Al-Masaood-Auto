@@ -30,11 +30,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-<<<<<<< HEAD
-=======
         //
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         parent::boot();
     }
 

@@ -1,14 +1,10 @@
 Mockery
 =======
 
-<<<<<<< HEAD
-[![Build Status](https://github.com/mockery/mockery/workflows/tests/badge.svg)](https://github.com/mockery/mockery/actions)
-=======
 [![Build Status](https://github.com/mockery/mockery/actions/workflows/tests.yml/badge.svg)](https://github.com/mockery/mockery/actions)
 [![Supported PHP Version](https://badgen.net/packagist/php/mockery/mockery?color=8892bf)](https://www.php.net/supported-versions)
 [![Code Coverage](https://codecov.io/gh/mockery/mockery/branch/1.6.x/graph/badge.svg?token=oxHwVM56bT)](https://codecov.io/gh/mockery/mockery)
 [![Type Coverage](https://shepherd.dev/github/mockery/mockery/coverage.svg)](https://shepherd.dev/github/mockery/mockery)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 [![Latest Stable Version](https://poser.pugx.org/mockery/mockery/v/stable.svg)](https://packagist.org/packages/mockery/mockery)
 [![Total Downloads](https://poser.pugx.org/mockery/mockery/downloads.svg)](https://packagist.org/packages/mockery/mockery)
 
@@ -40,8 +36,6 @@ to learn how to use Mockery.
 
 The current version can be seen at [docs.mockery.io](http://docs.mockery.io).
 
-<<<<<<< HEAD
-=======
 ## PHPUnit Integration
 
 Mockery ships with some helpers if you are using PHPUnit. You can extend the
@@ -50,7 +44,6 @@ class instead of `PHPUnit\Framework\TestCase`, or if you are already using a
 custom base class for your tests, take a look at the traits available in the
 [`Mockery\Adapter\Phpunit`](library/Mockery/Adapter/Phpunit) namespace.
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 ## Test Doubles
 
 Test doubles (often called mocks) simulate the behaviour of real objects. They are
@@ -177,11 +170,7 @@ $double->expects()->add($book)->twice();
 If you have used Mockery before, you might see something new in the example
 above &mdash; we created a method expectation using `expects`, instead of the "old"
 `shouldReceive` syntax. This is a new feature of Mockery v1, but same as with
-<<<<<<< HEAD
-`accepts` in the previous section, it can be written in the "old" style.
-=======
 `allows` in the previous section, it can be written in the "old" style.
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 For new users of Mockery, the above example can also be written as:
 
@@ -289,11 +278,7 @@ versioning scheme.
 
 ### Alternative Runtimes
 
-<<<<<<< HEAD
-Mockery will attempt to continue support HHVM, but will not make any guarantees.
-=======
 Mockery 1.3 was the last version to support HHVM 3 and PHP 5. There is no support for HHVM 4+.
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 ## A new home for Mockery
 

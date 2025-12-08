@@ -16,15 +16,6 @@
     },
     "prefer-stable": true,
     "require": {
-<<<<<<< HEAD
-        "php": ">=7.1",
-        "ext-tokenizer": "*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^7.0"
-    },
-    "config": {
-=======
         "php": "^7.3 || ^8.0",
         "ext-tokenizer": "*"
     },
@@ -35,7 +26,6 @@
         "platform": {
             "php": "7.3.0"
         },
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         "optimize-autoloader": true,
         "sort-packages": true
     },
@@ -46,11 +36,7 @@
     },
     "extra": {
         "branch-alias": {
-<<<<<<< HEAD
-            "dev-master": "3.1-dev"
-=======
             "dev-master": "4.0-dev"
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
     }
 }

@@ -15,23 +15,6 @@ use PhpParser\Node\Expr;
  *
  * @internal
  */
-<<<<<<< HEAD
-class PrintableNewAnonClassNode extends Expr
-{
-    /** @var Node\AttributeGroup[] PHP attribute groups */
-    public $attrGroups;
-    /** @var int Modifiers */
-    public $flags;
-    /** @var Node\Arg[] Arguments */
-    public $args;
-    /** @var null|Node\Name Name of extended class */
-    public $extends;
-    /** @var Node\Name[] Names of implemented interfaces */
-    public $implements;
-    /** @var Node\Stmt[] Statements */
-    public $stmts;
-
-=======
 class PrintableNewAnonClassNode extends Expr {
     /** @var Node\AttributeGroup[] PHP attribute groups */
     public array $attrGroups;
@@ -54,7 +37,6 @@ class PrintableNewAnonClassNode extends Expr {
      * @param Node\Stmt[] $stmts Statements
      * @param array<string, mixed> $attributes Attributes
      */
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     public function __construct(
         array $attrGroups, int $flags, array $args, ?Node\Name $extends, array $implements,
         array $stmts, array $attributes
@@ -68,11 +50,7 @@ class PrintableNewAnonClassNode extends Expr {
         $this->stmts = $stmts;
     }
 
-<<<<<<< HEAD
-    public static function fromNewNode(Expr\New_ $newNode) {
-=======
     public static function fromNewNode(Expr\New_ $newNode): self {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $class = $newNode->class;
         assert($class instanceof Node\Stmt\Class_);
         // We don't assert that $class->name is null here, to allow consumers to assign unique names
@@ -83,19 +61,11 @@ class PrintableNewAnonClassNode extends Expr {
         );
     }
 
-<<<<<<< HEAD
-    public function getType() : string {
-        return 'Expr_PrintableNewAnonClass';
-    }
-
-    public function getSubNodeNames() : array {
-=======
     public function getType(): string {
         return 'Expr_PrintableNewAnonClass';
     }
 
     public function getSubNodeNames(): array {
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         return ['attrGroups', 'flags', 'args', 'extends', 'implements', 'stmts'];
     }
 }

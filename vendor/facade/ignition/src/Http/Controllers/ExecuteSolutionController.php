@@ -14,20 +14,15 @@ class ExecuteSolutionController
         ExecuteSolutionRequest $request,
         SolutionProviderRepository $solutionProviderRepository
     ) {
-<<<<<<< HEAD
-=======
         $this->ensureLocalEnvironment();
         $this->ensureLocalRequest();
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $solution = $request->getRunnableSolution();
 
         $solution->run($request->get('parameters', []));
 
         return response('');
     }
-<<<<<<< HEAD
-=======
 
     public function ensureLocalEnvironment()
     {
@@ -48,5 +43,4 @@ class ExecuteSolutionController
             abort(403, "Solutions can only be executed by requests from a local IP address. Please also make sure `APP_DEBUG` is set to false on ANY production environment.");
         }
     }
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 }

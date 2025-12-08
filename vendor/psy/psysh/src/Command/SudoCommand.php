@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -28,17 +24,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SudoCommand extends Command
 {
-<<<<<<< HEAD
-    private $readline;
-    private $parser;
-    private $traverser;
-    private $printer;
-=======
     private Readline $readline;
     private CodeArgumentParser $parser;
     private NodeTraverser $traverser;
     private Printer $printer;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * {@inheritdoc}
@@ -47,10 +36,7 @@ class SudoCommand extends Command
     {
         $this->parser = new CodeArgumentParser();
 
-<<<<<<< HEAD
-=======
         // @todo Pass visitor directly to once we drop support for PHP-Parser 4.x
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $this->traverser = new NodeTraverser();
         $this->traverser->addVisitor(new SudoVisitor());
 
@@ -111,11 +97,7 @@ HELP
      *
      * @return int 0 if everything went fine, or an exit code
      */
-<<<<<<< HEAD
-    protected function execute(InputInterface $input, OutputInterface $output)
-=======
     protected function execute(InputInterface $input, OutputInterface $output): int
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         $code = $input->getArgument('code');
 
@@ -131,12 +113,8 @@ HELP
         $nodes = $this->traverser->traverse($this->parser->parse($code));
 
         $sudoCode = $this->printer->prettyPrint($nodes);
-<<<<<<< HEAD
-        $shell = $this->getApplication();
-=======
 
         $shell = $this->getShell();
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         $shell->addCode($sudoCode, !$shell->hasCode());
 
         return 0;

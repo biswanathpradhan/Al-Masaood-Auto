@@ -4,31 +4,13 @@ namespace PhpParser\Builder;
 
 use PhpParser;
 use PhpParser\BuilderHelpers;
-<<<<<<< HEAD
-=======
 use PhpParser\Modifiers;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\ComplexType;
 
-<<<<<<< HEAD
-class Property implements PhpParser\Builder
-{
-    protected $name;
-
-    protected $flags = 0;
-    protected $default = null;
-    protected $attributes = [];
-
-    /** @var null|Identifier|Name|NullableType */
-    protected $type;
-
-    /** @var Node\AttributeGroup[] */
-    protected $attributeGroups = [];
-=======
 class Property implements PhpParser\Builder {
     protected string $name;
 
@@ -43,7 +25,6 @@ class Property implements PhpParser\Builder {
     protected array $attributeGroups = [];
     /** @var list<Node\PropertyHook> */
     protected array $hooks = [];
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Creates a property builder.
@@ -60,11 +41,7 @@ class Property implements PhpParser\Builder {
      * @return $this The builder instance (for fluid interface)
      */
     public function makePublic() {
-<<<<<<< HEAD
-        $this->flags = BuilderHelpers::addModifier($this->flags, Stmt\Class_::MODIFIER_PUBLIC);
-=======
         $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::PUBLIC);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         return $this;
     }
@@ -75,11 +52,7 @@ class Property implements PhpParser\Builder {
      * @return $this The builder instance (for fluid interface)
      */
     public function makeProtected() {
-<<<<<<< HEAD
-        $this->flags = BuilderHelpers::addModifier($this->flags, Stmt\Class_::MODIFIER_PROTECTED);
-=======
         $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::PROTECTED);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         return $this;
     }
@@ -90,11 +63,7 @@ class Property implements PhpParser\Builder {
      * @return $this The builder instance (for fluid interface)
      */
     public function makePrivate() {
-<<<<<<< HEAD
-        $this->flags = BuilderHelpers::addModifier($this->flags, Stmt\Class_::MODIFIER_PRIVATE);
-=======
         $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::PRIVATE);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         return $this;
     }
@@ -105,11 +74,7 @@ class Property implements PhpParser\Builder {
      * @return $this The builder instance (for fluid interface)
      */
     public function makeStatic() {
-<<<<<<< HEAD
-        $this->flags = BuilderHelpers::addModifier($this->flags, Stmt\Class_::MODIFIER_STATIC);
-=======
         $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::STATIC);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         return $this;
     }
@@ -120,9 +85,6 @@ class Property implements PhpParser\Builder {
      * @return $this The builder instance (for fluid interface)
      */
     public function makeReadonly() {
-<<<<<<< HEAD
-        $this->flags = BuilderHelpers::addModifier($this->flags, Stmt\Class_::MODIFIER_READONLY);
-=======
         $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::READONLY);
 
         return $this;
@@ -168,7 +130,6 @@ class Property implements PhpParser\Builder {
      */
     public function makeProtectedSet() {
         $this->flags = BuilderHelpers::addModifier($this->flags, Modifiers::PROTECTED_SET);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         return $this;
     }
@@ -228,8 +189,6 @@ class Property implements PhpParser\Builder {
     }
 
     /**
-<<<<<<< HEAD
-=======
      * Adds a property hook.
      *
      * @return $this The builder instance (for fluid interface)
@@ -241,22 +200,10 @@ class Property implements PhpParser\Builder {
     }
 
     /**
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * Returns the built class node.
      *
      * @return Stmt\Property The built property node
      */
-<<<<<<< HEAD
-    public function getNode() : PhpParser\Node {
-        return new Stmt\Property(
-            $this->flags !== 0 ? $this->flags : Stmt\Class_::MODIFIER_PUBLIC,
-            [
-                new Stmt\PropertyProperty($this->name, $this->default)
-            ],
-            $this->attributes,
-            $this->type,
-            $this->attributeGroups
-=======
     public function getNode(): PhpParser\Node {
         if ($this->flags & Modifiers::ABSTRACT && !$this->hooks) {
             throw new PhpParser\Error('Only hooked properties may be declared abstract');
@@ -271,7 +218,6 @@ class Property implements PhpParser\Builder {
             $this->type,
             $this->attributeGroups,
             $this->hooks
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         );
     }
 }

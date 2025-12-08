@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,12 +12,8 @@
 namespace Psy\CodeCleaner;
 
 use PhpParser\Node;
-<<<<<<< HEAD
-use PhpParser\Node\Identifier;
-=======
 use PhpParser\Node\DeclareItem;
 use PhpParser\Node\Scalar\Int_;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use PhpParser\Node\Scalar\LNumber;
 use PhpParser\Node\Stmt\Declare_;
 use PhpParser\Node\Stmt\DeclareDeclare;
@@ -41,11 +33,7 @@ class StrictTypesPass extends CodeCleanerPass
 {
     const EXCEPTION_MESSAGE = 'strict_types declaration must have 0 or 1 as its value';
 
-<<<<<<< HEAD
-    private $strictTypes = false;
-=======
     private bool $strictTypes;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * @param bool $strictTypes enforce strict types by default
@@ -74,20 +62,11 @@ class StrictTypesPass extends CodeCleanerPass
         foreach ($nodes as $node) {
             if ($node instanceof Declare_) {
                 foreach ($node->declares as $declare) {
-<<<<<<< HEAD
-                    // For PHP Parser 4.x
-                    $declareKey = $declare->key instanceof Identifier ? $declare->key->toString() : $declare->key;
-                    if ($declareKey === 'strict_types') {
-                        $value = $declare->value;
-                        if (!$value instanceof LNumber || ($value->value !== 0 && $value->value !== 1)) {
-                            throw new FatalErrorException(self::EXCEPTION_MESSAGE, 0, \E_ERROR, null, $node->getLine());
-=======
                     if ($declare->key->toString() === 'strict_types') {
                         $value = $declare->value;
                         // @todo Remove LNumber once we drop support for PHP-Parser 4.x
                         if ((!$value instanceof LNumber && !$value instanceof Int_) || ($value->value !== 0 && $value->value !== 1)) {
                             throw new FatalErrorException(self::EXCEPTION_MESSAGE, 0, \E_ERROR, null, $node->getStartLine());
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                         }
 
                         $this->strictTypes = $value->value === 1;
@@ -99,9 +78,6 @@ class StrictTypesPass extends CodeCleanerPass
         if ($prependStrictTypes) {
             $first = \reset($nodes);
             if (!$first instanceof Declare_) {
-<<<<<<< HEAD
-                $declare = new Declare_([new DeclareDeclare('strict_types', new LNumber(1))]);
-=======
                 // @todo Switch to PhpParser\Node\DeclareItem once we drop support for PHP-Parser 4.x
                 // @todo Remove LNumber once we drop support for PHP-Parser 4.x
                 $arg = \class_exists('PhpParser\Node\Scalar\Int_') ? new Int_(1) : new LNumber(1);
@@ -109,7 +85,6 @@ class StrictTypesPass extends CodeCleanerPass
                     new DeclareItem('strict_types', $arg) :
                     new DeclareDeclare('strict_types', $arg);
                 $declare = new Declare_([$declareItem]);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                 \array_unshift($nodes, $declare);
             }
         }

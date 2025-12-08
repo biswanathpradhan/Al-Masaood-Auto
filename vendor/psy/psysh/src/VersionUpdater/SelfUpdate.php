@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -31,20 +27,9 @@ class SelfUpdate
     const SUCCESS = 0;
     const FAILURE = 1;
 
-<<<<<<< HEAD
-    /** @var Checker */
-    private $checker;
-
-    /** @var Installer */
-    private $installer;
-
-    /** @var Downloader */
-    private $downloader;
-=======
     private Checker $checker;
     private Installer $installer;
     private ?Downloader $downloader = null;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     public function __construct(Checker $checker, Installer $installer)
     {
@@ -55,11 +40,6 @@ class SelfUpdate
     /**
      * Allow the downloader to be injected for testing.
      *
-<<<<<<< HEAD
-     * @param Downloader $downloader
-     *
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * @return void
      */
     public function setDownloader(Downloader $downloader)
@@ -86,11 +66,6 @@ class SelfUpdate
      *
      * The file name used in the URL will include the flavour postfix extracted from the current version
      * if it's present
-<<<<<<< HEAD
-     *
-     * @param string $latestVersion
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      */
     private function getAssetUrl(string $latestVersion): string
     {
@@ -108,12 +83,6 @@ class SelfUpdate
     /**
      * Execute the self-update process.
      *
-<<<<<<< HEAD
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
      * @throws ErrorException if the current version is not restored when installation fails
      */
     public function run(InputInterface $input, OutputInterface $output): int

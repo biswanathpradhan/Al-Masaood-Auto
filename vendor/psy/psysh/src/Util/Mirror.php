@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,12 +12,7 @@
 namespace Psy\Util;
 
 use Psy\Exception\RuntimeException;
-<<<<<<< HEAD
-use Psy\Reflection\ReflectionClassConstant;
-use Psy\Reflection\ReflectionConstant_;
-=======
 use Psy\Reflection\ReflectionConstant;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Psy\Reflection\ReflectionNamespace;
 
 /**
@@ -45,15 +36,6 @@ class Mirror
      * @throws \Psy\Exception\RuntimeException when a $member specified but not present on $value
      * @throws \InvalidArgumentException       if $value is something other than an object or class/function name
      *
-<<<<<<< HEAD
-     * @param mixed  $value  Class or function name, or variable instance
-     * @param string $member Optional: property, constant or method name (default: null)
-     * @param int    $filter (default: CONSTANT | METHOD | PROPERTY | STATIC_PROPERTY)
-     *
-     * @return \Reflector
-     */
-    public static function get($value, string $member = null, int $filter = 15): \Reflector
-=======
      * @param mixed       $value  Class or function name, or variable instance
      * @param string|null $member Optional: property, constant or method name (default: null)
      * @param int         $filter (default: CONSTANT | METHOD | PROPERTY | STATIC_PROPERTY)
@@ -61,18 +43,12 @@ class Mirror
      * @return \Reflector
      */
     public static function get($value, ?string $member = null, int $filter = 15): \Reflector
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if ($member === null && \is_string($value)) {
             if (\function_exists($value)) {
                 return new \ReflectionFunction($value);
-<<<<<<< HEAD
-            } elseif (\defined($value) || ReflectionConstant_::isMagicConstant($value)) {
-                return new ReflectionConstant_($value);
-=======
             } elseif (\defined($value) || ReflectionConstant::isMagicConstant($value)) {
                 return new ReflectionConstant($value);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             }
         }
 
@@ -81,11 +57,7 @@ class Mirror
         if ($member === null) {
             return $class;
         } elseif ($filter & self::CONSTANT && $class->hasConstant($member)) {
-<<<<<<< HEAD
-            return ReflectionClassConstant::create($value, $member);
-=======
             return new \ReflectionClassConstant($value, $member);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         } elseif ($filter & self::METHOD && $class->hasMethod($member)) {
             return $class->getMethod($member);
         } elseif ($filter & self::PROPERTY && $class->hasProperty($member)) {

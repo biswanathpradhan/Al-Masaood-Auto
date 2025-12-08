@@ -3,11 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
-<<<<<<< HEAD
- * (c) 2012-2023 Justin Hileman
-=======
  * (c) 2012-2025 Justin Hileman
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,10 +11,7 @@
 
 namespace Psy\Command;
 
-<<<<<<< HEAD
-=======
 use Psy\ConfigPaths;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 use Psy\Context;
 use Psy\ContextAware;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,20 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class EditCommand extends Command implements ContextAware
 {
-<<<<<<< HEAD
-    /**
-     * @var string
-     */
-    private $runtimeDir = '';
-
-    /**
-     * @var Context
-     */
-    private $context;
-=======
     private string $runtimeDir = '';
     private Context $context;
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
     /**
      * Constructor.
@@ -92,11 +73,7 @@ class EditCommand extends Command implements ContextAware
      * @throws \InvalidArgumentException when both exec and no-exec flags are given or if a given variable is not found in the current context
      * @throws \UnexpectedValueException if file_get_contents on the edited file returns false instead of a string
      */
-<<<<<<< HEAD
-    protected function execute(InputInterface $input, OutputInterface $output)
-=======
     protected function execute(InputInterface $input, OutputInterface $output): int
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if ($input->getOption('exec') &&
             $input->getOption('no-exec')) {
@@ -114,10 +91,7 @@ class EditCommand extends Command implements ContextAware
         $shouldRemoveFile = false;
 
         if ($filePath === null) {
-<<<<<<< HEAD
-=======
             ConfigPaths::ensureDir($this->runtimeDir);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
             $filePath = \tempnam($this->runtimeDir, 'psysh-edit-command');
             $shouldRemoveFile = true;
         }
@@ -125,11 +99,7 @@ class EditCommand extends Command implements ContextAware
         $editedContent = $this->editFile($filePath, $shouldRemoveFile);
 
         if ($execute) {
-<<<<<<< HEAD
-            $this->getApplication()->addInput($editedContent);
-=======
             $this->getShell()->addInput($editedContent);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         }
 
         return 0;
@@ -140,11 +110,7 @@ class EditCommand extends Command implements ContextAware
      * @param bool        $noExecOption
      * @param string|null $filePath
      */
-<<<<<<< HEAD
-    private function shouldExecuteFile(bool $execOption, bool $noExecOption, string $filePath = null): bool
-=======
     private function shouldExecuteFile(bool $execOption, bool $noExecOption, ?string $filePath = null): bool
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         if ($execOption) {
             return true;
@@ -165,11 +131,7 @@ class EditCommand extends Command implements ContextAware
      *
      * @throws \InvalidArgumentException If the variable is not found in the current context
      */
-<<<<<<< HEAD
-    private function extractFilePath(string $fileArgument = null)
-=======
     private function extractFilePath(?string $fileArgument = null)
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     {
         // If the file argument was a variable, get it from the context
         if ($fileArgument !== null &&
