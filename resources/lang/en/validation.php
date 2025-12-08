@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return [
 
@@ -1388,59 +1388,6 @@ return [
     */
 
     'custom' => [
-<<<<<<< HEAD
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
-        ],
-        // XSS Protection - Custom validation messages
-        'username' => [
-            'regex' => 'The username may only contain letters, spaces, apostrophes, hyphens, and dots.',
-        ],
-        'mobile_number' => [
-            'regex' => 'The mobile number may only contain digits, plus sign, spaces, hyphens, and parentheses.',
-        ],
-        'otp' => [
-            'regex' => 'The OTP may only contain digits.',
-        ],
-        'session_id' => [
-            'regex' => 'The session ID contains invalid characters.',
-        ],
-        'customer_id' => [
-            'integer' => 'The customer ID must be a valid number.',
-        ],
-        'device_id' => [
-            'regex' => 'The device ID contains invalid characters.',
-        ],
-        'device_token' => [
-            'regex' => 'The device token contains invalid characters.',
-        ],
-        'car_registration_number' => [
-            'regex' => 'The car registration number may only contain letters, numbers, spaces, and hyphens.',
-        ],
-        'reg_chasis_number' => [
-            'regex' => 'The chassis number may only contain letters, numbers, and hyphens.',
-        ],
-        'category_number' => [
-            'regex' => 'The category number may only contain letters, numbers, spaces, and hyphens.',
-        ],
-        'language_id' => [
-            'in' => 'The language ID must be 1 (English) or 2 (Arabic).',
-        ],
-        'main_brand_id' => [
-            'integer' => 'The brand ID must be a valid number.',
-        ],
-        'reg_brand_id' => [
-            'integer' => 'The brand ID must be a valid number.',
-        ],
-        'reg_model_id' => [
-            'integer' => 'The model ID must be a valid number.',
-        ],
-        'latitude' => [
-            'between' => 'The latitude must be between -90 and 90.',
-        ],
-        'longitude' => [
-            'between' => 'The longitude must be between -180 and 180.',
-=======
         'email' => [
             'required' => 'Email address is required.',
             'email' => 'Please enter a valid email address.',
@@ -1507,7 +1454,6 @@ return [
         'service' => [
             'required' => 'Service selection is required.',
             'exists' => 'Selected service is invalid.',
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         ],
     ],
 
@@ -1522,9 +1468,6 @@ return [
     |
     */
 
-<<<<<<< HEAD
-    'attributes' => [],
-=======
     'attributes' => [
         'email' => 'email address',
         'name' => 'name',
@@ -1565,6 +1508,5 @@ return [
         'page' => 'page',
         'per_page' => 'items per page',
     ],
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
 ];

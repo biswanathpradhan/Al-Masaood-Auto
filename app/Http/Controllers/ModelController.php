@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Redirect;
@@ -46,10 +46,6 @@ use App\User;
 use App\helpers;
 use App\customer;
 use App\service_package_enquiry;
-<<<<<<< HEAD
-use App\ValidationHelper;
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
  
 
 
@@ -2207,41 +2203,6 @@ public function __construct()
 
  public static function getquotes(Request $request)
     {    
-<<<<<<< HEAD
-            // XSS Protection: Validate and sanitize input parameters
-            $validator = Validator::make($request->all(), [
-                'model_id_filter' => ['nullable', 'integer', 'min:1'],
-                'search' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s\@\.\-\_]+$/'],
-            ], ValidationHelper::errorMessages());
-
-            if ($validator->fails()) {
-                return response()->json(['error' => 'Invalid input parameters'], 400);
-            }
-
-            if ($request->ajax()) {
-              
-            $data = quote::getquoteslistquery();
-            $dataupdate = quote::updatecountstatus();
-            
-            // Sanitize filter inputs
-            $modelIdFilter = $request->get('model_id_filter') ? (int)$request->get('model_id_filter') : null;
-            $searchTerm = $request->get('search') ? ValidationHelper::sanitize($request->get('search')) : null;
-
-            return Datatables::of($data)
-                    ->addIndexColumn()
-                  ->filter(function ($instance) use ($modelIdFilter, $searchTerm) {
-                        if ($modelIdFilter !== null && $modelIdFilter != '' && $modelIdFilter != 4) {
-                            $instance->where('testdrive.main_brand_id', $modelIdFilter);
-                        }
-                        if (!empty($searchTerm)) {
-                             $instance->where(function($w) use($searchTerm){
-                                $w->orWhere('customer.username', 'LIKE', "%$searchTerm%")
-                                ->orWhere('customer.mobile_number', 'LIKE', "%$searchTerm%")
-                                ->orWhere('customer.email', 'LIKE', "%$searchTerm%")
-                                ->orWhere('car_model.model_name', 'LIKE', "%$searchTerm%")
-                                ->orWhere('city_master.city', 'LIKE', "%$searchTerm%")
-                                ->orWhere('showroom.name', 'LIKE', "%$searchTerm%");
-=======
      // $value = Session::get('model_id');
       // dd(self::$version_image_url);
       // dd("here in getcustomers".$value);
@@ -2271,19 +2232,15 @@ public function __construct()
                                 ->orWhere('car_model.model_name', 'LIKE', "%$search%")
                                 ->orWhere('city_master.city', 'LIKE', "%$search%")
                                 ->orWhere('showroom.name', 'LIKE', "%$search%");
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                                
                             });
                         }
                     })
-<<<<<<< HEAD
-=======
 
 
                     
                          
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
                     ->make(true); 
        
     }   
@@ -2686,24 +2643,6 @@ public function __construct()
 
     public static function getmodelquotesave(Request $request)
     {
-<<<<<<< HEAD
-        // XSS Protection: Using ValidationHelper for secure input validation
-        $brand_id = getallBrands()->pluck('id')->toArray();
-        $city_id = getallcities()->pluck('id')->toArray();
-        $showroom_id = getallshowroom()->pluck('id')->toArray();
-
-        $validator = Validator::make($request->all(), [
-            'session_id' => ValidationHelper::sessionId(),
-            'customer_id' => ValidationHelper::customerId(),
-            'main_brand_id' => ['required', 'integer', Rule::in($brand_id)],
-            'model_id' => ValidationHelper::modelId(),
-            'version_id' => ValidationHelper::positiveInteger(),
-            'car_owned_type' => ValidationHelper::carOwnedType(),
-            'city_id' => ['required', 'integer', Rule::in($city_id)],
-            'showroom_id' => ['required', 'integer', Rule::in($showroom_id)],
-            'language_id' => ValidationHelper::languageId()
-        ], ValidationHelper::errorMessages());
-=======
         $brand_id = getallBrands()->pluck('id'); // 
         $city_id = getallcities()->pluck('id'); // 
         $showroom_id = getallshowroom()->pluck('id'); // 
@@ -2724,7 +2663,6 @@ public function __construct()
       'language_id' => ['required',Rule::in($language_id)]
 
         ]);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
          if ($validator->fails()) {
             // return $validator->errors();
@@ -2777,26 +2715,6 @@ public function __construct()
 
     public static function getmodeltestdrivesave(Request $request)
     {
-<<<<<<< HEAD
-        // XSS Protection: Using ValidationHelper for secure input validation
-        $brand_id = getallBrands()->pluck('id')->toArray();
-        $city_id = getallcities()->pluck('id')->toArray();
-        $showroom_id = getallshowroom()->pluck('id')->toArray();
-
-        $validator = Validator::make($request->all(), [
-            'session_id' => ValidationHelper::sessionId(),
-            'customer_id' => ValidationHelper::customerId(),
-            'main_brand_id' => ['required', 'integer', Rule::in($brand_id)],
-            'model_id' => ValidationHelper::modelId(),
-            'version_id' => ValidationHelper::positiveInteger(),
-            'car_owned_type' => ValidationHelper::carOwnedType(),
-            'city_id' => ['required', 'integer', Rule::in($city_id)],
-            'showroom_id' => ['required', 'integer', Rule::in($showroom_id)],
-            'language_id' => ValidationHelper::languageId(),
-            'date' => ['required', 'date', 'after:yesterday'],
-            'time' => ['required', 'date_format:H:i']
-        ], ValidationHelper::errorMessages());
-=======
         $brand_id = getallBrands()->pluck('id'); // 
         $city_id = getallcities()->pluck('id'); // 
         $showroom_id = getallshowroom()->pluck('id'); // 
@@ -2819,7 +2737,6 @@ public function __construct()
             //]
 
         ]);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
          if ($validator->fails()) {
             // return $validator->errors();
@@ -3940,20 +3857,6 @@ public static function editcarApi(Request $request)
 
      public static function getmodelversiondetails(Request $request)
     {
-<<<<<<< HEAD
-        // XSS Protection: Using ValidationHelper for secure input validation
-        $brand_id = getallBrands()->pluck('id')->toArray();
-
-        $validator = Validator::make($request->all(), [
-            'session_id' => ValidationHelper::sessionId(),
-            'customer_id' => ValidationHelper::customerId(),
-            'main_brand_id' => ['required', 'integer', Rule::in($brand_id)],
-            'model_id' => ValidationHelper::modelId(),
-            'version_id' => ValidationHelper::positiveInteger(),
-            'language_id' => ValidationHelper::languageId(),
-            'car_owned_type' => ValidationHelper::carOwnedType()
-        ], ValidationHelper::errorMessages());
-=======
         $brand_id = getallBrands()->pluck('id'); // 
   
         $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
@@ -3970,7 +3873,6 @@ public static function editcarApi(Request $request)
             //]
 
         ]);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
          if ($validator->fails()) {
             // return $validator->errors();
@@ -4394,24 +4296,6 @@ public static function versionaccessoriesenquiry(Request $request)
 
     public static function getmodeltradeinsave(Request $request)
     {
-<<<<<<< HEAD
-        // XSS Protection: Using ValidationHelper for secure input validation
-        $brand_id = getallBrands()->pluck('id')->toArray();
-
-        $validator = Validator::make($request->all(), [
-            'session_id' => ValidationHelper::sessionId(),
-            'customer_id' => ValidationHelper::customerId(),
-            'customer_vehicles_id' => ValidationHelper::positiveInteger(),
-            'main_brand_id' => ['required', 'integer', Rule::in($brand_id)],
-            'model_id' => ValidationHelper::modelId(),
-            'car_owned_type' => ValidationHelper::carOwnedType(),
-            'language_id' => ValidationHelper::languageId(),
-            'mileage' => ['required', 'numeric', 'min:0', 'max:999999'],
-            'customer_name' => ValidationHelper::username(),
-            'customer_mobile_number' => ValidationHelper::mobileNumber(),
-            'customer_email' => ValidationHelper::email()
-        ], ValidationHelper::errorMessages());
-=======
 
 
         $brand_id = getallBrands()->pluck('id'); // 
@@ -4442,7 +4326,6 @@ public static function versionaccessoriesenquiry(Request $request)
             //]
 
         ]);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
         
          if ($validator->fails()) {
             // return $validator->errors();
@@ -7778,19 +7661,12 @@ public static function editspecification(Request $request)
 
     public static function getcityApi(Request $request)
     {
-<<<<<<< HEAD
-        // XSS Protection: Using ValidationHelper for secure input validation
-        $validator = Validator::make($request->all(), [
-            'language_id' => ValidationHelper::languageId()
-        ], ValidationHelper::errorMessages());
-=======
 
        $language_id = [1,2]; // 
         $validator = Validator::make($request->all(), [
             'language_id' => ['required',Rule::in($language_id)]
    
         ]);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         if ($validator->fails()) {
             // return $validator->errors();
@@ -7805,20 +7681,6 @@ public static function editspecification(Request $request)
 
             // return  $getallcities;
         }
-<<<<<<< HEAD
-    }
-
-    public static function getshowroomApi(Request $request)
-    { 
-        // XSS Protection: Using ValidationHelper for secure input validation
-        $city_ids = getallcities()->pluck('id')->toArray();
-    
-        $validator = Validator::make($request->all(), [
-            'language_id' => ValidationHelper::languageId(),
-            'main_brand_id' => ValidationHelper::brandId(false),
-            'city_id' => ['nullable', 'integer', Rule::in($city_ids)]
-        ], ValidationHelper::errorMessages());
-=======
       
        
 
@@ -7839,7 +7701,6 @@ public static function editspecification(Request $request)
             'city_id' => [Rule::in($city_id)]
    
         ]);
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
 
         if ($validator->fails()) {
             // return $validator->errors();
@@ -7851,12 +7712,9 @@ public static function editspecification(Request $request)
 
             return ["status" => "1","response_message" => "success","display_message" => "Showroom List","showroom_list" =>  $getallshowroom];
         }
-<<<<<<< HEAD
-=======
       
       
 
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     }
     public static function getallshowroomApi(Request $request)
     {
