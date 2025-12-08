@@ -171,6 +171,57 @@ class appointment extends Model
 
      }
 
+     /**
+      * Get paginated appointments API
+      * 
+      * @param Request $request
+      * @param int $perPage
+      * @param int $page
+      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+      */
+     public static function getappointmentsApiPaginated(Request $request, $perPage = 15, $page = 1)
+     {
+         // Sanitize inputs
+         $perPage = max(1, min(100, (int) $perPage));
+         $page = max(1, (int) $page);
+         $customer_id = isset($request->customer_id) ? (int) $request->customer_id : null;
+         $session_id = isset($request->session_id) ? trim($request->session_id) : null;
+
+         if($customer_id && $customer_id > 0 && $session_id)
+         {
+             $query = appointment::join('main_brand','main_brand.id','=','form_book_appointment.main_brand_id')
+                 ->join('car_service_status','car_service_status.id','=','form_book_appointment.status')
+                 ->where('form_book_appointment.soft_delete', 0)
+                 ->where('form_book_appointment.customer_id', $customer_id)
+                 ->where('form_book_appointment.session_id', $session_id)
+                 ->select('form_book_appointment.id','form_book_appointment.car_model as model_name','form_book_appointment.chassis_number','form_book_appointment.appointment_date','form_book_appointment.appointment_time','form_book_appointment.created_at','car_service_status.status','car_service_status.id as statusid',DB::raw('(CASE 
+                                 WHEN form_book_appointment.reschedule_status = "1" THEN "Yes"
+                                 ELSE "No"
+                                 END) AS reschedule_status'));
+         }
+         else
+         {
+             $query = appointment::join('main_brand','main_brand.id','=','form_book_appointment.main_brand_id')
+                 ->join('car_service_status','car_service_status.id','=','form_book_appointment.status')
+                 ->join('customer','customer.id','=','form_book_appointment.customer_id')
+                 ->join('service_needed','service_needed.id','=','form_book_appointment.service_needed_id')
+                 ->join('location','location.id','=','form_book_appointment.location_id')
+                 ->where('form_book_appointment.soft_delete', 0)
+                 ->select('form_book_appointment.id','form_book_appointment.car_model as model_name','form_book_appointment.chassis_number','form_book_appointment.appointment_date','form_book_appointment.appointment_time','form_book_appointment.created_at','car_service_status.status','form_book_appointment.customer_first_name','form_book_appointment.mobile_number','form_book_appointment.email','form_book_appointment.chassis_number','form_book_appointment.appointment_date','form_book_appointment.appointment_time','service_needed.service_needed_title','form_book_appointment.created_at',DB::raw('(CASE 
+                                 WHEN form_book_appointment.car_required = "1" THEN "Yes"
+                                 ELSE "No"
+                                 END) AS car_required'),DB::raw('(CASE 
+                                 WHEN form_book_appointment.pickup_required = "1" THEN "Yes"
+                                 ELSE "No"
+                                 END) AS pickup_required'),'location.location_name','car_service_status.id as statusid',DB::raw('(CASE 
+                                 WHEN form_book_appointment.reschedule_status = "1" THEN "Yes"
+                                 ELSE "No"
+                                 END) AS reschedule_status'));
+         }
+
+         return $query->orderBy('form_book_appointment.created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
+     }
+
         public static function getappointmentsApilist(Request $request)
      {
         // dd($request->upcoming_appointment);
@@ -241,6 +292,70 @@ class appointment extends Model
 
      }
 
+     /**
+      * Get paginated appointments list for a customer.
+      *
+      * @param Request $request
+      * @param int $perPage
+      * @param int $page
+      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+      */
+     public static function getappointmentsApilistPaginated(Request $request, $perPage = 15, $page = 1)
+     {
+         // Sanitize inputs
+         $customer_id = (int) $request->customer_id;
+         $upcoming_appointment = isset($request->upcoming_appointment) ? (int) $request->upcoming_appointment : 0;
+         $perPage = max(1, min(100, (int) $perPage));
+         $page = max(1, (int) $page);
+
+         $query = appointment::join('main_brand','main_brand.id','=','form_book_appointment.main_brand_id')
+             ->join('car_service_status','car_service_status.id','=','form_book_appointment.status')
+             ->join('customer','customer.id','=','form_book_appointment.customer_id')
+             ->join('customer_vehicles','customer_vehicles.chasis_number','=','form_book_appointment.chassis_number')
+             ->join('service_needed','service_needed.id','=','form_book_appointment.service_needed_id')
+             ->join('location','location.id','=','form_book_appointment.location_id')
+             ->where('form_book_appointment.soft_delete', 0)
+             ->where('customer_vehicles.soft_delete', 0)
+             ->where('car_service_status.id','<>',8)
+             ->where('form_book_appointment.customer_id', $customer_id);
+
+         // Filter by upcoming appointments if requested
+         if($upcoming_appointment == 1) {
+             $query->where('form_book_appointment.appointment_date', '>=', date('Y-m-d'));
+         }
+
+         $query->select(
+             'form_book_appointment.id',
+             'form_book_appointment.car_model as model_name',
+             'form_book_appointment.chassis_number',
+             'form_book_appointment.appointment_date',
+             'form_book_appointment.appointment_time',
+             'form_book_appointment.created_at',
+             'car_service_status.status',
+             'form_book_appointment.customer_first_name',
+             'form_book_appointment.mobile_number',
+             'form_book_appointment.email',
+             'service_needed.service_needed_title',
+             DB::raw('(CASE 
+                 WHEN form_book_appointment.car_required = "1" THEN "Yes"
+                 ELSE "No"
+                 END) AS car_required'),
+             DB::raw('(CASE 
+                 WHEN form_book_appointment.pickup_required = "1" THEN "Yes"
+                 ELSE "No"
+                 END) AS pickup_required'),
+             'location.location_name',
+             'customer_vehicles.car_registration_number as registration_number',
+             'customer_vehicles.category_dropdown as category',
+             'customer_vehicles.category_number'
+         )
+         ->groupBy('form_book_appointment.id')
+         ->orderBy('form_book_appointment.appointment_date', 'desc')
+         ->orderBy('form_book_appointment.appointment_time', 'desc');
+
+         return $query->paginate($perPage, ['*'], 'page', $page);
+     }
+
       public static function get_call_back_count()
      {
          $call_back_request = appointment::where('form_book_appointment.soft_delete', 0)->where('form_book_appointment.countstatus', 0)->count();
@@ -278,12 +393,57 @@ class appointment extends Model
                         WHEN form_book_appointment.pickup_required = "1" THEN "Yes"
                         ELSE "No"
                         END) AS pickup_required'),'location.location_name','customer_vehicles.car_registration_number as registration_number','customer_vehicles.category_dropdown as category','customer_vehicles.category_number')->groupBy('form_book_appointment.id')->get();  
- 
+
 
         return $appointment;
 
  
 
+     }
+
+     public static function getbookedAppointmentbyHistoryPaginated(Request $request, $perPage = 15, $page = 1)
+     {
+         // Sanitize inputs
+         $perPage = max(1, min(100, (int) $perPage));
+         $page = max(1, (int) $page);
+         $customer_id = isset($request->customer_id) ? (int) $request->customer_id : null;
+         $session_id = isset($request->session_id) ? trim($request->session_id) : null;
+
+         if($customer_id && $customer_id > 0)
+         {
+             $query = appointment::join('main_brand','main_brand.id','=','form_book_appointment.main_brand_id')
+                 ->join('car_service_status','car_service_status.id','=','form_book_appointment.status')
+                 ->join('customer','customer.id','=','form_book_appointment.customer_id')
+                 ->join('customer_vehicles','customer_vehicles.chasis_number','=','form_book_appointment.chassis_number')
+                 ->join('service_needed','service_needed.id','=','form_book_appointment.service_needed_id')
+                 ->join('location','location.id','=','form_book_appointment.location_id')
+                 
+                 ->where('form_book_appointment.soft_delete', 0)
+                 ->where('customer_vehicles.soft_delete', 0)
+                 ->where('form_book_appointment.customer_id', $customer_id)
+                 ->where('form_book_appointment.appointment_date', '<', date('Y-m-d'))
+                 ->where('car_service_status.id','<>',8)
+                 ->select('form_book_appointment.id','form_book_appointment.car_model as model_name','form_book_appointment.chassis_number','form_book_appointment.appointment_date','form_book_appointment.appointment_time','form_book_appointment.created_at','car_service_status.status','form_book_appointment.customer_first_name','form_book_appointment.mobile_number','form_book_appointment.email','service_needed.service_needed_title',DB::raw('(CASE 
+                                 WHEN form_book_appointment.car_required = "1" THEN "Yes"
+                                 ELSE "No"
+                                 END) AS car_required'),DB::raw('(CASE 
+                                 WHEN form_book_appointment.pickup_required = "1" THEN "Yes"
+                                 ELSE "No"
+                                 END) AS pickup_required'),'location.location_name','customer_vehicles.car_registration_number as registration_number','customer_vehicles.category_dropdown as category','customer_vehicles.category_number')
+                 ->groupBy('form_book_appointment.id')
+                 ->orderBy('form_book_appointment.appointment_date', 'desc')
+                 ->orderBy('form_book_appointment.appointment_time', 'desc');
+         }
+         else
+         {
+             // Return empty result if no customer_id
+             $query = appointment::where('id', 0);
+         }
+
+         // Paginate the query
+         $paginated = $query->paginate($perPage, ['*'], 'page', $page);
+
+         return $paginated;
      }
 
      public static function CancelAppointment($appointment_id)

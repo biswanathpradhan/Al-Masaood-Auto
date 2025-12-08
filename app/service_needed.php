@@ -102,13 +102,44 @@ class service_needed extends Model
        
 
         return $services;
+     }
 
-            // DB::table('users')
-            // ->select('users.id','users.name','profiles.photo')
-            // ->join('profiles','profiles.id','=','users.id')
-            // ->where(['something' => 'something', 'otherThing' => 'otherThing'])
-            // ->get();
+     /**
+      * Get paginated service needed list
+      * 
+      * @param int|null $main_brand_id
+      * @param int|null $language_id
+      * @param int $per_page
+      * @param int $page
+      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+      */
+     public static function getservice_needed_paginated($main_brand_id = null, $language_id = null, $per_page = 15, $page = 1)
+     {
+        // Sanitize inputs to prevent SQL injection
+        $main_brand_id = $main_brand_id !== null ? (int) $main_brand_id : null;
+        $language_id = $language_id !== null ? (int) $language_id : 1;
+        $per_page = max(1, min(100, (int) $per_page)); // Limit between 1 and 100
+        $page = max(1, (int) $page);
 
+        $query = service_needed::join('main_brand','main_brand.id','=','service_needed.main_brand_id')
+            ->where('service_needed.soft_delete', 0)
+            ->where('service_needed.fk_language_id', $language_id);
+
+        // Add brand filter if provided
+        if($main_brand_id != null) {
+            $query->where('service_needed.main_brand_id', $main_brand_id);
+        }
+
+        $services = $query->select(
+                'service_needed.id as service_id',
+                'service_needed.service_needed_title as service_label',
+                DB::raw('DATE_FORMAT(service_needed.created_at, "%Y-%m-%d %h:%m:%s") as created_at'),
+                'service_needed.main_brand_id'
+            )
+            ->orderBy('service_needed.id', 'asc')
+            ->paginate($per_page, ['*'], 'page', $page);
+
+        return $services;
      }
 
               /**

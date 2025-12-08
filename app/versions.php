@@ -558,7 +558,7 @@ class versions extends Model
         $search_term = $request['query'];
         // dd($request['query']);v
         $versiondetails_array = [];
- 
+
              
         if(isset($request->language_id) && ($request->language_id == 1|| $request->language_id == '1'))
         {
@@ -622,6 +622,83 @@ class versions extends Model
             // ->where(['something' => 'something', 'otherThing' => 'otherThing'])
             // ->get();
 
+     }
+
+     /**
+      * Get paginated search results for car versions.
+      *
+      * @param string $search_term
+      * @param int $language_id
+      * @param int $perPage
+      * @param int $page
+      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+      */
+     public static function getversiondetailssearchApiPaginated($search_term, $language_id, $perPage = 15, $page = 1)
+     {
+         // Sanitize inputs
+         $search_term = trim(strip_tags($search_term));
+         $language_id = (int) $language_id;
+         $perPage = max(1, min(100, (int) $perPage));
+         $page = max(1, (int) $page);
+
+         if($language_id == 1)
+         {
+             $query = versions::join('car_model','car_model.id','=','car_model_version.model_id')
+                 ->join('main_brand','main_brand.id','=','car_model.main_brand_id')
+                 ->where('car_model_version.soft_delete', 0)
+                 ->select(
+                     'car_model_version.id as version_id',
+                     'car_model_version.version_name',
+                     'car_model_version.model_id',
+                     \DB::raw('(CASE 
+                         WHEN car_model.car_owned_type = 0 THEN "New" 
+                         WHEN car_model.car_owned_type = 1 THEN "Preowned" 
+                         END) AS type'),
+                     'car_model_version.finance_amount',
+                     'car_model_version.insurance_amount',
+                     'car_model_version.finance_amount_visibility_app',
+                     'car_model_version.insurance_amount_visibility_app',
+                     'car_model_version.created_at',
+                     'car_model.model_name',
+                     'car_model_version.youtube_url',
+                     'car_model_version.starting_price'
+                 )
+                 ->whereRaw('(car_model.model_name LIKE ? OR car_model_version.version_name LIKE ? OR main_brand.main_brand_name LIKE ?)', 
+                     ["%{$search_term}%", "%{$search_term}%", "%{$search_term}%"]);
+         }
+         else
+         {
+             $query = versions::join('car_model','car_model.id','=','car_model_version.model_id')
+                 ->join('main_brand','main_brand.id','=','car_model.main_brand_id')
+                 ->where('car_model_version.soft_delete', 0)
+                 ->select(
+                     'car_model_version.id as version_id',
+                     'car_model_version.model_id',
+                     \DB::raw('(CASE 
+                         WHEN car_model.car_owned_type = 0 THEN "New" 
+                         WHEN car_model.car_owned_type = 1 THEN "Preowned" 
+                         END) AS type'),
+                     DB::raw('(CASE 
+                         WHEN car_model_version.version_name_ar != "" THEN car_model_version.version_name_ar
+                         ELSE car_model_version.version_name
+                         END) AS version_name'),
+                     DB::raw('(CASE 
+                         WHEN car_model.model_name_ar != "" THEN car_model.model_name_ar
+                         ELSE car_model.model_name
+                         END) AS model_name'),
+                     'car_model_version.finance_amount',
+                     'car_model_version.insurance_amount',
+                     'car_model_version.finance_amount_visibility_app',
+                     'car_model_version.insurance_amount_visibility_app',
+                     'car_model_version.created_at',
+                     'car_model_version.youtube_url',
+                     'car_model_version.starting_price'
+                 )
+                 ->whereRaw('(car_model.model_name_ar LIKE ? OR car_model_version.version_name_ar LIKE ? OR main_brand.main_brand_name LIKE ?)', 
+                     ["%{$search_term}%", "%{$search_term}%", "%{$search_term}%"]);
+         }
+
+         return $query->paginate($perPage, ['*'], 'page', $page);
      }
 
 

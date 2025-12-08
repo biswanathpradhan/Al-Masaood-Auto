@@ -136,6 +136,36 @@ class accessories extends Model
  
      }
 
+     /**
+      * Get paginated accessories by model ID
+      * 
+      * @param int $model_id
+      * @param int $perPage
+      * @param int $page
+      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+      */
+     public static function getversionaccessoriesByModelPaginated($model_id, $perPage = 15, $page = 1)
+     {  
+        // Sanitize inputs
+        $model_id = (int) $model_id;
+        $perPage = max(1, min(100, (int) $perPage));
+        $page = max(1, (int) $page);
+        
+        $app_url = env('APP_URL');
+        $image_url = asset('storage/images/accessories/');
+
+        $query = accessories::join('car_model_version_accessories_mapping','car_model_version_accessories_mapping.accessories_id','=','accessories.id')
+         ->join('car_model_version','car_model_version.id','=','car_model_version_accessories_mapping.car_model_version_id')
+         ->join('car_model','car_model.id','=','car_model_version.model_id')
+         ->where('car_model_version_accessories_mapping.status',0)
+         ->where('car_model.id',$model_id)
+         ->where('accessories.status',0)->where('accessories.soft_delete',0)
+         ->where('car_model_version_accessories_mapping.soft_delete',0) 
+         ->select('accessories.id','accessories.accessories_title','accessories.accessories_description','accessories.price as accessories_price','accessories.created_at',DB::raw('concat("'.$image_url.'/",accessories.accessories_image_url) as image_url'));
+         
+         return $query->orderBy('accessories.created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
+     }
+
      public static function get_allaccessories()
      {  
         $app_url = env('APP_URL');

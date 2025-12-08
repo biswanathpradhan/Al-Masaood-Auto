@@ -66,4 +66,44 @@ class notifications_sent extends Model
 
           return $notifications;
      }
+
+     public static function getnotificationsbyCustomerIdPaginated($customer_id, $perPage = 15, $page = 1, $status = null)
+     {
+         // Sanitize inputs
+         $customer_id = (int) $customer_id;
+         $perPage = max(1, min(100, (int) $perPage));
+         $page = max(1, (int) $page);
+         $status = $status !== null ? (int) $status : null;
+
+         $query = notifications_sent::where('customer_id', $customer_id)
+             ->where('soft_delete', 0)
+             ->select("id",
+                 "fk_notification_id",
+                 "main_brand_id",
+                 "main_model_id",
+                 "notify_image",
+                 "title",
+                 "description",
+                 "date",
+                 "time",
+                 "date_time",
+                 "created_at",
+                 "updated_at",
+                 "status",
+                 "customer_id");
+
+         // Filter by status if provided (0 = unread, 1 = read)
+         if ($status !== null) {
+             $query->where('status', $status);
+         }
+
+         // Order by most recent first
+         $query->orderBy('date_time', 'desc')
+               ->orderBy('created_at', 'desc');
+
+         // Paginate the query
+         $paginated = $query->paginate($perPage, ['*'], 'page', $page);
+
+         return $paginated;
+     }
 }

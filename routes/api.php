@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\customer;
+use App\Http\Controllers\ServiceController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +15,7 @@ use App\customer;
 |
 */
  
+// Customer Registration
 Route::post('/customer/register', 'CustomerController@create')->name('customer.create');
 
 Route::post('/customer/register/categories', 'CustomerController@getregcategories')->name('customer.categories');
@@ -26,23 +28,24 @@ Route::post('/customer/getdeletecustomer', 'CustomerController@deleteCustomer')-
  
 Route::get('/car/model_list', 'CustomerController@model_list')->name('customer.model_list');
 
-Route::post('/car/getmodel_list', 'CustomerController@getmodel_list')->name('customer.getmodel_list');
+Route::post('/car/model-list', 'CustomerController@getmodel_list')->name('customer.getmodel_list'); // Get Car Model List
+
 Route::post('/car/getmodel_listsignup', 'CustomerController@getmodel_listsignup')->name('customer.getmodel_listsignup');
 
 Route::post('/city/citylist', 'ModelController@getcityApi')->name('city_list');
 
 Route::post('/city/showroomlist', 'ModelController@getshowroomApi')->name('showroom_list');
-Route::post('/city/allshowroomlist', 'ModelController@getallshowroomApi')->name('allshowroom_list');
+Route::post('/city/all-showroom-list', 'ModelController@getallshowroomApi')->name('allshowroom_list'); // Get All Showrooms by Brand
 
 Route::post('/car/version_list', 'CustomerController@version_list')->name('customer.version_list');
 
 Route::post('/car/saveaquote', 'ModelController@getmodelquotesave')->name('saveaquote'); // New Car Model Version Lease this Car
 
-Route::post('/car/savecarpickup', 'ModelController@getcarpickupsave')->name('savecarpickup'); // New Car Model Version Lease this Car
+Route::post('/car/save-car-pickup', 'ModelController@getcarpickupsave')->name('savecarpickup'); // New Car Model Version Lease this Car
 
-Route::post('/customer/callbackrequest', 'ModelController@getcallbackrequestsave')->name('savecallback'); // New Car Model Version Lease this Car
+Route::post('/customer/callback-request', 'ModelController@getcallbackrequestsave')->name('savecallback'); // Callback Request
 
-Route::post('/customer/emergencycall', 'ModelController@getemergencycallrequestsave')->name('saveemergencycall'); // New Car Model Version Lease this Car
+Route::post('/customer/emergency-call', 'ModelController@getemergencycallrequestsave')->name('saveemergencycall'); // Emergency Call Request
 
 Route::get('/car/getquotes', 'ModelController@getmodelquote')->name('getquotes'); // New Car Model Version Lease this Car
 
@@ -50,7 +53,7 @@ Route::post('/car/savetestdrive', 'ModelController@getmodeltestdrivesave')->name
 
 Route::post('/car/savetradein', 'ModelController@getmodeltradeinsave')->name('savetradein'); // New Car Model Version Lease this Car
 
-Route::post('/car/savetradeinfamilycar', 'ModelController@getmodeltradeinsavefamily')->name('savetradein'); // New Car Model Version Lease this Car
+Route::post('/car/save-trade-in-family-car', 'ModelController@getmodeltradeinsavefamily')->name('savetradeinfamilycar'); // Save Trade In Family Car Request
 
 Route::get('/car/gettestdrive', 'ModelController@getmodeltestdrive')->name('gettestdrive'); // New Car Model Version Lease this Car
 
@@ -75,23 +78,23 @@ Route::post('/services/service_packages', 'ServiceController@getservicePackages'
 
 Route::post('/services/list', 'ServiceController@getserviceNeeded')->name('service_list'); // Get Service Needed
 
-Route::post('/book_an_appointment/service_list', 'ServiceController@getserviceappointmentNeeded')->name('appointment_service_list'); // Get Service Needed
+Route::post('/book-an-appointment/service-list', 'ServiceController@getserviceappointmentNeeded')->name('appointment_service_list'); // Get Service Needed
 
-Route::post('/book_an_appointment/location_list', 'ServiceController@getlocationsApi')->name('service_locations_list'); // Get Service Needed
+Route::post('/book-an-appointment/location-list', 'ServiceController@getlocationsApi')->name('service_locations_list'); // Get Service Locations
 
+// Book Appointment
+Route::post('/book-an-appointment', 'ServiceController@bookanAppointment')->name('book_appointment');
 
-Route::post('/book_an_appointment', 'ServiceController@bookanAppointment')->name('book_appointment'); // Get Service Needed
+Route::post('/book-an-appointment/list', 'ServiceController@getbookedAppointmentbyCustomer')->name('book_appointmentlist'); // Get Appointment List
 
-Route::post('/book_an_appointment/list', 'ServiceController@getbookedAppointmentbyCustomer')->name('book_appointmentlist'); // Get Service Needed
-
-Route::post('/services/track_service_list', 'ServiceController@getbookedAppointment')->name('appointmentlist'); // Get Service Needed
+Route::post('/services/track-service-list', 'ServiceController@getbookedAppointment')->name('appointmentlist'); // Track Service List
 // getbookedAppointment
 
-Route::post('/reschedule_appointment', 'ServiceController@rescheduleAppointment')->name('reschedule_appointment'); // Get Service Needed
+Route::post('/reschedule-appointment', 'ServiceController@rescheduleAppointment')->name('reschedule_appointment'); // Reschedule Appointment
 
-Route::post('/book_an_appointment/history', 'ServiceController@getbookedAppointmentbyCustomerHistory')->name('book_appointmenthistory'); // Get Appointment history
+Route::post('/book-an-appointment/history', 'ServiceController@getbookedAppointmentbyCustomerHistory')->name('book_appointmenthistory'); // Get Appointment History
 
-Route::post('/cancel_an_appointment', 'ServiceController@cancelbookedAppointment')->name('cancel_appointment'); // Get Appointment history
+Route::post('/cancel-appointment', 'ServiceController@cancelbookedAppointment')->name('cancel_appointment'); // Cancel Appointment
 
 
 
@@ -108,15 +111,15 @@ Route::post('/customer/removecar', 'CustomerController@removecarfromlist')->name
 
 //Route::post('/customer/logon', 'CustomerController@logon')->name('customer.logon');
 
-Route::post('/news_promo', 'CustomerController@newspromotions')->name('customer.newspromotions');
+Route::post('/news-promo', 'CustomerController@newspromotions')->name('customer.newspromotions'); // News and Promotions List
 
-Route::post('/corporate_solutions', 'CustomerController@corporatesolutions')->name('customer.corporatesolutions');
+Route::post('/corporate-solutions', 'CustomerController@corporatesolutions')->name('customer.corporatesolutions'); // Corporate Solutions List
 
-Route::post('/corporate_enquiry', 'CustomerController@corporatesolutionsrequest')->name('customer.corporatesolutionsrequest');
+Route::post('/corporate-solutions/enquiry', 'CustomerController@corporatesolutionsrequest')->name('customer.corporatesolutionsrequest'); // Corporate Solutions Enquiry
 
-Route::post('/service_package_enquiry', 'CustomerController@servicepackagerequest')->name('customer.servicepackagerequest');
+Route::post('/service-package-enquiry', 'CustomerController@servicepackagerequest')->name('customer.servicepackagerequest'); // Service Package Enquiry
 
-Route::post('/news_promo/avail_offer', 'CustomerController@availofferrequest')->name('customer.availofferrequest');
+Route::post('/news-promo/avail-offer', 'CustomerController@availofferrequest')->name('customer.availofferrequest'); // Avail Offer Request
 
 Route::post('/onboarding_screens', 'CustomerController@onboardingscreens')->name('customer.onboardingscreens');
 
@@ -133,7 +136,7 @@ Route::post('/customer/notifications', 'CustomerController@getnotificationsbyCus
 
 Route::post('/customer/notifications/send', 'CustomerController@sendNotificationstoCustomer')->name('sendnotifications'); // New Car Model Version Lease this Car
 
-Route::post('/customer/notifications/markasread', 'CustomerController@markNotificationsasread')->name('markasreadnotifications'); // New Car Model Version Lease this Car
+Route::post('/customer/notifications/mark-as-read', 'CustomerController@markNotificationsasread')->name('markasreadnotifications'); // Mark Notifications as Read
 
 
 // Guest Routes
@@ -144,13 +147,9 @@ Route::post('/translation/getlanguage/{language_id?}', 'CustomerController@guest
 
 Route::post('/search', 'ModelController@searchApi')->name('search');
 
-Route::post('/car/addcar', 'ModelController@addcarApi')->name('addcar');
+Route::post('/car/add-car', 'ModelController@addcarApi')->name('addcar'); // Add Car to Customer Profile
+Route::post('/car/edit-car', 'ModelController@editcarApi')->name('editcar'); // Edit Car in Customer Profile
 
-Route::post('/car/editcar', 'ModelController@editcarApi')->name('editcar');
-
-
-  
- 
 //Route::get('/customer/{id}', 'CustomerController@show')->name('customer.show');
 
 // Route::post('/customer/store', 'CustomerController@store')->name('customer.store');

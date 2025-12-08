@@ -241,48 +241,172 @@ class notifications extends Model
      */
     public static function sendnotification(Request $request)
     {   
-
-       
-
-                $headers = array
-                (
+        try {
+            // Get current date and time
+                $current_date = date('Y-m-d H:i:s');
+                $date = date('Y-m-d');
+                $time = date('H:i:s');
+                
+                // Get customer to calculate badge count
+                $customer = customer::getcustomer($request->customer_id);
+                if ($customer) {
+                    $badge_count = (int) ($customer->badge_count ?? 0) + 1;
+                } else {
+                    $badge_count = 1;
+                }
+                
+                // Update customer badge count
+                if ($customer) {
+                    $updatedata = ['badge_count' => $badge_count];
+                    customer::where('soft_delete', 0)
+                        ->where('id', $request->customer_id)
+                        ->update($updatedata);
+                }
+                
+                // Prepare FCM notification
+                $headers = array(
                     'Authorization: key='.self::$apikey,
                     'Content-Type: application/json'
                 );
                  
+                $token_id = $request->device_token;
+                $registrationIds = array($token_id);
                 
-                    $token_id=$request->device_token;
-                    $badge_count=1;
- 
-                    
-                    $registrationIds=array($token_id);
-                    //$badge_count = '1';
-                    $msg = array
-                    (
-                        'body'  => $request->description,
-                        'title'     => $request->title,
-                        //'largeIcon' => ROOT.NOTIFICATIONS.$image,
-                        'click_action'=>'.activities.NotificationDetailsActivity',
-                        'vibrate'   => 1,
-                        'sound'     => "default",
-                        'badge'=> $badge_count
-                    );
-                    $fields = array 
-                    (
-                        'registration_ids' => $registrationIds,
-                        'notification' => $msg
-                    );
-                    $ch = curl_init();
-                    curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
-                    curl_setopt( $ch,CURLOPT_POST, true );
-                    curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
-                    curl_setopt( $ch,CURLOPT_RETURNTRANSFER, true );
-                    curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER, false );
-                    curl_setopt( $ch,CURLOPT_POSTFIELDS, json_encode($fields));
-                    $result = curl_exec($ch );
-                dd($result);
-        
- 
+                $msg = array(
+                    'body'  => $request->description,
+                    'title' => $request->title,
+                    'click_action' => '.activities.NotificationDetailsActivity',
+                    'vibrate' => 1,
+                    'sound' => "default",
+                    'badge' => $badge_count
+                );
+                
+                $fields = array(
+                    'registration_ids' => $registrationIds,
+                    'notification' => $msg
+                );
+                
+                // Send FCM notification
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
+                $result = curl_exec($ch);
+                $curl_error = curl_error($ch);
+                $curl_errno = curl_errno($ch);
+                curl_close($ch);
+                
+                // Parse FCM response
+                $fcm_response = null;
+                $success = false;
+                
+                if ($result === false) {
+                    // cURL error occurred
+                    $fcm_response = [
+                        'error' => 'cURL Error: ' . $curl_error,
+                        'errno' => $curl_errno
+                    ];
+                } else {
+                    // Check if response is HTML (error page)
+                    if (stripos($result, '<html') !== false || stripos($result, '<!DOCTYPE') !== false) {
+                        // HTML error page returned (usually 404 or 401)
+                        if (stripos($result, '404') !== false || stripos($result, 'Not Found') !== false) {
+                            $fcm_response = [
+                                'error' => 'FCM endpoint not found (404). Please verify your FCM API key is valid and the Firebase project has FCM enabled.',
+                                'error_type' => 'fcm_404',
+                                'raw_response' => substr($result, 0, 500)
+                            ];
+                        } else if (stripos($result, '401') !== false || stripos($result, 'Unauthorized') !== false) {
+                            $fcm_response = [
+                                'error' => 'FCM authentication failed (401). Please verify your FCM API key is correct and has proper permissions.',
+                                'error_type' => 'fcm_401',
+                                'raw_response' => substr($result, 0, 500)
+                            ];
+                        } else {
+                            $fcm_response = [
+                                'error' => 'FCM returned HTML error page. Please check your FCM API key and project configuration.',
+                                'error_type' => 'fcm_html_error',
+                                'raw_response' => substr($result, 0, 500)
+                            ];
+                        }
+                    } else {
+                        // Try to decode JSON response
+                        $fcm_response = json_decode($result, true);
+                        
+                        if ($fcm_response === null) {
+                            // JSON decode failed
+                            $fcm_response = [
+                                'error' => 'Invalid JSON response from FCM',
+                                'error_type' => 'fcm_invalid_json',
+                                'raw_response' => substr($result, 0, 500)
+                            ];
+                        } else {
+                            // Check if FCM request was successful
+                            $success = isset($fcm_response['success']) && $fcm_response['success'] > 0;
+                            
+                            // If not successful, check for specific error codes
+                            if (!$success && isset($fcm_response['results']) && is_array($fcm_response['results'])) {
+                                foreach ($fcm_response['results'] as $index => $result_item) {
+                                    if (isset($result_item['error'])) {
+                                        $fcm_response['error'] = 'FCM Error: ' . $result_item['error'];
+                                        $fcm_response['error_type'] = 'fcm_delivery_error';
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Save notification to notifications table
+                $notifications = new notifications();
+                $notifications->main_brand_id = $request->main_brand_id ?? null;
+                $notifications->main_model_id = $request->main_model_id ?? null;
+                $notifications->notify_image = ''; // Use empty string instead of null
+                $notifications->title = $request->title;
+                $notifications->description = $request->description;
+                $notifications->date = $date;
+                $notifications->time = $time;
+                $notifications->date_time = $current_date;
+                $notifications->save();
+                
+                // Save to notifications_sent table
+                $insertData = [
+                    'fk_notification_id' => $notifications->id,
+                    'main_brand_id' => $request->main_brand_id ?? null,
+                    'main_model_id' => $request->main_model_id ?? null,
+                    'customer_id' => $request->customer_id,
+                    'notify_image' => '', // Use empty string instead of null
+                    'title' => $request->title,
+                    'description' => $request->description,
+                    'date' => $date,
+                    'time' => $time,
+                    'date_time' => $current_date,
+                    'status' => 0
+                ];
+                
+                $customer_notification_sent = DB::table('notifications_sent')->insert($insertData);
+                
+                return [
+                    'success' => $success,
+                    'notification_id' => $notifications->id,
+                    'fcm_response' => $fcm_response,
+                    'badge_count' => $badge_count,
+                    'error' => $success ? null : (isset($fcm_response['error']) ? $fcm_response['error'] : 'Failed to send notification')
+                ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Exception: ' . $e->getMessage(),
+                'notification_id' => null,
+                'fcm_response' => null,
+                'badge_count' => null
+            ];
+        }
+
     }
 
 

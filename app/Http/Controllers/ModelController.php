@@ -2789,384 +2789,1049 @@ public function __construct()
 
     public static function getcarpickupsave(Request $request)
     {
-      $case_id = [0,1]; // 0 Normal  1 Regular
-      $rent_car = ['Yes','No']; // 
-      $showroom_id = getallshowroom()->pluck('id'); // 
-        
-        $language_id = [1,2]; // 
-        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
-
-      $validator = Validator::make($request->all(), [
-      'session_id' => 'required',
-      'customer_id' => 'required',
-      'case_id' => ['required',Rule::in($case_id)],
-      'rent_car' =>['required',Rule::in($rent_car)],
-      'name' => 'required',
-      'mobile' => 'required',
-      'email' => ['email','required'],
-      'address' => 'required',
-      'car_delivery_location' => 'required',
-      'language_id' => ['required',Rule::in($language_id)]
-      //]
-
-        ]);
+        try {
+            $case_id = [0, 1]; // 0 Normal, 1 Regular
+            $rent_car = ['Yes', 'No'];
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'case_id' => 'integer',
+                'rent_car' => 'string',
+                'name' => 'string',
+                'mobile' => 'string',
+                'email' => 'email',
+                'address' => 'string',
+                'car_delivery_location' => 'string',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['case_id'] = (int) ($sanitizedData['case_id'] ?? -1);
+            $sanitizedData['rent_car'] = trim(strip_tags($sanitizedData['rent_car'] ?? ''));
+            $sanitizedData['name'] = trim(strip_tags($sanitizedData['name'] ?? ''));
+            $sanitizedData['mobile'] = trim(strip_tags($sanitizedData['mobile'] ?? ''));
+            $sanitizedData['email'] = filter_var(trim($sanitizedData['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+            $sanitizedData['address'] = trim(strip_tags($sanitizedData['address'] ?? ''));
+            $sanitizedData['car_delivery_location'] = trim(strip_tags($sanitizedData['car_delivery_location'] ?? ''));
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'case_id' => ['required', 'integer', Rule::in($case_id)],
+                'rent_car' => ['required', 'string', Rule::in($rent_car)],
+                'name' => 'required|string|max:255',
+                'mobile' => 'required|string|max:20',
+                'email' => 'required|email|max:255',
+                'address' => 'required|string|max:500',
+                'car_delivery_location' => 'required|string|max:500',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'save-car-pickup';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
 
          if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+                return \ValidationHelper::formatValidationErrors($validator, $module);
         }
         else
         {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
           $customer_session_check = customer_session::check_customersession($request);
 
             if($customer_session_check == null)
             {
-                return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
             }
             else
             {
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    
+                    // Merge sanitized data back to request for saving
+                    $request->merge($sanitizedData);
         
                 $savecar_pickup_request = car_pickup_request::savecar_pickup_request($request);
 
                 if($savecar_pickup_request)
                 {
                 $message_key = 'pick_up_car_success_message';
-                $message = getTranslationsAPImessage($request->language_id,$message_key);
-
-
-                  // In future Email Teemplate to be sent from here
-                  return ["status" => "1","response_message" => "success","display_message" => $message];
+                        $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                        
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => $message ?: "Car pickup request submitted successfully. We will contact you soon."
+                        ];
+                    }
+                    else
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "pickup_request_failed",
+                            "display_message" => "Failed to submit car pickup request. Please try again.",
+                            "error_message" => "Car pickup request submission failed"
+                        ];
+                    }
                 }
-               
             }
-           
-
-        
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
     } 
 
 
      public static function getcallbackrequestsave(Request $request)
     {
-
-        $brand_id = getallBrands()->pluck('id'); // 
-  
-        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
-        $language_id = [1,2]; // 1 EN 2 Ar 
-
-   
-
-      $validator = Validator::make($request->all(), [
-      'session_id' => 'required',
-      'customer_id' => 'required',
-      'main_brand_id' => ['required',Rule::in($brand_id)],
-      //'rent_car' =>['required',Rule::in($rent_car)],
-      'date' => 'required',
-      'time' => 'required',
-      //'email' => ['email','required'],
-      //'address' => 'required',
-      //'car_delivery_location' => 'required',
-      'language_id' => ['required',Rule::in($language_id)]
-      //]
-
-        ]);
+        try {
+            // Get valid brand IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'main_brand_id' => 'integer',
+                'date' => 'string',
+                'time' => 'string',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['main_brand_id'] = (int) ($sanitizedData['main_brand_id'] ?? 0);
+            $sanitizedData['date'] = trim(strip_tags($sanitizedData['date'] ?? ''));
+            $sanitizedData['time'] = trim(strip_tags($sanitizedData['time'] ?? ''));
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'main_brand_id' => ['required', 'integer', Rule::in($brand_id)],
+                'date' => 'required|date_format:Y-m-d',
+                'time' => 'required|date_format:H:i',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'callback-request';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
 
          if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+                return \ValidationHelper::formatValidationErrors($validator, $module);
         }
         else
         {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
           $customer_session_check = customer_session::check_customersession($request);
 
             if($customer_session_check == null)
             {
-                return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
             }
             else
             {   
-                    // dd($request->all());
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    else
+                    {
+                        // Merge sanitized data back to request for saving
+                        $request->merge($sanitizedData);
+                        
                 $savecar_pickup_request = call_back_request::savecar_call_back_request($request);
 
                 if($savecar_pickup_request)
                 {
-                    $message_key = 'corporate_solutions_thank_you_message';
-                    $message = getTranslationsAPImessage($request->language_id,$message_key);
-   
-                  // In future Email Teemplate to be sent from here
-                  return ["status" => "1","response_message" => "success","display_message" => $message];
+                            // Try to get translated message, but use fallback if not available
+                            $message = "Callback request submitted successfully. We will contact you soon.";
+                            try {
+                                if (function_exists('getTranslationsAPImessage')) {
+                                    $message_key = 'callback_request_success_message';
+                                    $translated_message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                    if ($translated_message && $translated_message !== $message_key) {
+                                        $message = $translated_message;
+                                    }
+                                }
+                            } catch (\Exception $e) {
+                                // Use default message if translation fails
+                                $message = "Callback request submitted successfully. We will contact you soon.";
+                            }
+                            
+                            return [
+                                "status" => "1",
+                                "response_message" => "success",
+                                "display_message" => $message,
+                                "request_id" => $savecar_pickup_request->id ?? null
+                            ];
                 }
-               
+                        else
+                        {
+                            return [
+                                "status" => "0",
+                                "response_message" => "callback_request_failed",
+                                "display_message" => "Failed to submit callback request. Please try again.",
+                                "error_message" => "Callback request submission failed"
+                            ];
+                        }
+                    }
+                }
             }
-           
-
-        
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
     } 
 
      public static function getemergencycallrequestsave(Request $request)
     {
-
-        $brand_id = getallBrands()->pluck('id'); // 
-  
-        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
-        $language_id = [1,2]; // 1 EN 2 Ar 
-
-   
-
-      $validator = Validator::make($request->all(), [
-      'session_id' => 'required',
-      'customer_id' => 'required',
-      'main_brand_id' => ['required',Rule::in($brand_id)],
-      //'rent_car' =>['required',Rule::in($rent_car)],
-      'date' => 'required',
-      'time' => 'required',
-      //'email' => ['email','required'],
-      'latitude' => 'required',
-      'longitude' => 'required',
-      //'car_delivery_location' => 'required',
-      'language_id' => ['required',Rule::in($language_id)]
-      //]
-
-        ]);
+        try {
+            // Get valid brand IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'main_brand_id' => 'integer',
+                'date' => 'string',
+                'time' => 'string',
+                'latitude' => 'float',
+                'longitude' => 'float',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['main_brand_id'] = (int) ($sanitizedData['main_brand_id'] ?? 0);
+            $sanitizedData['date'] = trim(strip_tags($sanitizedData['date'] ?? ''));
+            $sanitizedData['time'] = trim(strip_tags($sanitizedData['time'] ?? ''));
+            $sanitizedData['latitude'] = (float) ($sanitizedData['latitude'] ?? 0);
+            $sanitizedData['longitude'] = (float) ($sanitizedData['longitude'] ?? 0);
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'main_brand_id' => ['required', 'integer', Rule::in($brand_id)],
+                'date' => 'required|date_format:Y-m-d',
+                'time' => 'required|date_format:H:i',
+                'latitude' => 'required|numeric|between:-90,90',
+                'longitude' => 'required|numeric|between:-180,180',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'emergency-call';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
 
          if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+                return \ValidationHelper::formatValidationErrors($validator, $module);
         }
         else
         {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
           $customer_session_check = customer_session::check_customersession($request);
 
             if($customer_session_check == null)
             {
-                return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
             }
             else
             {   
-                    // dd($request->all());
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    else
+                    {
+                        // Merge sanitized data back to request for saving
+                        $request->merge($sanitizedData);
+                        
                 $savecar_pickup_request = emergencycallservice::savecar_emergencycall_request($request);
 
                 if($savecar_pickup_request)
                 {
                     $emergency_call = env('EMERGENCY_NUMBER');
-                  // In future Email Teemplate to be sent from here
-                  return ["status" => "1","response_message" => "success","display_message" => "Emergency Call Request is successful",'emergency_call'=>$emergency_call];
+                            
+                            // Try to get translated message, but use fallback if not available
+                            $message = "Emergency call request submitted successfully. We will contact you soon.";
+                            try {
+                                if (function_exists('getTranslationsAPImessage')) {
+                                    $message_key = 'emergency_call_success_message';
+                                    $translated_message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                    if ($translated_message && $translated_message !== $message_key) {
+                                        $message = $translated_message;
+                                    }
+                                }
+                            } catch (\Exception $e) {
+                                // Use default message if translation fails
+                                $message = "Emergency call request submitted successfully. We will contact you soon.";
+                            }
+                            
+                            return [
+                                "status" => "1",
+                                "response_message" => "success",
+                                "display_message" => $message,
+                                "emergency_call" => $emergency_call,
+                                "request_id" => $savecar_pickup_request->id ?? null
+                            ];
+                        }
+                        else
+                        {
+                            return [
+                                "status" => "0",
+                                "response_message" => "emergency_call_failed",
+                                "display_message" => "Failed to submit emergency call request. Please try again.",
+                                "error_message" => "Emergency call request submission failed"
+                            ];
                 }
-               
+                    }
+                }
             }
-           
-
-        
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
     } 
 
     public static function searchApi(Request $request)
     {
-      $case_id = [0,1]; // 0 Normal  1 Regular
-      $rent_car = ['Yes','No']; // 
-      $showroom_id = getallshowroom()->pluck('id'); // 
-        
-        $language_id = [1,2]; // 
-        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
-
-      $validator = Validator::make($request->all(), [
-      'session_id' => 'required',
-      'customer_id' => 'required',
-      'query' => 'required',
-      'language_id' => ['required',Rule::in($language_id)]
-      //]
-
-        ]);
+        try {
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'query' => 'string',
+                'language_id' => 'integer',
+                'page' => 'integer',
+                'per_page' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['query'] = trim(strip_tags($sanitizedData['query'] ?? ''));
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+            $sanitizedData['page'] = max(1, (int) ($sanitizedData['page'] ?? 1));
+            $sanitizedData['per_page'] = max(1, min(100, (int) ($sanitizedData['per_page'] ?? 15)));
+            
+            // Determine if pagination is requested
+            $use_pagination = $request->has('page') || $request->has('per_page');
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'query' => 'required|string|min:1|max:255',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            if ($use_pagination) {
+                $validationRules['page'] = 'integer|min:1';
+                $validationRules['per_page'] = 'integer|min:1|max:100';
+            }
+            
+            // Get module-specific validation messages
+            $module = 'car-search';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
 
          if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+                return \ValidationHelper::formatValidationErrors($validator, $module);
         }
         else
         {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
           $customer_session_check = customer_session::check_customersession($request);
 
             if($customer_session_check == null)
             {
-                return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
             }
             else
             {
-        
-                $search_request = versions::getversiondetailssearchApi($request);
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    
+                    // Perform search
+                    $search_term = $sanitizedData['query'];
+                    $lang_id = (int) $sanitizedData['language_id'];
+                    
+                    if($use_pagination) {
+                        $page = (int) $sanitizedData['page'];
+                        $per_page = (int) $sanitizedData['per_page'];
+                        
+                        $search_results = versions::getversiondetailssearchApiPaginated($search_term, $lang_id, $per_page, $page);
 
-                if($search_request)
+                        if($search_results && $search_results->count() > 0)
                 {
-                  // In future Email Teemplate to be sent from here
-                  return ["status" => "1","response_message" => "success","display_message" => $search_request];
+                            return [
+                                "status" => "1",
+                                "response_message" => "success",
+                                "display_message" => "Search results retrieved successfully",
+                                "search_results" => $search_results->items(),
+                                "pagination" => [
+                                    "current_page" => $search_results->currentPage(),
+                                    "per_page" => $search_results->perPage(),
+                                    "total" => $search_results->total(),
+                                    "last_page" => $search_results->lastPage(),
+                                    "from" => $search_results->firstItem(),
+                                    "to" => $search_results->lastItem(),
+                                    "has_more_pages" => $search_results->hasMorePages()
+                                ]
+                            ];
+                        }
+                        else
+                        {
+                            return [
+                                "status" => "0",
+                                "response_message" => "no_results_found",
+                                "display_message" => "No search results found. Please try a different search term.",
+                                "error_message" => "No results found",
+                                "search_results" => [],
+                                "pagination" => [
+                                    "current_page" => $page,
+                                    "per_page" => $per_page,
+                                    "total" => 0,
+                                    "last_page" => 1,
+                                    "from" => null,
+                                    "to" => null,
+                                    "has_more_pages" => false
+                                ]
+                            ];
+                        }
+                    } else {
+                        // Backward compatibility: return all results if pagination not requested
+                        $request->merge($sanitizedData);
+                        $search_request = versions::getversiondetailssearchApi($request);
+                        
+                        if($search_request && $search_request->count() > 0)
+                        {
+                            return [
+                                "status" => "1",
+                                "response_message" => "success",
+                                "display_message" => "Search results retrieved successfully",
+                                "search_results" => $search_request
+                            ];
                 }
-               
+                        else
+                        {
+                            return [
+                                "status" => "0",
+                                "response_message" => "no_results_found",
+                                "display_message" => "No search results found. Please try a different search term.",
+                                "error_message" => "No results found",
+                                "search_results" => []
+                            ];
+                        }
+                    }
+                }
             }
-           
-
-        
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
     } 
 
     public static function addcarApi(Request $request)
     {
-
-      $case_id = [0,1]; // 0 Normal  1 Regular
-      $rent_car = ['Yes','No']; // 
-      $showroom_id = getallshowroom()->pluck('id'); // 
-      $category_dropdown = ['AUH','DXB','SHJ','AJMAN','RAK','UAQ','FUJ'];
-        
-        $language_id = [1,2]; // 
-        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
-
-      $validator = Validator::make($request->all(), [
-      'session_id' => 'required',
-      'customer_id' => 'required',
-      'car_registration_number' => 'required',
-      'reg_brand_id' => 'required',
-      'reg_model_id' => 'required',
-      'version_id' => 'required',
-      'reg_chasis_number' => 'required',
-      'mileage_kms' => 'required',
-      'insurance_date' => 'required',
-      'service_due_date' => 'required',
-      'category_dropdown' => ['required',Rule::in($category_dropdown)],
-      'category_number' => 'required',
-      'language_id' => ['required',Rule::in($language_id)],
-      //'image' => ['required'],
-      // 'images' => ['required']
-      //]
-
-        ]);
-       // dd($validator->fails(),$validator->errors());
+        try {
+            // Get valid brand IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $category_dropdown = ['AUH', 'DXB', 'SHJ', 'AJMAN', 'RAK', 'UAQ', 'FUJ'];
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'car_registration_number' => 'string',
+                'reg_brand_id' => 'integer',
+                'reg_model_id' => 'integer',
+                'version_id' => 'integer',
+                'reg_chasis_number' => 'string',
+                'mileage_kms' => 'string',
+                'insurance_date' => 'string',
+                'service_due_date' => 'string',
+                'category_dropdown' => 'string',
+                'category_number' => 'string',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['car_registration_number'] = trim(strip_tags($sanitizedData['car_registration_number'] ?? ''));
+            $sanitizedData['reg_brand_id'] = (int) ($sanitizedData['reg_brand_id'] ?? 0);
+            $sanitizedData['reg_model_id'] = (int) ($sanitizedData['reg_model_id'] ?? 0);
+            $sanitizedData['version_id'] = (int) ($sanitizedData['version_id'] ?? 0);
+            $sanitizedData['reg_chasis_number'] = trim(strip_tags($sanitizedData['reg_chasis_number'] ?? ''));
+            $sanitizedData['mileage_kms'] = trim(strip_tags($sanitizedData['mileage_kms'] ?? ''));
+            $sanitizedData['insurance_date'] = trim(strip_tags($sanitizedData['insurance_date'] ?? ''));
+            $sanitizedData['service_due_date'] = trim(strip_tags($sanitizedData['service_due_date'] ?? ''));
+            $sanitizedData['category_dropdown'] = strtoupper(trim(strip_tags($sanitizedData['category_dropdown'] ?? '')));
+            $sanitizedData['category_number'] = trim(strip_tags($sanitizedData['category_number'] ?? ''));
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+            
+            // Handle file upload if present
+            $hasFile = $request->hasFile('image');
+            $uploadedFile = null;
+            
+            if ($hasFile) {
+                $uploadedFile = $request->file('image');
+                
+                // Validate file type and size before Laravel validation
+                $allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                $allowedExtensions = ['jpeg', 'jpg', 'png', 'gif'];
+                $maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+                
+                $fileMimeType = $uploadedFile->getMimeType();
+                $fileExtension = strtolower($uploadedFile->getClientOriginalExtension());
+                $fileSize = $uploadedFile->getSize();
+                
+                if (!in_array($fileMimeType, $allowedMimeTypes) || !in_array($fileExtension, $allowedExtensions)) {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_file_type",
+                        "display_message" => "Invalid image file type. Allowed types: JPEG, JPG, PNG, GIF.",
+                        "error_message" => "Invalid file type"
+                    ];
+                }
+                
+                if ($fileSize > $maxFileSize) {
+                    return [
+                        "status" => "0",
+                        "response_message" => "file_too_large",
+                        "display_message" => "Image size exceeds maximum allowed size of 5MB.",
+                        "error_message" => "File too large"
+                    ];
+                }
+            }
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'car_registration_number' => 'required|string|max:50',
+                'reg_brand_id' => ['required', 'integer', Rule::in($brand_id)],
+                'reg_model_id' => 'required|integer|min:1',
+                'version_id' => 'required|integer|min:1',
+                'reg_chasis_number' => 'required|string|max:100',
+                'mileage_kms' => 'required|string|max:20',
+                'insurance_date' => 'required|date_format:Y-m-d',
+                'service_due_date' => 'required|date_format:Y-m-d',
+                'category_dropdown' => ['required', 'string', Rule::in($category_dropdown)],
+                'category_number' => 'required|string|max:50',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Add optional image validation if file is uploaded
+            if ($hasFile) {
+                $validationRules['image'] = 'image|mimes:jpeg,jpg,png,gif|max:5120'; // 5MB max
+            }
+            
+            // Get module-specific validation messages
+            $module = 'add-car';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Prepare validation data - include file if present
+            $validationData = $sanitizedData;
+            if ($hasFile) {
+                $validationData['image'] = $uploadedFile;
+            }
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($validationData, $moduleValidation['rules'], $moduleValidation['messages']);
 
          if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+                return \ValidationHelper::formatValidationErrors($validator, $module);
         }
         else
         {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
           $customer_session_check = customer_session::check_customersession($request);
 
             if($customer_session_check == null)
             {
-                return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
             }
             else
             {   
-              $customer_carversion_check = versions::checkmodelversion($request['reg_model_id'],$request['version_id']);
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    
+                    // Validate model and version match
+                    $reg_model_id = (int) $sanitizedData['reg_model_id'];
+                    $version_id = (int) $sanitizedData['version_id'];
+                    $customer_carversion_check = versions::checkmodelversion($reg_model_id, $version_id);
 
                   if($customer_carversion_check == null)
                   {
-                    return ["status" => "0","response_message" => "invalid model or version id","display_message" => "Model or Version Id does not match","error_message" => "invalid model or version id"];
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_model_version",
+                            "display_message" => "Model or Version ID does not match. Please select a valid model and version combination.",
+                            "error_message" => "Invalid Model or Version ID"
+                        ];
                   }
                   else
                   {
-                       $customer_vehicle_check = customer_vehicles::get_customervehicle_bychasisnumber($request['customer_id'],$request['car_registration_number'],$request['reg_chasis_number']);
-                      // dd($customer_vehicle_check);
+                        // Check if car registration number or chassis number already exists
+                        $car_registration_number = $sanitizedData['car_registration_number'];
+                        $reg_chasis_number = $sanitizedData['reg_chasis_number'];
+                        $customer_vehicle_check = customer_vehicles::get_customervehicle_bychasisnumber($customer_id, $car_registration_number, $reg_chasis_number);
+                        
                         if($customer_vehicle_check != null)
                         {
-                          return ["status" => "0","response_message" => "Car registration number or chasis number already exits  ","display_message" => "Car registration number or chasis number already exits","error_message" => "Car registration number or chasis number already exits"];
+                            return [
+                                "status" => "0",
+                                "response_message" => "duplicate_vehicle",
+                                "display_message" => "Car registration number or chassis number already exists. Please use a different registration or chassis number.",
+                                "error_message" => "Duplicate Vehicle"
+                            ];
                         }
                         else
                         {
+                            // Merge sanitized data back to request for saving (including file if present)
+                            $request->merge($sanitizedData);
 
-                           $addcartocustomer = customer_vehicles::register_customervehicle($request,$request['customer_id']);
+                            $addcartocustomer = customer_vehicles::register_customervehicle($request, $customer_id);
 
                           if($addcartocustomer)
                           {
-                            // In future Email Teemplate to be sent from here
-                            return ["status" => "1","response_message" => "success","display_message" => "Car added successfully"];
+                                $message_key = 'car_added_success_message';
+                                $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                
+                                return [
+                                    "status" => "1",
+                                    "response_message" => "success",
+                                    "display_message" => $message ?: "Car added successfully to your profile.",
+                                    "vehicle_id" => $addcartocustomer->id ?? null
+                                ];
                           }
+                            else
+                            {
+                                return [
+                                    "status" => "0",
+                                    "response_message" => "car_add_failed",
+                                    "display_message" => "Failed to add car to your profile. Please try again.",
+                                    "error_message" => "Car addition failed"
+                                ];
                         }
                   }
-              
-               
+                    }
+                }
             }
-           
-
-        
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
     } 
 
 public static function editcarApi(Request $request)
     {
-      $case_id = [0,1]; // 0 Normal  1 Regular
-      $rent_car = ['Yes','No']; // 
-      $showroom_id = getallshowroom()->pluck('id'); // 
-        
-        $language_id = [1,2]; // 
-        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
-
-      $validator = Validator::make($request->all(), [
-      'session_id' => 'required',
-      'customer_id' => 'required',
-      'car_registration_number' => 'required',
-      'reg_brand_id' => 'required',
-      'reg_model_id' => 'required',
-      'version_id' => 'required',
-      'reg_chasis_number' => 'required',
-      'mileage_kms' => 'required',
-      'insurance_date' => 'required',
-      'service_due_date' => 'required',
-      'language_id' => ['required',Rule::in($language_id)],
-      'customer_vehicles_id' => 'required'
-      //]
-
-        ]);
+        try {
+            // Get valid brand IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $category_dropdown = ['AUH', 'DXB', 'SHJ', 'AJMAN', 'RAK', 'UAQ', 'FUJ'];
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'customer_vehicles_id' => 'integer',
+                'car_registration_number' => 'string',
+                'reg_brand_id' => 'integer',
+                'reg_model_id' => 'integer',
+                'version_id' => 'integer',
+                'reg_chasis_number' => 'string',
+                'mileage_kms' => 'string',
+                'insurance_date' => 'string',
+                'service_due_date' => 'string',
+                'category_dropdown' => 'string',
+                'category_number' => 'string',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['customer_vehicles_id'] = (int) ($sanitizedData['customer_vehicles_id'] ?? 0);
+            $sanitizedData['car_registration_number'] = trim(strip_tags($sanitizedData['car_registration_number'] ?? ''));
+            $sanitizedData['reg_brand_id'] = (int) ($sanitizedData['reg_brand_id'] ?? 0);
+            $sanitizedData['reg_model_id'] = (int) ($sanitizedData['reg_model_id'] ?? 0);
+            $sanitizedData['version_id'] = (int) ($sanitizedData['version_id'] ?? 0);
+            $sanitizedData['reg_chasis_number'] = trim(strip_tags($sanitizedData['reg_chasis_number'] ?? ''));
+            $sanitizedData['mileage_kms'] = trim(strip_tags($sanitizedData['mileage_kms'] ?? ''));
+            $sanitizedData['insurance_date'] = trim(strip_tags($sanitizedData['insurance_date'] ?? ''));
+            $sanitizedData['service_due_date'] = trim(strip_tags($sanitizedData['service_due_date'] ?? ''));
+            $sanitizedData['category_dropdown'] = isset($sanitizedData['category_dropdown']) ? strtoupper(trim(strip_tags($sanitizedData['category_dropdown']))) : null;
+            $sanitizedData['category_number'] = isset($sanitizedData['category_number']) ? trim(strip_tags($sanitizedData['category_number'])) : null;
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+            
+            // Handle file upload if present
+            $hasFile = $request->hasFile('image');
+            $uploadedFile = null;
+            
+            if ($hasFile) {
+                $uploadedFile = $request->file('image');
+                
+                // Validate file type and size before Laravel validation
+                $allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                $allowedExtensions = ['jpeg', 'jpg', 'png', 'gif'];
+                $maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+                
+                $fileMimeType = $uploadedFile->getMimeType();
+                $fileExtension = strtolower($uploadedFile->getClientOriginalExtension());
+                $fileSize = $uploadedFile->getSize();
+                
+                if (!in_array($fileMimeType, $allowedMimeTypes) || !in_array($fileExtension, $allowedExtensions)) {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_file_type",
+                        "display_message" => "Invalid image file type. Allowed types: JPEG, JPG, PNG, GIF.",
+                        "error_message" => "Invalid file type"
+                    ];
+                }
+                
+                if ($fileSize > $maxFileSize) {
+                    return [
+                        "status" => "0",
+                        "response_message" => "file_too_large",
+                        "display_message" => "Image size exceeds maximum allowed size of 5MB.",
+                        "error_message" => "File too large"
+                    ];
+                }
+            }
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'customer_vehicles_id' => 'required|integer|min:1',
+                'car_registration_number' => 'required|string|max:50',
+                'reg_brand_id' => ['required', 'integer', Rule::in($brand_id)],
+                'reg_model_id' => 'required|integer|min:1',
+                'version_id' => 'required|integer|min:1',
+                'reg_chasis_number' => 'required|string|max:100',
+                'mileage_kms' => 'required|string|max:20',
+                'insurance_date' => 'required|date_format:Y-m-d',
+                'service_due_date' => 'required|date_format:Y-m-d',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Add optional image validation if file is uploaded
+            if ($hasFile) {
+                $validationRules['image'] = 'image|mimes:jpeg,jpg,png,gif|max:5120'; // 5MB max
+            }
+            
+            // Get module-specific validation messages
+            $module = 'edit-car';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Prepare validation data - include file if present
+            $validationData = $sanitizedData;
+            if ($hasFile) {
+                $validationData['image'] = $uploadedFile;
+            }
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($validationData, $moduleValidation['rules'], $moduleValidation['messages']);
 
          if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+                return \ValidationHelper::formatValidationErrors($validator, $module);
         }
         else
         {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
           $customer_session_check = customer_session::check_customersession($request);
 
             if($customer_session_check == null)
             {
-                return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
             }
             else
             {   
-              $customer_carversion_check = versions::checkmodelversion($request['reg_model_id'],$request['version_id']);
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
 
-                  if($customer_carversion_check == null)
+                    if($check_customer_id == null)
                   {
-                    return ["status" => "0","response_message" => "invalid model or version id","display_message" => "Model or Version Id does not match","error_message" => "invalid model or version id"];
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
                   }
                   else
                   {
-                       $customer_vehicle_check = customer_vehicles::get_customervehicle_byidApi($request['customer_id'],$request['customer_vehicles_id'],$request['session_id']);
-
+                        // Verify that the vehicle belongs to the customer before updating
+                        $customer_vehicles_id = (int) $sanitizedData['customer_vehicles_id'];
+                        $customer_vehicle_check = customer_vehicles::get_customervehicle_byidApi($customer_id, $customer_vehicles_id, $sanitizedData['session_id']);
                         
-                       // dd($customer_vehicle_check);
-                        if($customer_vehicle_check != null)
+                        if($customer_vehicle_check == null)
                         {
-
-                           $addcartocustomer = customer_vehicles::update_customervehicle($request,$request['customer_id']);
-
-                          if($addcartocustomer)
-                          {
-                            // In future Email Teemplate to be sent from here
-                            return ["status" => "1","response_message" => "success","display_message" => "Car details updated successfully"];
-                          }
-
-                          
+                            return [
+                                "status" => "0",
+                                "response_message" => "invalid_vehicle",
+                                "display_message" => "Vehicle does not exist or does not belong to this customer. Please verify the vehicle ID.",
+                                "error_message" => "Invalid Vehicle"
+                            ];
                         }
                         else
                         {
-                          return ["status" => "0","response_message" => "Car details update failed","display_message" => "Car details update failed","error_message" => "Car details update failed"];
-                          
-                        }
-                  }
-              
-               
-            }
-           
+                            // Validate model and version match
+                            $reg_model_id = (int) $sanitizedData['reg_model_id'];
+                            $version_id = (int) $sanitizedData['version_id'];
+                            $customer_carversion_check = versions::checkmodelversion($reg_model_id, $version_id);
+                            
+                            if($customer_carversion_check == null)
+                        {
+                                return [
+                                    "status" => "0",
+                                    "response_message" => "invalid_model_version",
+                                    "display_message" => "Model or Version ID does not match. Please select a valid model and version combination.",
+                                    "error_message" => "Invalid Model or Version ID"
+                                ];
+                            }
+                            else
+                            {
+                                // Merge sanitized data back to request for saving (including file if present)
+                                $request->merge($sanitizedData);
+                                
+                                $updatecartocustomer = customer_vehicles::update_customervehicle($request, $customer_id);
 
-        
+                                if($updatecartocustomer)
+                          {
+                                    $message_key = 'car_updated_success_message';
+                                    $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                    
+                                    return [
+                                        "status" => "1",
+                                        "response_message" => "success",
+                                        "display_message" => $message ?: "Car details updated successfully."
+                                    ];
+                        }
+                        else
+                        {
+                                    return [
+                                        "status" => "0",
+                                        "response_message" => "car_update_failed",
+                                        "display_message" => "Failed to update car details. Please try again.",
+                                        "error_message" => "Car update failed"
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
     } 
 
@@ -3272,197 +3937,360 @@ public static function editcarApi(Request $request)
 
  public static function versionaccessoriesdetails(Request $request)
     {
-      $brand_id = getallBrands()->pluck('id'); // 
-  
-        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
-        $language_id = [1,2]; // 
-      $validator = Validator::make($request->all(), [
-      'session_id' => 'required',
-      'customer_id' => 'required',
-      'main_brand_id' => ['required',Rule::in($brand_id)],
-      'model_id' => 'required',
-      //'version_id' => 'required',
-      'language_id' => ['required',Rule::in($language_id)]
-     // 'car_owned_type' => ['required',Rule::in($car_owned_type)]
-      //]
-
-        ]);
+        // Get valid brand IDs
+        $brand_id = getallBrands()->pluck('id')->toArray();
+        $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+        
+        // Define sanitization rules
+        $sanitizeRules = [
+            'session_id' => 'string',
+            'customer_id' => 'integer',
+            'main_brand_id' => 'integer',
+            'model_id' => 'integer',
+            'language_id' => 'integer',
+            'page' => 'integer',
+            'per_page' => 'integer',
+        ];
+        
+        // Sanitize input data to prevent SQL injection
+        $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+        
+        // Apply additional sanitization for specific fields
+        $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+        $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+        $sanitizedData['main_brand_id'] = (int) ($sanitizedData['main_brand_id'] ?? 0);
+        $sanitizedData['model_id'] = (int) ($sanitizedData['model_id'] ?? 0);
+        $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+        $sanitizedData['page'] = max(1, (int) ($sanitizedData['page'] ?? 1));
+        $sanitizedData['per_page'] = max(1, min(100, (int) ($sanitizedData['per_page'] ?? 15)));
+        
+        // Check if pagination is requested
+        $use_pagination = isset($request->page) || isset($request->per_page);
+        
+        // Define validation rules
+        $validationRules = [
+            'session_id' => 'required|string|max:255',
+            'customer_id' => 'required|integer|min:1',
+            'main_brand_id' => ['required', 'integer', Rule::in($brand_id)],
+            'model_id' => 'required|integer|min:1',
+            'language_id' => ['required', 'integer', Rule::in($language_id)],
+            'page' => 'nullable|integer|min:1',
+            'per_page' => 'nullable|integer|min:1|max:100',
+        ];
+        
+        // Get module-specific validation messages
+        $module = 'car-accessories';
+        $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+        
+        // Create validator with module-specific messages
+        $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
 
          if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+            return \ValidationHelper::formatValidationErrors($validator, $module);
         }
         else
         {
+            // Merge sanitized data back into request for session check
+            $request->merge($sanitizedData);
+            
           $customer_session_check = customer_session::check_customersession($request);
 
       if($customer_session_check == null)
       {
-          return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
+                return [
+                    "status" => "0",
+                    "response_message" => "invalid_session",
+                    "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                    "error_message" => "Invalid Session"
+                ];
       }
       else
       {
+                // Sanitize model_id and main_brand_id before query
+                $model_id = (int) $sanitizedData['model_id'];
+                $main_brand_id = (int) $sanitizedData['main_brand_id'];
 
-        $customer_carversion_check = models::getcarmodelbyTypeApi_check($request['model_id'],$request['main_brand_id']);
+                $objmodels= new models();
+                $customer_carversion_check = $objmodels->getcarmodelbyTypeApi_check($model_id, $main_brand_id);
     
         if($customer_carversion_check == null)
         {
-          return ["status" => "0","response_message" => "invalid model","display_message" => "Model Id does not match","error_message" => "invalid model"];
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_model",
+                        "display_message" => "Model ID does not match the selected brand. Please select a valid model.",
+                        "error_message" => "Invalid Model"
+                    ];
         }
         else
         {
-          //$versiondetails = accessories::getversionaccessoriesApi($request['version_id']);
-          $versiondetails = accessories::getversionaccessoriesByModel($request['model_id']);
+                    if($use_pagination) {
+                        $page = (int) $sanitizedData['page'];
+                        $per_page = (int) $sanitizedData['per_page'];
+                        
+                        $versiondetails = accessories::getversionaccessoriesByModelPaginated($model_id, $per_page, $page);
 
-          if($versiondetails)
-          {
-            // In future Email Teemplate to be sent from here
-            return ["status" => "1","response_message" => "success","display_message" => "success","accessories_list" => $versiondetails];
+                        if($versiondetails && $versiondetails->count() > 0)
+                        {
+                            return [
+                                "status" => "1",
+                                "response_message" => "success",
+                                "display_message" => "Accessories list retrieved successfully",
+                                "accessories_list" => $versiondetails->items(),
+                                "pagination" => [
+                                    "current_page" => $versiondetails->currentPage(),
+                                    "per_page" => $versiondetails->perPage(),
+                                    "total" => $versiondetails->total(),
+                                    "last_page" => $versiondetails->lastPage(),
+                                    "from" => $versiondetails->firstItem(),
+                                    "to" => $versiondetails->lastItem(),
+                                    "has_more_pages" => $versiondetails->hasMorePages()
+                                ]
+                            ];
           }
           else
           {
-            // In future Email Teemplate to be sent from here
-            return ["status" => "0","response_message" => "success","display_message" => "No records found"];
+                            return [
+                                "status" => "0",
+                                "response_message" => "no_records_found",
+                                "display_message" => "No accessories found for the selected model.",
+                                "error_message" => "No records found"
+                            ];
+                        }
+                    } else {
+                        // Backward compatibility: return all results if pagination not requested
+                        $versiondetails = accessories::getversionaccessoriesByModel($model_id);
+                        
+                        if($versiondetails && $versiondetails->count() > 0)
+                        {
+                            return [
+                                "status" => "1",
+                                "response_message" => "success",
+                                "display_message" => "Accessories list retrieved successfully",
+                                "accessories_list" => $versiondetails
+                            ];
+                        }
+                        else
+                        {
+                            return [
+                                "status" => "0",
+                                "response_message" => "no_records_found",
+                                "display_message" => "No accessories found for the selected model.",
+                                "error_message" => "No records found"
+                            ];
           }
         }
-
+                }
       }
-           
-
-        
     }
     }
 
 public static function versionaccessoriesenquiry(Request $request)
     {
-      $brand_id = getallBrands()->pluck('id'); // 
-  
-        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
-        $language_id = [1,2]; // 0 New Car 1 Old Car 
-
-      $validator = Validator::make($request->all(), [
-      'session_id' => 'required',
-      'customer_id' => 'required',
-      'accessories_id' => 'required',
-      'language_id' => ['required',Rule::in($language_id)]
-      // 'main_brand_id' => ['required',Rule::in($brand_id)],
-      // 'model_id' => 'required',
-      // 'version_id' => 'required',
-     // 'car_owned_type' => ['required',Rule::in($car_owned_type)]
-      //]
-
-        ]);
+        // Define allowed values for validation
+        $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+        
+        // Define sanitization rules
+        $sanitizeRules = [
+            'session_id' => 'string',
+            'customer_id' => 'integer',
+            'accessories_id' => 'integer',
+            'language_id' => 'integer',
+        ];
+        
+        // Sanitize input data to prevent SQL injection
+        $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+        
+        // Apply additional sanitization for specific fields
+        $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+        $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+        $sanitizedData['accessories_id'] = (int) ($sanitizedData['accessories_id'] ?? 0);
+        $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+        
+        // Define validation rules
+        $validationRules = [
+            'session_id' => 'required|string|max:255',
+            'customer_id' => 'required|integer|min:1',
+            'accessories_id' => 'required|integer|min:1',
+            'language_id' => ['required', 'integer', Rule::in($language_id)],
+        ];
+        
+        // Get module-specific validation messages
+        $module = 'car-accessories-enquiry';
+        $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+        
+        // Create validator with module-specific messages
+        $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
 
          if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+            return \ValidationHelper::formatValidationErrors($validator, $module);
         }
         else
         {
+            // Merge sanitized data back into request for session check
+            $request->merge($sanitizedData);
+            
           $customer_session_check = customer_session::check_customersession($request);
 
       if($customer_session_check == null)
       {
-          return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
+                return [
+                    "status" => "0",
+                    "response_message" => "invalid_session",
+                    "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                    "error_message" => "Invalid Session"
+                ];
       }
       else
       {
-
-        
-        $customer_carversion_check = accessories::getaccessoriesbyid($request->accessories_id);
+                // Sanitize accessories_id before query
+                $accessories_id = (int) $sanitizedData['accessories_id'];
+                $customer_carversion_check = accessories::getaccessoriesbyid($accessories_id);
 
         if($customer_carversion_check == null)
         {
-          return ["status" => "0","response_message" => "invalid accessory id","display_message" => "Accessory Id does not match","error_message" => "invalid accessory id"];
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_accessory_id",
+                        "display_message" => "Invalid accessory ID. Please select a valid accessory.",
+                        "error_message" => "Invalid Accessory ID"
+                    ];
         }
         else
         {
+                    // Merge sanitized data back to request for saving
+                    $request->merge($sanitizedData);
+                    
           $versiondetails = accessories::saveaccessoryenquiry($request);
 
           if($versiondetails)
           {
                 $message_key = 'corporate_solutions_thank_you_message';
-                $message = getTranslationsAPImessage($request->language_id,$message_key);
+                        $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
 
-            // In future Email Teemplate to be sent from here
-            return ["status" => "1","response_message" => "success","display_message" => $message];
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => $message ?: "Accessory enquiry submitted successfully. Thank you for your interest."
+                        ];
           }
           else
           {
-            // In future Email Teemplate to be sent from here
-            return ["status" => "0","response_message" => "success","display_message" => "Accessory requested failed"];
+                        return [
+                            "status" => "0",
+                            "response_message" => "enquiry_failed",
+                            "display_message" => "Failed to submit accessory enquiry. Please try again.",
+                            "error_message" => "Enquiry submission failed"
+                        ];
           }
         }
-
-      }
-           
-
-        
+            }
     }
     }
 
 
     public static function versionaccessoriespay_now(Request $request)
     {
-      $brand_id = getallBrands()->pluck('id'); // 
-  
-        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
-        $language_id = [1,2]; // 0 New Car 1 Old Car 
-      $validator = Validator::make($request->all(), [
-      'session_id' => 'required',
-      'customer_id' => 'required',
-      'accessories_id' => 'required',
-      'language_id' => ['required',Rule::in($language_id)]
-      // 'main_brand_id' => ['required',Rule::in($brand_id)],
-      // 'model_id' => 'required',
-      // 'version_id' => 'required',
-     // 'car_owned_type' => ['required',Rule::in($car_owned_type)]
-      //]
-
-        ]);
+        // Define allowed values for validation
+        $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+        
+        // Define sanitization rules
+        $sanitizeRules = [
+            'session_id' => 'string',
+            'customer_id' => 'integer',
+            'accessories_id' => 'integer',
+            'language_id' => 'integer',
+        ];
+        
+        // Sanitize input data to prevent SQL injection
+        $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+        
+        // Apply additional sanitization for specific fields
+        $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+        $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+        $sanitizedData['accessories_id'] = (int) ($sanitizedData['accessories_id'] ?? 0);
+        $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+        
+        // Define validation rules
+        $validationRules = [
+            'session_id' => 'required|string|max:255',
+            'customer_id' => 'required|integer|min:1',
+            'accessories_id' => 'required|integer|min:1',
+            'language_id' => ['required', 'integer', Rule::in($language_id)],
+        ];
+        
+        // Get module-specific validation messages
+        $module = 'car-accessories-pay-now';
+        $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+        
+        // Create validator with module-specific messages
+        $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
 
          if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+            return \ValidationHelper::formatValidationErrors($validator, $module);
         }
         else
         {
+            // Merge sanitized data back into request for session check
+            $request->merge($sanitizedData);
+            
           $customer_session_check = customer_session::check_customersession($request);
 
       if($customer_session_check == null)
       {
-          return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
+                return [
+                    "status" => "0",
+                    "response_message" => "invalid_session",
+                    "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                    "error_message" => "Invalid Session"
+                ];
       }
       else
       {
+                // Sanitize accessories_id before query
+                $accessories_id = (int) $sanitizedData['accessories_id'];
 
-        
-        $customer_carversion_check = accessories::getaccessoriesbymultipleids($request->accessories_id);
+                // Check if accessory exists (using getaccessoriesbyid for single ID validation)
+                $customer_carversion_check = accessories::getaccessoriesbyid($accessories_id);
 
         if($customer_carversion_check == null)
         {
-          return ["status" => "0","response_message" => "invalid accessory id","display_message" => "Accessory Id does not match","error_message" => "invalid accessory id"];
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_accessory_id",
+                        "display_message" => "Invalid accessory ID. Please select a valid accessory.",
+                        "error_message" => "Invalid Accessory ID"
+                    ];
         }
         else
         {
+                    // Merge sanitized data back to request for saving
+                    $request->merge($sanitizedData);
+                    
           $versiondetails = accessories::saveaccessorypaiddetails($request);
 
           if($versiondetails)
           {
-            // In future Email Teemplate to be sent from here
-            return ["status" => "1","response_message" => "success","display_message" => "Accessory Pay requested successfully"];
+                        $message_key = 'corporate_solutions_thank_you_message';
+                        $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                        
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => $message ?: "Accessory payment request submitted successfully. Thank you for your interest."
+                        ];
           }
           else
           {
-            // In future Email Teemplate to be sent from here
-            return ["status" => "0","response_message" => "success","display_message" => "Accessory Pay requested failed"];
+                        return [
+                            "status" => "0",
+                            "response_message" => "payment_request_failed",
+                            "display_message" => "Failed to submit accessory payment request. Please try again.",
+                            "error_message" => "Payment request submission failed"
+                        ];
           }
         }
-
-      }
-           
-
-        
+            }
     }
     }
 
@@ -3548,67 +4376,235 @@ public static function versionaccessoriesenquiry(Request $request)
 
   public static function getmodeltradeinsavefamily(Request $request)
     {
-
-
-      $brand_id = getallBrands()->pluck('id'); // 
-      //$city_id = getallcities()->pluck('id'); // 
-      //$showroom_id = getallshowroom()->pluck('id'); // 
-        $device_id = [1,2]; // 
-        $language_id = [1,2]; // 
-        $car_owned_type = [0,1]; // 0 New Car 1 Old Car 
-
-      $validator = Validator::make($request->all(), [
-      'session_id' => 'required',
-      'customer_id' => 'required',
-      //'customer_vehicles_id' => 'required',
-      'main_brand_id' => ['required',Rule::in($brand_id)],
-      'model_id' => 'required',
-      //'version_id' => 'required',
-      'car_owned_type' => ['required',Rule::in($car_owned_type)],
-      'language_id' => ['required',Rule::in($language_id)],
-      //'mileage' => 'required',
-      'customer_name' => 'required',
-      'customer_mobile_number' => 'required',
-      'customer_email' => 'required'
-      // 'model_id' => 'required'
-      //'city_id' => ['required',Rule::in($city_id)],
-      //'showroom_id' => ['required',Rule::in($showroom_id)],
-      //'date' => ['required','date','after:yesterday'],
-      //'time' => ['required','time' => 'date_format:H:i']
-      //]
-
-        ]);
+        try {
+            // Get valid brand IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            $car_owned_type = [0, 1]; // 0 = New Car, 1 = Pre-owned Car
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'main_brand_id' => 'integer',
+                'model_id' => 'integer',
+                'car_owned_type' => 'integer',
+                'customer_name' => 'string',
+                'customer_mobile_number' => 'string',
+                'customer_email' => 'email',
+                'language_id' => 'integer',
+                'customer_vehicles_id' => 'integer',
+                'mileage' => 'string',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['main_brand_id'] = (int) ($sanitizedData['main_brand_id'] ?? 0);
+            $sanitizedData['model_id'] = (int) ($sanitizedData['model_id'] ?? 0);
+            $sanitizedData['car_owned_type'] = (int) ($sanitizedData['car_owned_type'] ?? -1);
+            $sanitizedData['customer_name'] = trim(strip_tags($sanitizedData['customer_name'] ?? ''));
+            $sanitizedData['customer_mobile_number'] = trim(strip_tags($sanitizedData['customer_mobile_number'] ?? ''));
+            $sanitizedData['customer_email'] = filter_var(trim($sanitizedData['customer_email'] ?? ''), FILTER_SANITIZE_EMAIL);
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+            $sanitizedData['customer_vehicles_id'] = isset($sanitizedData['customer_vehicles_id']) ? (int) $sanitizedData['customer_vehicles_id'] : null;
+            $sanitizedData['mileage'] = isset($sanitizedData['mileage']) ? trim(strip_tags($sanitizedData['mileage'])) : null;
+            
+            // Handle file upload if present
+            $hasFile = $request->hasFile('trade_in_image');
+            $uploadedFile = null;
+            
+            if ($hasFile) {
+                $uploadedFile = $request->file('trade_in_image');
+                
+                // Validate file type and size before Laravel validation
+                $allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                $allowedExtensions = ['jpeg', 'jpg', 'png', 'gif'];
+                $maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+                
+                $fileMimeType = $uploadedFile->getMimeType();
+                $fileExtension = strtolower($uploadedFile->getClientOriginalExtension());
+                $fileSize = $uploadedFile->getSize();
+                
+                if (!in_array($fileMimeType, $allowedMimeTypes) || !in_array($fileExtension, $allowedExtensions)) {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_file_type",
+                        "display_message" => "Invalid image file type. Allowed types: JPEG, JPG, PNG, GIF.",
+                        "error_message" => "Invalid file type"
+                    ];
+                }
+                
+                if ($fileSize > $maxFileSize) {
+                    return [
+                        "status" => "0",
+                        "response_message" => "file_too_large",
+                        "display_message" => "Image size exceeds maximum allowed size of 5MB.",
+                        "error_message" => "File too large"
+                    ];
+                }
+            }
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'main_brand_id' => ['required', 'integer', Rule::in($brand_id)],
+                'model_id' => 'required|integer|min:1',
+                'car_owned_type' => ['required', 'integer', Rule::in($car_owned_type)],
+                'customer_name' => 'required|string|max:255',
+                'customer_mobile_number' => 'required|string|max:20',
+                'customer_email' => 'required|email|max:255',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Add optional fields validation
+            if (isset($sanitizedData['customer_vehicles_id']) && $sanitizedData['customer_vehicles_id'] !== null) {
+                $validationRules['customer_vehicles_id'] = 'integer|min:1';
+            }
+            
+            if (isset($sanitizedData['mileage']) && $sanitizedData['mileage'] !== null) {
+                $validationRules['mileage'] = 'string|max:20';
+            }
+            
+            // Add optional image validation if file is uploaded
+            if ($hasFile) {
+                $validationRules['trade_in_image'] = 'image|mimes:jpeg,jpg,png,gif|max:5120'; // 5MB max
+            }
+            
+            // Get module-specific validation messages
+            $module = 'save-trade-in-family-car';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Prepare validation data - include file if present
+            $validationData = $sanitizedData;
+            if ($hasFile) {
+                $validationData['trade_in_image'] = $uploadedFile;
+            }
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($validationData, $moduleValidation['rules'], $moduleValidation['messages']);
       
          if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+                return \ValidationHelper::formatValidationErrors($validator, $module);
         }
         else
         {
-          // dd("inside1".$validator->fails());
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
           $customer_session_check = customer_session::check_customersession($request);
 
       if($customer_session_check == null)
       {
-          return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
       }
       else
       {
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    else
+                    {
+                        // Validate model belongs to brand
+                        $reg_model_id = (int) $sanitizedData['model_id'];
+                        $main_brand_id = (int) $sanitizedData['main_brand_id'];
+                        $customer_carmodel_check = models::getcarmodelbyTypeApi_check($reg_model_id, $main_brand_id);
 
-         $tradeinsave = tradein::savetradein($request);
-
-          if($tradeinsave)
+                        if($customer_carmodel_check == null)
+                        {
+                            return [
+                                "status" => "0",
+                                "response_message" => "invalid_model_brand",
+                                "display_message" => "Model ID does not match the selected brand. Please select a valid model.",
+                                "error_message" => "Invalid Model or Brand"
+                            ];
+                        }
+                        else
           {
-            // In future Email Teemplate to be sent from here
-            return ["status" => "1","response_message" => "success","display_message" => "Trade In request is successful"];
+                            // If customer_vehicles_id is provided, verify it belongs to the customer
+                            if(isset($sanitizedData['customer_vehicles_id']) && $sanitizedData['customer_vehicles_id'] !== null && $sanitizedData['customer_vehicles_id'] > 0)
+                            {
+                                $customer_vehicles_id = (int) $sanitizedData['customer_vehicles_id'];
+                                $vehicle_check = customer_vehicles::get_customervehicle_byidApi($customer_id, $customer_vehicles_id, $sanitizedData['session_id']);
+                                
+                                if($vehicle_check == null)
+                                {
+                                    return [
+                                        "status" => "0",
+                                        "response_message" => "invalid_vehicle",
+                                        "display_message" => "Vehicle does not exist or does not belong to this customer. Please verify the vehicle ID.",
+                                        "error_message" => "Invalid Vehicle"
+                                    ];
+                                }
+                            }
+                            
+                            // Set self_car flag (1 for family car, 0 for own car)
+                            $sanitizedData['self_car'] = 1; // This is for family car
+                            
+                            // Merge sanitized data back to request for saving (including file if present)
+                            $request->merge($sanitizedData);
+                            
+                            $tradeinsave = tradein::savetradein($request);
+                            
+                            if($tradeinsave)
+                            {
+                                $message_key = 'trade_in_success_message';
+                                $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                
+                                return [
+                                    "status" => "1",
+                                    "response_message" => "success",
+                                    "display_message" => $message ?: "Trade-in family car request submitted successfully. We will contact you soon.",
+                                    "trade_in_id" => $tradeinsave->id ?? null
+                                ];
           }
-      }
-           
-
-        
+                            else
+                            {
+                                return [
+                                    "status" => "0",
+                                    "response_message" => "trade_in_failed",
+                                    "display_message" => "Failed to submit trade-in family car request. Please try again.",
+                                    "error_message" => "Trade-in request submission failed"
+                                ];
+                            }
+                        }
+                    }
+                }
     }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
+        }
     }
-
 
     public static function addnewcars(Request $request)
     {   
@@ -6722,28 +7718,108 @@ public static function editspecification(Request $request)
     }
     public static function getallshowroomApi(Request $request)
     {
-      
-      $language_id = [1,2]; // 
-      $main_brand_id = [1,2,3]; // 
-        $validator = Validator::make($request->all(), [
-            'language_id' => ['required',Rule::in($language_id)],
-            'main_brand_id' => [Rule::in($main_brand_id)]
-   
-        ]);
-
-        if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        try {
+            // Get valid brand IDs and language IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'main_brand_id' => 'integer',
+                'language_id' => 'integer',
+                'page' => 'integer',
+                'per_page' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['main_brand_id'] = isset($sanitizedData['main_brand_id']) ? (int) $sanitizedData['main_brand_id'] : null;
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 1);
+            $sanitizedData['page'] = max(1, (int) ($sanitizedData['page'] ?? 1));
+            $sanitizedData['per_page'] = max(1, min(100, (int) ($sanitizedData['per_page'] ?? 15)));
+            
+            // Define validation rules
+            $validationRules = [
+                'main_brand_id' => ['required', 'integer', Rule::in($brand_id)],
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+                'page' => 'nullable|integer|min:1',
+                'per_page' => 'nullable|integer|min:1|max:100',
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'all-showroom-list';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+            
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator, $module);
+            }
+            else
+            {
+                // Get pagination parameters
+                $main_brand_id = (int) $sanitizedData['main_brand_id'];
+                $lang_id = (int) $sanitizedData['language_id'];
+                $page = (int) $sanitizedData['page'];
+                $per_page = (int) $sanitizedData['per_page'];
+                
+                // Check if pagination is requested (if per_page is provided and > 0)
+                $use_pagination = $request->has('per_page') || $request->has('page');
+                
+                if($use_pagination) {
+                    // Get paginated showroom list
+                    $getallshowroom = locations::getallshowroombyBrandPaginated($main_brand_id, $lang_id, $per_page, $page);
+                    
+                    // Try to get translated message, but use fallback if not available
+                    $message = \ValidationHelper::getModuleMessage($module, 'display_message', $lang_id);
+                    
+                    return [
+                        "status" => "1",
+                        "response_message" => "success",
+                        "display_message" => $message,
+                        "allshowroom_list" => $getallshowroom->items(),
+                        "pagination" => [
+                            "current_page" => $getallshowroom->currentPage(),
+                            "per_page" => $getallshowroom->perPage(),
+                            "total" => $getallshowroom->total(),
+                            "last_page" => $getallshowroom->lastPage(),
+                            "from" => $getallshowroom->firstItem(),
+                            "to" => $getallshowroom->lastItem(),
+                            "has_more_pages" => $getallshowroom->hasMorePages(),
+                        ]
+                    ];
+                } else {
+                    // Backward compatibility: return all results if pagination not requested
+                    $getallshowroom = getalllocationbyBrand($main_brand_id, $lang_id);
+                    
+                    // Try to get translated message, but use fallback if not available
+                    $message = \ValidationHelper::getModuleMessage($module, 'display_message', $lang_id);
+                    
+                    return [
+                        "status" => "1",
+                        "response_message" => "success",
+                        "display_message" => $message,
+                        "allshowroom_list" => $getallshowroom
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
-        else
-        {
-             $getallshowroom = getalllocationbyBrand($request->main_brand_id,$request->language_id);
-
-            return ["status" => "1","response_message" => "success","display_message" => "AllShowroom List","allshowroom_list" =>  $getallshowroom];
-        }
-      
-      
-
     }
 
      public static function addversion(Request $request)

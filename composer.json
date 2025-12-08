@@ -46,7 +46,8 @@
         ],
 
         "files": [
-              "app/helpers.php"    
+              "app/helpers.php",
+              "app/ValidationHelper.php"
         ]
     },
     "autoload-dev": {

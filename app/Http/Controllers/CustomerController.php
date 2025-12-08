@@ -56,80 +56,203 @@ class CustomerController extends Controller
      */
     public function create(Request $request)
     {   
-
-        $brand_id = [1,2,3]; // 
-        $device_id = [1,2]; // 
-        $messages = [
-            'required' => 'The :attribute field is required.',
-            'unique' => 'The :attribute field should be unique.',
-            'alpha_num' => 'The :attribute field should not contains special characters.',
-            'email' => 'The :attribute field must be valid format.',
-            'in' => 'The :attribute must be one of the following types: :values',
-            'max' => 'The :attribute must be between 1 to 20 :values',
-
-
-           // 'unique' => 'The :attribute field should be unique.',
-            //'unique' => 'The :attribute field should be unique.',
-        ];
-        if(!Str::startsWith($request->mobile_number, '9715'))
-        {
-
-           $mobile_number_validation =  ["mobile_number" => [ 0 => "The mobile number field should start with 5 after country code."]];
-
-
-            return ["status" => "0","response_message" => $mobile_number_validation,"display_message" => "Please check your Mobile Number","error_message" => $mobile_number_validation];
-        }
-
-       $category_dropdown = ['AUH','DXB','SHJ','AJMAN','RAK','UAQ','FUJ'];
-        $validator = Validator::make($request->all(), [
-            'username' => 'required|max:255',
-            //'username' => 'required|regex:/^[a-zA-Z]+$/|max:255',
-           // 'username' => 'required|alpha',
-           // 'mobile_number' => 'required|unique:customer',
-            'mobile_number' => 'required|numeric|unique:customer',
-            'email' => 'required|email:rfc,dns|unique:customer',
-            'car_registration_number' => 'required|max:255',
-            'reg_chasis_number' => 'required|unique:customer|max:255',
-            'reg_brand_id' => ['required',Rule::in($brand_id)],
-            'reg_model_id' => 'required|max:255',
-            'device_type' => ['required',Rule::in($device_id)],
-            'device_id' => 'required|max:255',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'device_token' => 'required',
-            'category_dropdown'=>['required',Rule::in($category_dropdown)],
-            'category_number'=> 'required',
-            'image' => 'image',
-        ],$messages);
-        // dd($validator->fails());
-        if ($validator->fails()) {
-            // return $validator->errors();
-            return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs email , username , Mobile Number or Email or Car Registration number or chasis number is already exist. Make sure the mobile number field starts with 5 not 0. ","error_message" => $validator->errors()];
-        }
-        else
-        {
-           $customer_create =  customer::register($request);
-
-           if($customer_create)
-           {    
-                $message_key = 'sign_up_success_message';
-                if(isset($request->language_id))
+        try {
+            // Get valid brand IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $device_id = [1, 2]; // 1 = Android, 2 = iOS
+            $category_dropdown = ['AUH', 'DXB', 'SHJ', 'AJMAN', 'RAK', 'UAQ', 'FUJ'];
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'username' => 'string',
+                'mobile_number' => 'string',
+                'email' => 'email',
+                'car_registration_number' => 'string',
+                'reg_chasis_number' => 'string',
+                'reg_brand_id' => 'integer',
+                'reg_model_id' => 'integer',
+                'device_type' => 'integer',
+                'device_id' => 'string',
+                'latitude' => 'float',
+                'longitude' => 'float',
+                'device_token' => 'string',
+                'category_dropdown' => 'string',
+                'category_number' => 'string',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['username'] = trim(strip_tags($sanitizedData['username'] ?? ''));
+            
+            // Get mobile number directly from request before sanitization to preserve format
+            $mobile_number_raw = trim((string)($request->input('mobile_number') ?? ''));
+            
+            // Remove any non-digit characters (spaces, dashes, etc.) but keep the number
+            $mobile_number_raw = preg_replace('/[^\d]/', '', $mobile_number_raw);
+            
+            // Validate mobile number format first (before normalization)
+            // Accepts both formats: 5XXXXXXXX (9 digits) or 9715XXXXXXXX (12 digits)
+            if (!preg_match('/^(9715\d{8}|5\d{8})$/', $mobile_number_raw)) {
+                return [
+                    "status" => "0",
+                    "response_message" => "invalid_mobile_format",
+                    "display_message" => "Mobile number must be in Dubai/UAE format: 5XXXXXXXX (9 digits starting with 5) or 9715XXXXXXXX (12 digits starting with 9715). Please check your mobile number.",
+                    "error_message" => "Invalid Mobile Number Format",
+                    "errors" => [
+                        "mobile_number" => "Mobile number must be in Dubai/UAE format: 5 followed by 8 digits (e.g., 512345678) or 9715 followed by 8 digits (e.g., 971512345678)."
+                    ]
+                ];
+            }
+            
+            // Normalize mobile number: convert local format (5XXXXXXXX) to international format (9715XXXXXXXX)
+            if (preg_match('/^5\d{8}$/', $mobile_number_raw)) {
+                // Local format: 5XXXXXXXX (9 digits) - prepend 971
+                $sanitizedData['mobile_number'] = '971' . $mobile_number_raw;
+            } else {
+                // International format: 9715XXXXXXXX (12 digits) - use as is
+                $sanitizedData['mobile_number'] = $mobile_number_raw;
+            }
+            
+            $sanitizedData['email'] = filter_var(trim($sanitizedData['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+            $sanitizedData['car_registration_number'] = trim(strip_tags($sanitizedData['car_registration_number'] ?? ''));
+            $sanitizedData['reg_chasis_number'] = trim(strip_tags($sanitizedData['reg_chasis_number'] ?? ''));
+            $sanitizedData['reg_brand_id'] = (int) ($sanitizedData['reg_brand_id'] ?? 0);
+            $sanitizedData['reg_model_id'] = (int) ($sanitizedData['reg_model_id'] ?? 0);
+            $sanitizedData['device_type'] = (int) ($sanitizedData['device_type'] ?? 0);
+            $sanitizedData['device_id'] = trim(strip_tags($sanitizedData['device_id'] ?? ''));
+            $sanitizedData['latitude'] = (float) ($sanitizedData['latitude'] ?? 0);
+            $sanitizedData['longitude'] = (float) ($sanitizedData['longitude'] ?? 0);
+            $sanitizedData['device_token'] = trim(strip_tags($sanitizedData['device_token'] ?? ''));
+            $sanitizedData['category_dropdown'] = strtoupper(trim(strip_tags($sanitizedData['category_dropdown'] ?? '')));
+            $sanitizedData['category_number'] = trim(strip_tags($sanitizedData['category_number'] ?? ''));
+            $sanitizedData['language_id'] = isset($sanitizedData['language_id']) ? (int) $sanitizedData['language_id'] : 1;
+            
+            // Update the request with normalized mobile number for unique check
+            $request->merge(['mobile_number' => $sanitizedData['mobile_number']]);
+            
+            // Define validation rules
+            // Note: mobile_number format is already validated above, now we just check uniqueness
+            // The normalization above converts 5XXXXXXXX to 9715XXXXXXXX before database storage
+            $validationRules = [
+                'username' => 'required|string|max:255',
+                'mobile_number' => 'required|string|unique:customer',
+                'email' => 'required|email:rfc,dns|unique:customer',
+                'car_registration_number' => 'required|string|max:255',
+                'reg_chasis_number' => 'required|string|unique:customer|max:255',
+                'reg_brand_id' => ['required', 'integer', Rule::in($brand_id)],
+                'reg_model_id' => 'required|integer|min:1',
+                'device_type' => ['required', 'integer', Rule::in($device_id)],
+                'device_id' => 'required|string|max:255',
+                'latitude' => 'required|numeric|between:-90,90',
+                'longitude' => 'required|numeric|between:-180,180',
+                'device_token' => 'required|string',
+                'category_dropdown' => ['required', 'string', Rule::in($category_dropdown)],
+                'category_number' => 'required|string|max:50',
+                'image' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:5120', // 5MB max
+            ];
+            
+            // Add optional language_id validation if present
+            if (isset($sanitizedData['language_id']) && $sanitizedData['language_id'] !== null) {
+                $validationRules['language_id'] = ['integer', Rule::in($language_id)];
+            }
+            
+            // Get module-specific validation messages
+            $module = 'customer-register';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages using sanitized data (which includes normalized mobile number)
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+            
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator, $module);
+            }
+            else
+            {
+                // Validate model belongs to brand
+                $reg_model_id = (int) $sanitizedData['reg_model_id'];
+                $reg_brand_id = (int) $sanitizedData['reg_brand_id'];
+                
+                $model_check = models::getcarmodelbyTypeApi_check($reg_model_id, $reg_brand_id);
+                
+                if($model_check == null)
                 {
-
-                    $message = getTranslationsAPImessage($request->language_id,$message_key);
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_model_brand",
+                        "display_message" => "Model ID does not match the selected brand. Please select a valid model.",
+                        "error_message" => "Invalid Model or Brand"
+                    ];
+                }
+                
+                // Handle file upload if present
+                if ($request->hasFile('image')) {
+                    $file = $request->file('image');
+                    $fileName = time() . '_' . $file->getClientOriginalName();
+                    $filePath = $file->storeAs('images/user_profile', $fileName, 'public'); // Store in public/images/user_profile
+                    $sanitizedData['image'] = $fileName; // Save only the filename to DB
+                    $request->merge(['image' => $fileName]); // Merge filename back to request
+                } else {
+                    $sanitizedData['image'] = null;
+                    $request->merge(['image' => null]);
+                }
+                
+                // Merge sanitized data back to request for registration
+                $request->merge($sanitizedData);
+                
+                $customer_create = customer::register($request);
+                
+                if($customer_create)
+                {
+                    // Try to get translated message, but use fallback if not available
+                    $message = "Registration completed successfully. Welcome!";
+                    try {
+                        if (function_exists('getTranslationsAPImessage')) {
+                            $message_key = 'sign_up_success_message';
+                            $translated_message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                            if ($translated_message && $translated_message !== $message_key) {
+                                $message = $translated_message;
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // Use default message if translation fails
+                        $message = "Registration completed successfully. Welcome!";
+                    }
+                    
+                    return [
+                        "status" => "1",
+                        "response_message" => "success",
+                        "display_message" => $message,
+                        "customer_id" => $customer_create->id ?? null
+                    ];
                 }
                 else
                 {
-                    $language_id = 1;
-                    $message = getTranslationsAPImessage($language_id,$message_key);
+                    return [
+                        "status" => "0",
+                        "response_message" => "registration_failed",
+                        "display_message" => "Failed to complete registration. Please try again.",
+                        "error_message" => "Registration failed"
+                    ];
                 }
-                
- 
-           		// In future Email Teemplate to be sent from here
-           		return ["status" => "1","response_message" => "success","display_message" => $message];
-           }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
- 
     }
     public function getregcategories(Request $request)
     {   
@@ -315,269 +438,716 @@ public function logon()
 
     public function getnotificationsbyCustomer(Request $request)
     {   
-         
-                $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                   'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        try {
+            // Get valid language IDs
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            $status_options = [0, 1]; // 0 = unread, 1 = read
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'language_id' => 'integer',
+                'status' => 'integer',
+                'page' => 'integer',
+                'per_page' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 1);
+            $sanitizedData['status'] = isset($sanitizedData['status']) ? (int) $sanitizedData['status'] : null;
+            $sanitizedData['page'] = isset($sanitizedData['page']) ? (int) $sanitizedData['page'] : 1;
+            $sanitizedData['per_page'] = isset($sanitizedData['per_page']) ? (int) $sanitizedData['per_page'] : 15;
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+                'status' => ['nullable', 'integer', Rule::in($status_options)],
+                'page' => 'nullable|integer|min:1',
+                'per_page' => 'nullable|integer|min:1|max:100',
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'customer-notifications';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+            
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator, $module);
+            }
+            else
+            {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
+                $customer_session_check = customer_session::check_customersession($request);
+                
+                if($customer_session_check == null)
+                {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id);
-                        if($check_customer_id != null)
-                        {
-
-                          // $cars = customer_vehicles::get_customervehicle_byidApi($check_customer_id->id,$request->customer_vehicle_id,$request->session_id);
-                           // dd($cars);
-
-                           $getallnotification = notifications_sent::getnotificationsbyCustomerId($check_customer_id->id);
-
-
-                           if($getallnotification){
-
-                            return ["status" => "1","response_message" => "success","display_message" => "Notification List",
-                                "notifications_list" =>  $getallnotification , "notifications_badgecount" =>  $check_customer_id->badge_count
-                            ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Insurance request failed","display_message" => "Insurance request failed Customer Id or Customer vehicle Id does not match","error_message" => "Insurance request failed"];
-                           }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    else
+                    {
+                        // Get pagination parameters
+                        $page = (int) $sanitizedData['page'];
+                        $perPage = (int) $sanitizedData['per_page'];
+                        $status = $sanitizedData['status'];
                         
-         
-                }        
-
-        
+                        // Get paginated notifications
+                        $paginatedNotifications = notifications_sent::getnotificationsbyCustomerIdPaginated(
+                            $check_customer_id->id,
+                            $perPage,
+                            $page,
+                            $status
+                        );
+                        
+                        // Transform notifications to include full image URLs
+                        $app_url = config('app.url');
+                        $notifications_list = $paginatedNotifications->getCollection()->map(function ($notification) use ($app_url) {
+                            $notification_data = [
+                                'id' => $notification->id,
+                                'fk_notification_id' => $notification->fk_notification_id,
+                                'main_brand_id' => $notification->main_brand_id,
+                                'main_model_id' => $notification->main_model_id,
+                                'title' => $notification->title,
+                                'description' => $notification->description,
+                                'date' => $notification->date,
+                                'time' => $notification->time,
+                                'date_time' => $notification->date_time,
+                                'status' => $notification->status,
+                                'customer_id' => $notification->customer_id,
+                                'created_at' => $notification->created_at,
+                                'updated_at' => $notification->updated_at,
+                            ];
+                            
+                            // Add full image URL if image exists
+                            if(isset($notification->notify_image) && $notification->notify_image != '')
+                            {
+                                $notification_data['notify_image'] = $app_url.'/images/notifications/'.$notification->notify_image;
+                            }
+                            else
+                            {
+                                $notification_data['notify_image'] = null;
+                            }
+                            
+                            return $notification_data;
+                        });
+                        
+                        // Try to get translated message, but use fallback if not available
+                        $message = "Notifications retrieved successfully.";
+                        try {
+                            if (function_exists('getTranslationsAPImessage')) {
+                                $message_key = 'notifications_retrieved_success';
+                                $translated_message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                if ($translated_message && $translated_message !== $message_key) {
+                                    $message = $translated_message;
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            // Use default message if translation fails
+                            $message = "Notifications retrieved successfully.";
+                        }
+                        
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => $message,
+                            "notifications_list" => $notifications_list,
+                            "notifications_badgecount" => $check_customer_id->badge_count ?? 0,
+                            "pagination" => [
+                                "current_page" => $paginatedNotifications->currentPage(),
+                                "per_page" => $paginatedNotifications->perPage(),
+                                "total" => $paginatedNotifications->total(),
+                                "last_page" => $paginatedNotifications->lastPage(),
+                                "from" => $paginatedNotifications->firstItem(),
+                                "to" => $paginatedNotifications->lastItem(),
+                                "has_more_pages" => $paginatedNotifications->hasMorePages(),
+                            ]
+                        ];
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
+        }
     } 
 
 
         public function sendNotificationstoCustomer(Request $request)
     {   
-         
-                $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                    'device_token' => 'required',
-                   'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        try {
+            // Get valid brand IDs and language IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'main_brand_id' => 'integer',
+                'main_model_id' => 'integer',
+                'device_token' => 'string',
+                'title' => 'string',
+                'description' => 'string',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['main_brand_id'] = isset($sanitizedData['main_brand_id']) ? (int) $sanitizedData['main_brand_id'] : null;
+            $sanitizedData['main_model_id'] = isset($sanitizedData['main_model_id']) ? (int) $sanitizedData['main_model_id'] : null;
+            $sanitizedData['device_token'] = trim(strip_tags($sanitizedData['device_token'] ?? ''));
+            $sanitizedData['title'] = trim(strip_tags($sanitizedData['title'] ?? ''));
+            $sanitizedData['description'] = trim(strip_tags($sanitizedData['description'] ?? ''));
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 1);
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'device_token' => 'required|string|max:500',
+                'title' => 'required|string|max:255',
+                'description' => 'required|string|max:1000',
+                'main_brand_id' => ['nullable', 'integer', Rule::in($brand_id)],
+                'main_model_id' => 'nullable|integer|min:1',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'customer-notifications-send';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+            
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator, $module);
+            }
+            else
+            {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
+                $customer_session_check = customer_session::check_customersession($request);
+                
+                if($customer_session_check == null)
+                {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id);
-                        if($check_customer_id != null)
-                        {
-
-                          // $cars = customer_vehicles::get_customervehicle_byidApi($check_customer_id->id,$request->customer_vehicle_id,$request->session_id);
-                           // dd($cars);
-
-                           $getallnotification = notifications::sendnotification($request);
-                           // dd($getallnotification);
-
-                           if($getallnotification){
-
-                            return ["status" => "1","response_message" => "success","display_message" => "Notification Sent Successfully",
-                                 
-                            ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Notification failed","display_message" => "Notification failed","error_message" => "Notification failed"];
-                           }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    else
+                    {
+                        // Merge sanitized data back to request for sending notification
+                        $request->merge($sanitizedData);
                         
-         
-                }        
-
-        
+                        // Send notification
+                        $notification_result = notifications::sendnotification($request);
+                        
+                        // Check if notification was saved (even if FCM failed)
+                        if($notification_result && isset($notification_result['notification_id']))
+                        {
+                            if(isset($notification_result['success']) && $notification_result['success'])
+                            {
+                                // FCM notification sent successfully
+                                $message = "Notification sent successfully.";
+                                try {
+                                    if (function_exists('getTranslationsAPImessage')) {
+                                        $message_key = 'notification_sent_success';
+                                        $translated_message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                        if ($translated_message && $translated_message !== $message_key) {
+                                            $message = $translated_message;
+                                        }
+                                    }
+                                } catch (\Exception $e) {
+                                    // Use default message if translation fails
+                                    $message = "Notification sent successfully.";
+                                }
+                                
+                                return [
+                                    "status" => "1",
+                                    "response_message" => "success",
+                                    "display_message" => $message,
+                                    "notification_id" => $notification_result['notification_id'],
+                                    "badge_count" => $notification_result['badge_count'] ?? null
+                                ];
+                            }
+                            else
+                            {
+                                // Notification saved but FCM failed
+                                $error_message = isset($notification_result['error']) ? $notification_result['error'] : 'Failed to send push notification, but notification was saved.';
+                                return [
+                                    "status" => "0",
+                                    "response_message" => "notification_fcm_failed",
+                                    "display_message" => "Notification was saved but failed to send push notification. Please check device token and FCM configuration.",
+                                    "error_message" => $error_message,
+                                    "notification_id" => $notification_result['notification_id'],
+                                    "fcm_response" => $notification_result['fcm_response'] ?? null
+                                ];
+                            }
+                        }
+                        else
+                        {
+                            // Complete failure - notification not saved
+                            $error_message = isset($notification_result['error']) ? $notification_result['error'] : 'Failed to save and send notification.';
+                            return [
+                                "status" => "0",
+                                "response_message" => "notification_failed",
+                                "display_message" => "Failed to send notification. Please try again.",
+                                "error_message" => $error_message,
+                                "fcm_response" => $notification_result['fcm_response'] ?? null
+                            ];
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
+        }
     } 
 
         public function markNotificationsasread(Request $request)
     {   
-         
-                $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                    //'device_token' => 'required',
-                    //'notification_id' => 'required',
-                   'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        try {
+            // Get valid language IDs
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'language_id' => 'integer',
+                'notification_id' => 'integer',
+                'notification_ids' => 'array',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 1);
+            
+            // Handle notification IDs (can be single ID or array of IDs)
+            if (isset($sanitizedData['notification_ids']) && is_array($sanitizedData['notification_ids'])) {
+                $sanitizedData['notification_ids'] = array_map('intval', array_filter($sanitizedData['notification_ids'], 'is_numeric'));
+            } else {
+                $sanitizedData['notification_ids'] = null;
+            }
+            
+            if (isset($sanitizedData['notification_id'])) {
+                $sanitizedData['notification_id'] = (int) $sanitizedData['notification_id'];
+            } else {
+                $sanitizedData['notification_id'] = null;
+            }
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+                'notification_id' => 'nullable|integer|min:1',
+                'notification_ids' => 'nullable|array',
+                'notification_ids.*' => 'integer|min:1',
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'customer-notifications-mark-as-read';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+            
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator, $module);
+            }
+            else
+            {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
+                $customer_session_check = customer_session::check_customersession($request);
+                
+                if($customer_session_check == null)
+                {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id);
-                        if($check_customer_id != null)
-                        {
-
-                                              
-                           $updatedata = [
-                                 'badge_count' => 0
-                           ];  
-
-                           $updatenotification_badgecount =  customer::where('soft_delete', 0)
-                            ->where('id', $request->customer_id)
-                             
-                            ->update($updatedata);
-                         
-
-                           if($updatenotification_badgecount){
-
-                            return ["status" => "1","response_message" => "success","display_message" => "Notification count reset Successfully",
-                                 
-                            ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Notification failed","display_message" => "Notification count reset failed","error_message" => "Notification count reset failed"];
-                           }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    else
+                    {
+                        // Determine which notifications to mark as read
+                        $notification_ids = [];
                         
-         
-                }        
-
-        
+                        if (!empty($sanitizedData['notification_ids'])) {
+                            // Mark specific notifications by array
+                            $notification_ids = $sanitizedData['notification_ids'];
+                        } elseif (!empty($sanitizedData['notification_id'])) {
+                            // Mark single notification
+                            $notification_ids = [$sanitizedData['notification_id']];
+                        }
+                        // If neither is provided, mark all notifications as read
+                        
+                        // Build query to mark notifications as read
+                        $query = DB::table('notifications_sent')
+                            ->where('customer_id', $customer_id)
+                            ->where('soft_delete', 0)
+                            ->where('status', 0); // Only mark unread notifications
+                        
+                        // If specific notification IDs provided, filter by them
+                        if (!empty($notification_ids)) {
+                            $query->whereIn('id', $notification_ids);
+                        }
+                        
+                        // Update notifications to read status
+                        $updated_count = $query->update([
+                            'status' => 1, // 1 = read
+                            'updated_at' => date('Y-m-d H:i:s')
+                        ]);
+                        
+                        // Reset badge count to 0
+                        $badge_updated = customer::where('soft_delete', 0)
+                            ->where('id', $customer_id)
+                            ->update(['badge_count' => 0]);
+                        
+                        // Try to get translated message, but use fallback if not available
+                        $message = "Notifications marked as read successfully.";
+                        try {
+                            if (function_exists('getTranslationsAPImessage')) {
+                                $message_key = 'notifications_marked_read_success';
+                                $translated_message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                if ($translated_message && $translated_message !== $message_key) {
+                                    $message = $translated_message;
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            // Use default message if translation fails
+                            $message = "Notifications marked as read successfully.";
+                        }
+                        
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => $message,
+                            "notifications_marked" => $updated_count,
+                            "badge_count_reset" => $badge_updated ? true : false,
+                            "badge_count" => 0
+                        ];
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
+        }
     } 
 
 
     // Customer Profile 
     public static function getmodel_list(Request $request)
     {   
-                $language_id = [1,2];
-                $car_owned_type = [0,1];
-                $validator = Validator::make($request->all(), [
-                    //'session_id' => 'required',
-                    //'customer_id' => 'required',
-                    'language_id' => ['required',Rule::in($language_id)]
-                    // 'car_owned_type' => [Rule::in($car_owned_type)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
-                }
-                else
-                {   
-                     if(isset($request->session_id) && isset($request->customer_id))
-                     {
-                         $customer_session_check = customer_session::check_customersession($request);
-                         
-                         if($customer_session_check == null)
-                         {
-                            return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                         }
-                         else
-                         {
-                            $check_customer_id = customer::getcustomer($request->customer_id);
-                            if($check_customer_id != null)
-                            {
-                                            if(isset($request->car_owned_type))
-                                            {
-                                                $car_owned_type = $request->car_owned_type;
-                                            }
-                                            else
-                                            {
-                                                $car_owned_type = 0;
-                                            }
-                                            $getallcarmodel = models::getallcarmodel($request->language_id,$request->main_brand_id,$car_owned_type);
-                                            //dd($getallcarmodel);
-                                            return ["status" => "1","response_message" => "success","display_message" => "Model List",
-                                            "model_list" =>  $getallcarmodel
-                                            ];
-                                 
-                            }
-      
-                                
-                            }
-                     }
-                     else
-                     {
-
-                         if(isset($request->car_owned_type))
-                                            {
-                                                $car_owned_type = $request->car_owned_type;
-                                            }
-                                            else
-                                            {
-                                                $car_owned_type = 0;
-                                            }
-                                            $getallcarmodel = models::getallcarmodel($request->language_id,$request->main_brand_id,$car_owned_type);
-                                            //dd($getallcarmodel);
-                                            return ["status" => "1","response_message" => "success","display_message" => "Model List",
-                                            "model_list" =>  $getallcarmodel
-                                            ];
-
-                     }
+        try {
+            // Get valid brand IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            $car_owned_type = [0, 1]; // 0 = New Car, 1 = Pre-owned Car
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'language_id' => 'integer',
+                'main_brand_id' => 'integer',
+                'car_owned_type' => 'integer',
+                'page' => 'integer',
+                'per_page' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = isset($sanitizedData['session_id']) ? trim(strip_tags($sanitizedData['session_id'])) : null;
+            $sanitizedData['customer_id'] = isset($sanitizedData['customer_id']) ? (int) $sanitizedData['customer_id'] : null;
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 1);
+            $sanitizedData['main_brand_id'] = isset($sanitizedData['main_brand_id']) ? (int) $sanitizedData['main_brand_id'] : null;
+            $sanitizedData['car_owned_type'] = isset($sanitizedData['car_owned_type']) ? (int) $sanitizedData['car_owned_type'] : 0;
+            $sanitizedData['page'] = max(1, (int) ($sanitizedData['page'] ?? 1));
+            $sanitizedData['per_page'] = max(1, min(100, (int) ($sanitizedData['per_page'] ?? 15)));
+            
+            // Determine if pagination is requested
+            $use_pagination = $request->has('page') || $request->has('per_page');
+            
+            // Define validation rules
+            $validationRules = [
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Add optional validation rules
+            if (isset($sanitizedData['session_id']) && $sanitizedData['session_id'] !== null) {
+                $validationRules['session_id'] = 'string|max:255';
+            }
+            
+            if (isset($sanitizedData['customer_id']) && $sanitizedData['customer_id'] !== null) {
+                $validationRules['customer_id'] = 'integer|min:1';
+            }
+            
+            if (isset($sanitizedData['main_brand_id']) && $sanitizedData['main_brand_id'] !== null) {
+                $validationRules['main_brand_id'] = ['integer', Rule::in($brand_id)];
+            }
+            
+            if (isset($sanitizedData['car_owned_type']) && $sanitizedData['car_owned_type'] !== null) {
+                $validationRules['car_owned_type'] = ['integer', Rule::in($car_owned_type)];
+            }
+            
+            if ($use_pagination) {
+                $validationRules['page'] = 'integer|min:1';
+                $validationRules['per_page'] = 'integer|min:1|max:100';
+            }
+            
+            // Get module-specific validation messages
+            $module = 'car-model-list';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+            
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator, $module);
+            }
+            else
+            {
+                // If session_id and customer_id are provided, validate session
+                if(isset($sanitizedData['session_id']) && isset($sanitizedData['customer_id']) && 
+                   $sanitizedData['session_id'] !== null && $sanitizedData['customer_id'] !== null)
+                {
+                    // Merge sanitized data back into request for session check
+                    $request->merge($sanitizedData);
                     
-
+                    $customer_session_check = customer_session::check_customersession($request);
+                    
+                    if($customer_session_check == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_session",
+                            "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                            "error_message" => "Invalid Session"
+                        ];
+                    }
+                    else
+                    {
+                        // Sanitize customer_id before query
+                        $customer_id = (int) $sanitizedData['customer_id'];
+                        $check_customer_id = customer::getcustomer($customer_id);
                         
-         
-                }        
+                        if($check_customer_id == null)
+                        {
+                            return [
+                                "status" => "0",
+                                "response_message" => "invalid_customer",
+                                "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                                "error_message" => "Invalid Customer"
+                            ];
+                        }
+                    }
+                }
 
-        }  
+               
+                
+                // Prepare parameters for model query
+                $lang_id = (int) $sanitizedData['language_id'];
+                $main_brand_id = isset($sanitizedData['main_brand_id']) && $sanitizedData['main_brand_id'] !== null ? (int) $sanitizedData['main_brand_id'] : null;
+                $car_owned_type = (int) $sanitizedData['car_owned_type'];                
+                
+                if($use_pagination) {
+                    $page = (int) $sanitizedData['page'];
+                    $per_page = (int) $sanitizedData['per_page'];
+                    
+                    
+                    $getallcarmodel = models::getallcarmodelPaginated($lang_id, $main_brand_id, $car_owned_type, $per_page, $page);       
+                    
+                    
+                    
+                    if($getallcarmodel && $getallcarmodel->count() > 0)
+                    {
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => "Model list retrieved successfully",
+                            "model_list" => $getallcarmodel->items(),
+                            "pagination" => [
+                                "current_page" => $getallcarmodel->currentPage(),
+                                "per_page" => $getallcarmodel->perPage(),
+                                "total" => $getallcarmodel->total(),
+                                "last_page" => $getallcarmodel->lastPage(),
+                                "from" => $getallcarmodel->firstItem(),
+                                "to" => $getallcarmodel->lastItem(),
+                                "has_more_pages" => $getallcarmodel->hasMorePages()
+                            ]
+                        ];
+                    }
+                    else
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "no_models_found",
+                            "display_message" => "No car models found for the selected criteria. Please try different parameters.",
+                            "error_message" => "No models found",
+                            "model_list" => [],
+                            "pagination" => [
+                                "current_page" => $page,
+                                "per_page" => $per_page,
+                                "total" => 0,
+                                "last_page" => 1,
+                                "from" => null,
+                                "to" => null,
+                                "has_more_pages" => false
+                            ]
+                        ];
+                    }
+                } else {
+                    // Backward compatibility: return all results if pagination not requested
+                    $getallcarmodel = models::getallcarmodel($lang_id, $main_brand_id, $car_owned_type);
+                    
+                    if($getallcarmodel && count($getallcarmodel) > 0)
+                    {
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => "Model list retrieved successfully",
+                            "model_list" => $getallcarmodel
+                        ];
+                    }
+                    else
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "no_models_found",
+                            "display_message" => "No car models found for the selected criteria. Please try different parameters.",
+                            "error_message" => "No models found",
+                            "model_list" => []
+                        ];
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
+        }
+    }  
 
 //     SIgnup model List Added
 public static function getmodel_listsignup(Request $request)
@@ -1019,619 +1589,1084 @@ public static function getmodel_listsignup(Request $request)
         // Customer Profile 
     public static function insurancerequest(Request $request)
     {   
-        $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                   'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        // Define allowed values for validation
+        $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+        
+        // Define sanitization rules
+        $sanitizeRules = [
+            'session_id' => 'string',
+            'customer_id' => 'integer',
+            'customer_vehicle_id' => 'integer',
+            'language_id' => 'integer',
+        ];
+        
+        // Sanitize input data to prevent SQL injection
+        $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+        
+        // Apply additional sanitization for specific fields
+        $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+        $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+        $sanitizedData['customer_vehicle_id'] = (int) ($sanitizedData['customer_vehicle_id'] ?? 0);
+        $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+        
+        // Define validation rules
+        $validationRules = [
+            'session_id' => 'required|string|max:255',
+            'customer_id' => 'required|integer|min:1',
+            'customer_vehicle_id' => 'required|integer|min:1',
+            'language_id' => ['required', 'integer', Rule::in($language_id)],
+        ];
+        
+        // Get module-specific validation messages
+        $module = 'insurance-request';
+        $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+        
+        // Create validator with module-specific messages
+        $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+        
+        if ($validator->fails()) {
+            return \ValidationHelper::formatValidationErrors($validator, $module);
+        }
+        else
+        {
+            // Merge sanitized data back into request for session check
+            $request->merge($sanitizedData);
+            
+            $customer_session_check = customer_session::check_customersession($request);
+            
+            if($customer_session_check == null)
+            {
+                return [
+                    "status" => "0",
+                    "response_message" => "invalid_session",
+                    "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                    "error_message" => "Invalid Session"
+                ];
+            }
+            else
+            {
+                // Sanitize customer_id before query
+                $customer_id = (int) $sanitizedData['customer_id'];
+                $check_customer_id = customer::getcustomer($customer_id);
+                
+                if($check_customer_id != null)
+                {
+                    // Sanitize customer_vehicle_id before query
+                    $customer_vehicle_id = (int) $sanitizedData['customer_vehicle_id'];
+                    $session_id = $sanitizedData['session_id'];
+                    
+                    $cars = customer_vehicles::get_customervehicle_byidApi($customer_id, $customer_vehicle_id, $session_id);
+                    
+                    if($cars)
+                    {
+                        $message_key = 'renew_my_insurance_request_success_message';
+                        $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                        
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => $message ?: "Insurance request submitted successfully. We will contact you soon."
+                        ];
+                    }
+                    else
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "insurance_request_failed",
+                            "display_message" => "Insurance request failed. Customer ID or Customer vehicle ID does not match. Please verify your vehicle information.",
+                            "error_message" => "Insurance request failed"
+                        ];
+                    }
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id);
-                        if($check_customer_id != null)
-                        {
-
-                           $cars = customer_vehicles::get_customervehicle_byidApi($check_customer_id->id,$request->customer_vehicle_id,$request->session_id);
-                           // dd($cars);
-                           if($cars){
-                                    $message_key = 'renew_my_insurance_request_success_message';
-                                    $message = getTranslationsAPImessage($request->language_id,$message_key);
-
-                                  return [
-
-                                    "status" => "1",
-                                    "response_message" => "success",
-                                    "display_message" => $message
-                                     
-
-                                    ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Insurance request failed","display_message" => "Insurance request failed Customer Id or Customer vehicle Id does not match","error_message" => "Insurance request failed"];
-                           }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
-                        
-         
-                }        
-
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_customer",
+                        "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                        "error_message" => "Invalid Customer"
+                    ];
+                }
+            }
         }
+    }
        // Customer Profile 
     public static function removecarfromlist(Request $request)
-    {   
-        $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                    'customer_vehicles_id' => 'required',
-                   'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+    {
+        try {
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'customer_vehicles_id' => 'integer',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['customer_vehicles_id'] = (int) ($sanitizedData['customer_vehicles_id'] ?? 0);
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'customer_vehicles_id' => 'required|integer|min:1',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'remove-car';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+            
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator, $module);
+            }
+            else
+            {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
+                $customer_session_check = customer_session::check_customersession($request);
+                
+                if($customer_session_check == null)
+                {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id);
-                        if($check_customer_id != null)
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    else
+                    {
+                        // Verify that the vehicle belongs to the customer before removing
+                        $customer_vehicles_id = (int) $sanitizedData['customer_vehicles_id'];
+                        $vehicle_check = customer_vehicles::get_customervehicle_byidApi($customer_id, $customer_vehicles_id, $sanitizedData['session_id']);
+                        
+                        if($vehicle_check == null)
                         {
-
-                           $cars = customer_vehicles::remove_car_from_list($check_customer_id->id,$request->customer_vehicles_id);
-                           // dd($cars);
-                           if($cars){
-
-                                  return [
-
+                            return [
+                                "status" => "0",
+                                "response_message" => "invalid_vehicle",
+                                "display_message" => "Vehicle does not exist or does not belong to this customer. Please verify the vehicle ID.",
+                                "error_message" => "Invalid Vehicle"
+                            ];
+                        }
+                        else
+                        {
+                            // Remove car from list
+                            $cars = customer_vehicles::remove_car_from_list($customer_id, $customer_vehicles_id);
+                            
+                            if($cars)
+                            {
+                                $message_key = 'car_removed_success_message';
+                                $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                
+                                return [
                                     "status" => "1",
                                     "response_message" => "success",
-                                    "display_message" => "Car Removed from the list successfully"
-                                     
-
-                                    ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Car remove request failed","display_message" => "Customer Id or Customer vehicle Id does not match","error_message" => "Car remove failed"];
-                           }
-
-                           
-                             
+                                    "display_message" => $message ?: "Car removed from the list successfully."
+                                ];
+                            }
+                            else
+                            {
+                                return [
+                                    "status" => "0",
+                                    "response_message" => "car_remove_failed",
+                                    "display_message" => "Failed to remove car from the list. Please try again.",
+                                    "error_message" => "Car removal failed"
+                                ];
+                            }
                         }
-  
-                            
-                        }
-
-                        
-         
-                }        
-
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
+    }
   
           // Customer Profile 
     public static function availofferrequest(Request $request)
     {
-            $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                    'news_promo_id' => 'required',
-                    'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        // Define allowed values for validation
+        $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+        
+        // Define sanitization rules
+        $sanitizeRules = [
+            'session_id' => 'string',
+            'customer_id' => 'integer',
+            'news_promo_id' => 'integer',
+            'language_id' => 'integer',
+        ];
+        
+        // Sanitize input data to prevent SQL injection
+        $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+        
+        // Apply additional sanitization for specific fields
+        $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+        $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+        $sanitizedData['news_promo_id'] = (int) ($sanitizedData['news_promo_id'] ?? 0);
+        $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+        
+        // Define validation rules
+        $validationRules = [
+            'session_id' => 'required|string|max:255',
+            'customer_id' => 'required|integer|min:1',
+            'news_promo_id' => 'required|integer|min:1',
+            'language_id' => ['required', 'integer', Rule::in($language_id)],
+        ];
+        
+        // Get module-specific validation messages
+        $module = 'news-promo-avail-offer';
+        $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+        
+        // Create validator with module-specific messages
+        $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+        
+        if ($validator->fails()) {
+            return \ValidationHelper::formatValidationErrors($validator, $module);
+        }
+        else
+        {
+            // Merge sanitized data back into request for session check
+            $request->merge($sanitizedData);
+            
+            $customer_session_check = customer_session::check_customersession($request);
+            
+            if($customer_session_check == null)
+            {
+                return [
+                    "status" => "0",
+                    "response_message" => "invalid_session",
+                    "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                    "error_message" => "Invalid Session"
+                ];
+            }
+            else
+            {
+                // Sanitize customer_id and session_id before query
+                $customer_id = (int) $sanitizedData['customer_id'];
+                $session_id = $sanitizedData['session_id'];
+                $check_customer_id = customer::getcustomer($customer_id, $session_id);
+                
+                if($check_customer_id != null)
+                {
+                    // Sanitize news_promo_id before query
+                    $news_promo_id = (int) $sanitizedData['news_promo_id'];
+                    
+                    $cars = avail_offers::get_newspromotionscheckApi($check_customer_id->id, $session_id, $news_promo_id);
+                    
+                    if($cars)
+                    {
+                        $message_key = 'avail_offer_success_message';
+                        $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                        
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => $message ?: "Offer request submitted successfully. We will contact you soon."
+                        ];
+                    }
+                    else
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "avail_offer_failed",
+                            "display_message" => "Failed to submit offer request. The news/promo may not exist or may have expired. Please try again.",
+                            "error_message" => "Avail offer failed"
+                        ];
+                    }
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id,$request->session_id);
-                        if($check_customer_id != null)
-                        {
-
-                           $cars = avail_offers::get_newspromotionscheckApi($check_customer_id->id,$request->session_id,$request->news_promo_id);
-                           // dd($cars);
-                           if($cars){
-
-                                  return [
-
-                                    "status" => "1",
-                                    "response_message" => "success",
-                                    "display_message" => "Avail offer requested successfully"
-                                     
-
-                                    ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Avail offer failed","display_message" => "Avail offer failed",
-                                //"error_message" => "Avail offer failed"
-                                ];
-                           }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
-                        
-         
-                }        
-
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_customer",
+                        "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                        "error_message" => "Invalid Customer"
+                    ];
+                }
+            }
         }
+    }
   
          // Customer Profile 
     public static function newspromotions(Request $request)
     {   
-                $brand_id = getallBrands()->pluck('id'); // 
-                 $promo_type = [1,2]; // 
-                 $language_id = [1,2]; // 
-
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                    'promo_type' => ['required',Rule::in($promo_type)],
-                    'brand_id' => ['required',Rule::in($brand_id)],
-                    'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        try {
+            // Get valid brand IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $promo_type = [1, 2]; // 1 = News, 2 = Promotions
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'promo_type' => 'integer',
+                'brand_id' => 'integer',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['promo_type'] = (int) ($sanitizedData['promo_type'] ?? 0);
+            $sanitizedData['brand_id'] = (int) ($sanitizedData['brand_id'] ?? 0);
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'promo_type' => ['required', 'integer', Rule::in($promo_type)],
+                'brand_id' => ['required', 'integer', Rule::in($brand_id)],
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'news-promo';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+            
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator, $module);
+            }
+            else
+            {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
+                $customer_session_check = customer_session::check_customersession($request);
+                
+                if($customer_session_check == null)
+                {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id,$request->session_id);
-                        // dd($check_customer_id);
-                        if($check_customer_id != null)
-                        {
-
-                           $news_promotions = news_promotions::get_newspromotionsApi($check_customer_id->id,$request->promo_type,$request->brand_id);
-                            // dd($news_promotions);
-                           if($news_promotions){
-
-                                  return [
-
-                                    "status" => "1",
-                                    "response_message" => "success",
-                                    "display_message" => "success",
-                                    "news_promotions" => $news_promotions
-                                     
-
-                                    ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "News request failed","display_message" => "News request failed","error_message" => "News request failed", "news_promotions" => []];
-                           }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id, $sanitizedData['session_id']);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    else
+                    {
+                        // Use sanitized data for query
+                        $promo_type = (int) $sanitizedData['promo_type'];
+                        $brand_id = (int) $sanitizedData['brand_id'];
                         
-         
-                }        
-
+                        $news_promotions = news_promotions::get_newspromotionsApi($check_customer_id->id, $promo_type, $brand_id);
+                        
+                        if($news_promotions && $news_promotions->count() > 0)
+                        {
+                            return [
+                                "status" => "1",
+                                "response_message" => "success",
+                                "display_message" => "News and promotions retrieved successfully",
+                                "news_promotions" => $news_promotions
+                            ];
+                        }
+                        else
+                        {
+                            return [
+                                "status" => "0",
+                                "response_message" => "no_news_promotions_found",
+                                "display_message" => "No news or promotions found for the selected criteria.",
+                                "error_message" => "No news/promotions found",
+                                "news_promotions" => []
+                            ];
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
+    }
   
          // Customer Profile 
     public static function corporatesolutions(Request $request)
     {   
-                $brand_id = getallBrands()->pluck('id'); // 
-                $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                    'brand_id' => ['required',Rule::in($brand_id)],
-                    'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        // Get valid brand IDs
+        $brand_id = getallBrands()->pluck('id')->toArray();
+        $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+        
+        // Define sanitization rules
+        $sanitizeRules = [
+            'session_id' => 'string',
+            'customer_id' => 'integer',
+            'brand_id' => 'integer',
+            'language_id' => 'integer',
+        ];
+        
+        // Sanitize input data to prevent SQL injection
+        $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+        
+        // Apply additional sanitization for specific fields
+        $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+        $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+        $sanitizedData['brand_id'] = (int) ($sanitizedData['brand_id'] ?? 0);
+        $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+        
+        // Define validation rules
+        $validationRules = [
+            'session_id' => 'required|string|max:255',
+            'customer_id' => 'required|integer|min:1',
+            'brand_id' => ['required', 'integer', Rule::in($brand_id)],
+            'language_id' => ['required', 'integer', Rule::in($language_id)],
+        ];
+        
+        // Get module-specific validation messages
+        $module = 'corporate-solutions';
+        $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+        
+        // Create validator with module-specific messages
+        $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+        
+        if ($validator->fails()) {
+            return \ValidationHelper::formatValidationErrors($validator, $module);
+        }
+        else
+        {
+            // Merge sanitized data back into request for session check
+            $request->merge($sanitizedData);
+            
+            $customer_session_check = customer_session::check_customersession($request);
+            
+            if($customer_session_check == null)
+            {
+                return [
+                    "status" => "0",
+                    "response_message" => "invalid_session",
+                    "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                    "error_message" => "Invalid Session"
+                ];
+            }
+            else
+            {
+                // Sanitize customer_id and session_id before query
+                $customer_id = (int) $sanitizedData['customer_id'];
+                $session_id = $sanitizedData['session_id'];
+                $check_customer_id = customer::getcustomer($customer_id, $session_id);
+                
+                if($check_customer_id != null)
+                {
+                    // Sanitize brand_id and language_id before query
+                    $brand_id = (int) $sanitizedData['brand_id'];
+                    $language_id = (int) $sanitizedData['language_id'];
+                    
+                    $corporate_solutions = corporate_solutions::get_corporatesolutionsApi($brand_id, $language_id);
+                    
+                    if($corporate_solutions && $corporate_solutions->count() > 0)
+                    {
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => "Corporate solutions retrieved successfully",
+                            "corporate_solutions" => $corporate_solutions
+                        ];
+                    }
+                    else
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "no_corporate_solutions_found",
+                            "display_message" => "No corporate solutions found for the selected brand and language. Please try different parameters.",
+                            "error_message" => "No corporate solutions found",
+                            "corporate_solutions" => []
+                        ];
+                    }
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id,$request->session_id);
-                        if($check_customer_id != null)
-                        {
-
-                           $corporate_solutions = corporate_solutions::get_corporatesolutionsApi($request->brand_id,$request->language_id);
-                           // dd($cars);
-                           if($corporate_solutions){
-
-                                  return [
-
-                                    "status" => "1",
-                                    "response_message" => "success",
-                                    "display_message" => "success",
-                                    "corporate_solutions" => $corporate_solutions
-                                     
-
-                                    ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Corporate solution failed","display_message" => "Corporate solution failed","error_message" => "Corporate solution failed", "corporate_solutions" => []];
-                           }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
-                        
-         
-                }        
-
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_customer",
+                        "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                        "error_message" => "Invalid Customer"
+                    ];
+                }
+            }
         }
+    }
   
    public static function corporatesolutionsrequest(Request $request)
-    {   
-                $brand_id = getallBrands()->pluck('id'); // 
-                $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $leasing_options_required = [0,1];
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                    'corporate_solutions_title' => 'required',
-                    'first_name' => 'required',
-                    'last_name' => 'required',
-                    'email' => 'required',
-                    'mobile_number' => 'required',
-                    'leasing_options_required' => ['required',Rule::in($leasing_options_required)],
-                    //'brand_id' => ['required',Rule::in($brand_id)],
-                    'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+    {
+        try {
+            // Get valid brand IDs
+            $brand_id = getallBrands()->pluck('id')->toArray();
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            $leasing_options_required = [0, 1]; // 0 = No, 1 = Yes
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'main_brand_id' => 'integer',
+                'corporate_solutions_title' => 'string',
+                'first_name' => 'string',
+                'last_name' => 'string',
+                'email' => 'email',
+                'mobile_number' => 'string',
+                'leasing_options_required' => 'integer',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['main_brand_id'] = (int) ($sanitizedData['main_brand_id'] ?? 0);
+            $sanitizedData['corporate_solutions_title'] = trim(strip_tags($sanitizedData['corporate_solutions_title'] ?? ''));
+            $sanitizedData['first_name'] = trim(strip_tags($sanitizedData['first_name'] ?? ''));
+            $sanitizedData['last_name'] = trim(strip_tags($sanitizedData['last_name'] ?? ''));
+            $sanitizedData['email'] = filter_var(trim($sanitizedData['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+            $sanitizedData['mobile_number'] = trim(strip_tags($sanitizedData['mobile_number'] ?? ''));
+            $sanitizedData['leasing_options_required'] = (int) ($sanitizedData['leasing_options_required'] ?? -1);
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'main_brand_id' => ['required', 'integer', Rule::in($brand_id)],
+                'corporate_solutions_title' => 'required|string|max:255',
+                'first_name' => 'required|string|max:100',
+                'last_name' => 'required|string|max:100',
+                'email' => 'required|email|max:255',
+                'mobile_number' => 'required|string|max:20',
+                'leasing_options_required' => ['required', 'integer', Rule::in($leasing_options_required)],
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'corporate-solutions-enquiry';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+            
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator, $module);
+            }
+            else
+            {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
+                $customer_session_check = customer_session::check_customersession($request);
+                
+                if($customer_session_check == null)
+                {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id,$request->session_id);
-                        if($check_customer_id != null)
-                        {
-
-                           $corporate_solutions = corporate_request::save_corporatesolutionsApi($request);
-                           // dd($cars);
-                           if($corporate_solutions){
-
-                                $message_key = 'corporate_solutions_thank_you_message';
-                                $message = getTranslationsAPImessage($request->language_id,$message_key);
-
-
-                                  return [
-
-                                    "status" => "1",
-                                    "response_message" => "success",
-                                    "display_message" => $message,
-                                    // "corporate_solutions" => $corporate_solutions
-                                     
-
-                                    ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Corporate Enquiry failed","display_message" => "Corporate Enquiry failed","error_message" => "Corporate Enquiry failed"];
-                           }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id, $sanitizedData['session_id']);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    else
+                    {
+                        // Merge sanitized data back to request for saving
+                        $request->merge($sanitizedData);
                         
-         
-                }        
-
+                        $corporate_solutions = corporate_request::save_corporatesolutionsApi($request);
+                        
+                        if($corporate_solutions)
+                        {
+                            $message_key = 'corporate_solutions_thank_you_message';
+                            $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                            
+                            return [
+                                "status" => "1",
+                                "response_message" => "success",
+                                "display_message" => $message ?: "Corporate solutions enquiry submitted successfully. Thank you for your interest.",
+                                "enquiry_id" => $corporate_solutions->id ?? null
+                            ];
+                        }
+                        else
+                        {
+                            return [
+                                "status" => "0",
+                                "response_message" => "enquiry_failed",
+                                "display_message" => "Failed to submit corporate solutions enquiry. Please try again.",
+                                "error_message" => "Corporate enquiry submission failed"
+                            ];
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
+    }
 
 
          public static function servicepackagerequest(Request $request)
     {   
-                $brand_id = getallBrands()->pluck('id'); // 
-                $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $leasing_options_required = [0,1];
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                    'service_package_id' => 'required',
-                    'customer_vehicle_id' => 'required',
-                     
-                    'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        try {
+            // Get valid language IDs
+            $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+            
+            // Define sanitization rules
+            $sanitizeRules = [
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'service_package_id' => 'integer',
+                'customer_vehicle_id' => 'integer',
+                'language_id' => 'integer',
+            ];
+            
+            // Sanitize input data to prevent SQL injection
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+            
+            // Apply additional sanitization for specific fields
+            $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+            $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+            $sanitizedData['service_package_id'] = (int) ($sanitizedData['service_package_id'] ?? 0);
+            $sanitizedData['customer_vehicle_id'] = (int) ($sanitizedData['customer_vehicle_id'] ?? 0);
+            $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 1);
+            
+            // Define validation rules
+            $validationRules = [
+                'session_id' => 'required|string|max:255',
+                'customer_id' => 'required|integer|min:1',
+                'service_package_id' => 'required|integer|min:1',
+                'customer_vehicle_id' => 'required|integer|min:1',
+                'language_id' => ['required', 'integer', Rule::in($language_id)],
+            ];
+            
+            // Get module-specific validation messages
+            $module = 'service-package-enquiry';
+            $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+            
+            // Create validator with module-specific messages
+            $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+            
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator, $module);
+            }
+            else
+            {
+                // Merge sanitized data back into request for session check
+                $request->merge($sanitizedData);
+                
+                $customer_session_check = customer_session::check_customersession($request);
+                
+                if($customer_session_check == null)
+                {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id,$request->session_id);
-                        if($check_customer_id != null)
-                        {
-
-                             $cars = customer_vehicles::get_customervehicle_byidservicepackageApi($check_customer_id->id,$request->customer_vehicle_id,$request->session_id,$request->service_package_id);
-                            //dd($cars,$check_customer_id->id,$request->customer_vehicle_id,$request->session_id,$request->service_package_id);
-                           if($cars){
-
-                                $message_key = 'corporate_solutions_thank_you_message';
-                                $message = getTranslationsAPImessage($request->language_id,$message_key);
-
-                                  return [
-
-                                    "status" => "1",
-                                    "response_message" => "success",
-                                    "display_message" => $message,
-                                     
-
-                                    ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Service Package Enquiry failed","display_message" => "Service Package Enquiry failed","error_message" => "Service Package Enquiry failed"];
-                           }
-
-                           // $corporate_solutions = service_package_enquiry::save_service_package_enquiryApi($request);
-                           // // dd($cars);
-                           // if($corporate_solutions){
-
-                           //        return [
-
-                           //          "status" => "1",
-                           //          "response_message" => "success",
-                           //          "display_message" => "Service Package Enquiry received successfully",
-                           //          // "corporate_solutions" => $corporate_solutions
-                                     
-
-                           //          ];
-
-                           // }
-                           // else
-                           // {
-                           //      return ["status" => "0","response_message" => "Service Package Enquiry failed","display_message" => "Service Package Enquiry failed","error_message" => "Service Package Enquiry failed"];
-                           // }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
+                    // Sanitize customer_id before query
+                    $customer_id = (int) $sanitizedData['customer_id'];
+                    $check_customer_id = customer::getcustomer($customer_id, $sanitizedData['session_id']);
+                    
+                    if($check_customer_id == null)
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "invalid_customer",
+                            "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                            "error_message" => "Invalid Customer"
+                        ];
+                    }
+                    else
+                    {
+                        // Sanitize IDs before query
+                        $customer_vehicle_id = (int) $sanitizedData['customer_vehicle_id'];
+                        $service_package_id = (int) $sanitizedData['service_package_id'];
                         
-         
-                }        
-
+                        // Merge sanitized data back to request for saving
+                        $request->merge($sanitizedData);
+                        
+                        // Save service package enquiry
+                        $enquiry_result = customer_vehicles::get_customervehicle_byidservicepackageApi(
+                            $check_customer_id->id,
+                            $customer_vehicle_id,
+                            $sanitizedData['session_id'],
+                            $service_package_id
+                        );
+                        
+                        if($enquiry_result)
+                        {
+                            // Try to get translated message, but use fallback if not available
+                            $message = "Service package enquiry submitted successfully. Thank you for your interest.";
+                            try {
+                                if (function_exists('getTranslationsAPImessage')) {
+                                    $message_key = 'service_package_enquiry_success_message';
+                                    $translated_message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                    if ($translated_message && $translated_message !== $message_key) {
+                                        $message = $translated_message;
+                                    } else {
+                                        // Fallback to corporate solutions message if service package message doesn't exist
+                                        $message_key = 'corporate_solutions_thank_you_message';
+                                        $translated_message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                                        if ($translated_message && $translated_message !== $message_key) {
+                                            $message = $translated_message;
+                                        }
+                                    }
+                                }
+                            } catch (\Exception $e) {
+                                // Use default message if translation fails
+                                $message = "Service package enquiry submitted successfully. Thank you for your interest.";
+                            }
+                            
+                            return [
+                                "status" => "1",
+                                "response_message" => "success",
+                                "display_message" => $message,
+                                "enquiry_id" => $enquiry_result ?? null
+                            ];
+                        }
+                        else
+                        {
+                            return [
+                                "status" => "0",
+                                "response_message" => "enquiry_failed",
+                                "display_message" => "Failed to submit service package enquiry. Please verify that the customer vehicle exists and try again.",
+                                "error_message" => "Service Package Enquiry Failed"
+                            ];
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch any exceptions and return proper error response
+            return [
+                "status" => "0",
+                "response_message" => "internal_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error: " . $e->getMessage(),
+                "error_details" => config('app.debug') ? [
+                    "file" => $e->getFile(),
+                    "line" => $e->getLine(),
+                    "trace" => $e->getTraceAsString()
+                ] : null
+            ];
         }
+    }
   
        // Customer Profile 
     public static function onboardingscreens(Request $request)
     {   
-                $brand_id = getallBrands()->pluck('id'); // 
-                 $promo_type = [1,2]; // 
-                 $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                    'promo_type' => ['required',Rule::in($promo_type)],
-                    'brand_id' => ['required',Rule::in($brand_id)],
-                    'language_id' => ['required',Rule::in($language_id)]
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        // Get valid brand IDs
+        $brand_id = getallBrands()->pluck('id')->toArray();
+        $promo_type = [1, 2]; // Promo types
+        $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+        
+        // Define sanitization rules
+        $sanitizeRules = [
+            'session_id' => 'string',
+            'customer_id' => 'integer',
+            'promo_type' => 'integer',
+            'brand_id' => 'integer',
+            'language_id' => 'integer',
+        ];
+        
+        // Sanitize input data to prevent SQL injection
+        $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+        
+        // Apply additional sanitization for specific fields
+        $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+        $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+        $sanitizedData['promo_type'] = (int) ($sanitizedData['promo_type'] ?? 0);
+        $sanitizedData['brand_id'] = (int) ($sanitizedData['brand_id'] ?? 0);
+        $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+        
+        // Define validation rules
+        $validationRules = [
+            'session_id' => 'required|string|max:255',
+            'customer_id' => 'required|integer|min:1',
+            'promo_type' => ['required', 'integer', Rule::in($promo_type)],
+            'brand_id' => ['required', 'integer', Rule::in($brand_id)],
+            'language_id' => ['required', 'integer', Rule::in($language_id)],
+        ];
+        
+        // Get module-specific validation messages
+        $module = 'onboarding-screens';
+        $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+        
+        // Create validator with module-specific messages
+        $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+        
+        if ($validator->fails()) {
+            return \ValidationHelper::formatValidationErrors($validator, $module);
+        }
+        else
+        {
+            // Merge sanitized data back into request for session check
+            $request->merge($sanitizedData);
+            
+            $customer_session_check = customer_session::check_customersession($request);
+            
+            if($customer_session_check == null)
+            {
+                return [
+                    "status" => "0",
+                    "response_message" => "invalid_session",
+                    "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                    "error_message" => "Invalid Session"
+                ];
+            }
+            else
+            {
+                // Sanitize customer_id before query
+                $customer_id = (int) $sanitizedData['customer_id'];
+                $check_customer_id = customer::getcustomer($customer_id);
+                
+                if($check_customer_id != null)
+                {
+                    // Use sanitized language_id, default to 1 if not set
+                    $onboarding_screen_language_id = $sanitizedData['language_id'] ?? 1;
+                    $promo_type = (int) $sanitizedData['promo_type'];
+                    $brand_id = (int) $sanitizedData['brand_id'];
+                    
+                    $onboarding_screen = onboarding_screen::get_onboardingscreenApi($customer_id, $promo_type, $brand_id, $onboarding_screen_language_id);
+                    
+                    if($onboarding_screen && $onboarding_screen->count() > 0)
+                    {
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => "Onboarding screens retrieved successfully",
+                            "onboarding_screen" => $onboarding_screen
+                        ];
+                    }
+                    else
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "no_onboarding_screens_found",
+                            "display_message" => "No onboarding screens found for the selected criteria. Please try different parameters.",
+                            "error_message" => "No onboarding screens found",
+                            "onboarding_screen" => []
+                        ];
+                    }
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id);
-                        if($check_customer_id != null)
-                        {
-                            $language_id = $request->language_id;
-                            if(isset($language_id) && $language_id != '')
-                            {
-                                 $onboarding_screen_language_id = $language_id;
-                            }
-                            else
-                            {
-                                $onboarding_screen_language_id = 1;
-                            }
-                           $onboarding_screen = onboarding_screen::get_onboardingscreenApi($check_customer_id->id,$request->promo_type,$request->brand_id,$onboarding_screen_language_id);
-                           // dd($cars);
-                           if($onboarding_screen){
-
-                                  return [
-
-                                    "status" => "1",
-                                    "response_message" => "success",
-                                    "display_message" => "success",
-                                    "onboarding_screen" => $onboarding_screen
-                                     
-
-                                    ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Onboading screen request failed","display_message" => "Onboading screen request failed","error_message" => "Onboading screen request failed", "onboarding_screen" => []];
-                           }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
-                        
-         
-                }        
-
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_customer",
+                        "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                        "error_message" => "Invalid Customer"
+                    ];
+                }
+            }
         }
+    }
   
-        // Customer Profile 
+    // Customer Profile 
     public static function onboardingscreenslike(Request $request)
     {   
-                $brand_id = getallBrands()->pluck('id'); // 
-                 $promo_type = [1,2]; // 
-                  $language_id = [1,2]; // 0 New Car 1 Old Car 
-                $validator = Validator::make($request->all(), [
-                    'session_id' => 'required',
-                    'customer_id' => 'required',
-                    'promo_type' => ['required',Rule::in($promo_type)],
-                    'onboarding_screen_id' => ['required'],
-                    'language_id' => ['required',Rule::in($language_id)]
-
-                ]);
-
-                 if ($validator->fails()) {
-                    // return $validator->errors();
-                    return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
+        // Define allowed values for validation
+        $promo_type = [1, 2]; // Promo types
+        $language_id = [1, 2, 3]; // Allow all language IDs for consistency
+        
+        // Define sanitization rules
+        $sanitizeRules = [
+            'session_id' => 'string',
+            'customer_id' => 'integer',
+            'promo_type' => 'integer',
+            'onboarding_screen_id' => 'integer',
+            'language_id' => 'integer',
+        ];
+        
+        // Sanitize input data to prevent SQL injection
+        $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+        
+        // Apply additional sanitization for specific fields
+        $sanitizedData['session_id'] = trim(strip_tags($sanitizedData['session_id'] ?? ''));
+        $sanitizedData['customer_id'] = (int) ($sanitizedData['customer_id'] ?? 0);
+        $sanitizedData['promo_type'] = (int) ($sanitizedData['promo_type'] ?? 0);
+        $sanitizedData['onboarding_screen_id'] = (int) ($sanitizedData['onboarding_screen_id'] ?? 0);
+        $sanitizedData['language_id'] = (int) ($sanitizedData['language_id'] ?? 0);
+        
+        // Define validation rules
+        $validationRules = [
+            'session_id' => 'required|string|max:255',
+            'customer_id' => 'required|integer|min:1',
+            'promo_type' => ['required', 'integer', Rule::in($promo_type)],
+            'onboarding_screen_id' => 'required|integer|min:1',
+            'language_id' => ['required', 'integer', Rule::in($language_id)],
+        ];
+        
+        // Get module-specific validation messages
+        $module = 'onboarding-screens-like';
+        $moduleValidation = \ValidationHelper::getModuleValidation($module, $validationRules);
+        
+        // Create validator with module-specific messages
+        $validator = Validator::make($sanitizedData, $moduleValidation['rules'], $moduleValidation['messages']);
+        
+        if ($validator->fails()) {
+            return \ValidationHelper::formatValidationErrors($validator, $module);
+        }
+        else
+        {
+            // Merge sanitized data back into request for session check
+            $request->merge($sanitizedData);
+            
+            $customer_session_check = customer_session::check_customersession($request);
+            
+            if($customer_session_check == null)
+            {
+                return [
+                    "status" => "0",
+                    "response_message" => "invalid_session",
+                    "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                    "error_message" => "Invalid Session"
+                ];
+            }
+            else
+            {
+                // Sanitize customer_id before query
+                $customer_id = (int) $sanitizedData['customer_id'];
+                $check_customer_id = customer::getcustomer($customer_id);
+                
+                if($check_customer_id != null)
+                {
+                    // Sanitize parameters before query
+                    $session_id = $sanitizedData['session_id'];
+                    $onboarding_screen_id = (int) $sanitizedData['onboarding_screen_id'];
+                    $promo_type = (int) $sanitizedData['promo_type'];
+                    
+                    $onboarding_screen = onboarding_screen::get_onboardingscreenlikeApi($customer_id, $session_id, $onboarding_screen_id, $promo_type);
+                    
+                    if($onboarding_screen)
+                    {
+                        $message_key = 'onboarding_screen_like_success_message';
+                        $message = getTranslationsAPImessage($sanitizedData['language_id'], $message_key);
+                        
+                        return [
+                            "status" => "1",
+                            "response_message" => "success",
+                            "display_message" => $message ?: "Onboarding screen liked successfully. Thank you!"
+                        ];
+                    }
+                    else
+                    {
+                        return [
+                            "status" => "0",
+                            "response_message" => "onboarding_screen_like_failed",
+                            "display_message" => "Failed to like onboarding screen. The screen may not exist or the parameters may be invalid.",
+                            "error_message" => "Onboarding screen like failed"
+                        ];
+                    }
                 }
                 else
                 {
-                     $customer_session_check = customer_session::check_customersession($request);
-                     
-                     if($customer_session_check == null)
-                     {
-                        return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                     }
-                     else
-                     {
-                        $check_customer_id = customer::getcustomer($request->customer_id);
-                        if($check_customer_id != null)
-                        {
-
-                           $onboarding_screen = onboarding_screen::get_onboardingscreenlikeApi($check_customer_id->id,$request->session_id,$request->onboarding_screen_id,$request->promo_type);
-                           // dd($cars);
-                           if($onboarding_screen){
-
-                                $message_key = 'onboarding_screen_like_success_message';
-                                $message = getTranslationsAPImessage($request->language_id,$message_key);
-                                  return [
-
-                                    "status" => "1",
-                                    "response_message" => "success",
-                                    "display_message" => $message,
-                                   // "onboarding_screen" => $onboarding_screen
-                                     
-
-                                    ];
-
-                           }
-                           else
-                           {
-                                return ["status" => "0","response_message" => "Onboading screen like request failed","display_message" => "Onboading screen like request failed","error_message" => "Onboading screen like request failed"];
-                           }
-
-                           
-                             
-                        }
-  
-                            
-                        }
-
-                        
-         
-                }        
-
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_customer",
+                        "display_message" => "Customer does not exist or has been deactivated. Please contact administrator.",
+                        "error_message" => "Invalid Customer"
+                    ];
+                }
+            }
         }
+    }
 
   // Customer Profile Edit
     public static function profileEdit(Request $request)

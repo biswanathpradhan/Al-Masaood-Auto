@@ -227,5 +227,116 @@ class locations extends Model
     }
 
       
+    /**
+     * Get paginated locations by brand
+     * 
+     * @param int $main_brand_id
+     * @param int|null $language_id
+     * @param int $per_page
+     * @param int $page
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public static function getlocationsbyBrandPaginated($main_brand_id, $language_id = null, $per_page = 15, $page = 1)
+    {
+        // Sanitize inputs to prevent SQL injection
+        $main_brand_id = (int) $main_brand_id;
+        $language_id = $language_id !== null ? (int) $language_id : 1;
+        $per_page = max(1, min(100, (int) $per_page));
+        $page = max(1, (int) $page);
+
+        $query = DB::table('location')
+            ->where('location_category_id', 1)
+            ->where('location.soft_delete', 0)
+            ->where('main_brand_id', $main_brand_id);
+
+        if($language_id == 1) {
+            $query->select(
+                'location.id',
+                'location.location_name as name',
+                'location.city_id',
+                'location.latitude',
+                'location.longitude',
+                'location.address',
+                'location.available_services',
+                'location.pincode',
+                DB::raw('DATE_FORMAT(location.created_at, "%Y-%m-%d %h:%m:%s") as created_at'),
+                DB::raw('DATE_FORMAT(location.updated_at, "%Y-%m-%d %h:%m:%s") as updated_at')
+            );
+        } else {
+            $query->select(
+                'location.id',
+                'location.location_name_ar as name',
+                'location.city_id',
+                'location.latitude',
+                'location.longitude',
+                'location.address_ar as address',
+                'location.available_services_ar as available_services',
+                'location.pincode',
+                DB::raw('DATE_FORMAT(location.created_at, "%Y-%m-%d %h:%m:%s") as created_at'),
+                DB::raw('DATE_FORMAT(location.updated_at, "%Y-%m-%d %h:%m:%s") as updated_at')
+            );
+        }
+
+        $locations = $query->orderBy('location.id', 'asc')
+            ->paginate($per_page, ['*'], 'page', $page);
+
+        return $locations;
+    }
+
+    /**
+     * Get paginated showrooms by brand
+     * 
+     * @param int $main_brand_id
+     * @param int|null $language_id
+     * @param int $per_page
+     * @param int $page
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public static function getallshowroombyBrandPaginated($main_brand_id, $language_id = null, $per_page = 15, $page = 1)
+    {
+        // Sanitize inputs to prevent SQL injection
+        $main_brand_id = (int) $main_brand_id;
+        $language_id = $language_id !== null ? (int) $language_id : 1;
+        $per_page = max(1, min(100, (int) $per_page));
+        $page = max(1, (int) $page);
+
+        $query = DB::table('location')
+            ->where('location_category_id', 2) // Showrooms
+            ->where('location.soft_delete', 0)
+            ->where('main_brand_id', $main_brand_id);
+
+        if($language_id == 2) {
+            $query->select(
+                'location.id',
+                'location.location_name_ar as name',
+                'location.city_id',
+                'location.latitude',
+                'location.longitude',
+                'location.address_ar as address',
+                'location.available_services_ar as available_services',
+                'location.pincode',
+                DB::raw('DATE_FORMAT(location.created_at, "%Y-%m-%d %h:%m:%s") as created_at'),
+                DB::raw('DATE_FORMAT(location.updated_at, "%Y-%m-%d %h:%m:%s") as updated_at')
+            );
+        } else {
+            $query->select(
+                'location.id',
+                'location.location_name as name',
+                'location.city_id',
+                'location.latitude',
+                'location.longitude',
+                'location.address',
+                'location.available_services',
+                'location.pincode',
+                DB::raw('DATE_FORMAT(location.created_at, "%Y-%m-%d %h:%m:%s") as created_at'),
+                DB::raw('DATE_FORMAT(location.updated_at, "%Y-%m-%d %h:%m:%s") as updated_at')
+            );
+        }
+
+        $showrooms = $query->orderBy('location.id', 'asc')
+            ->paginate($per_page, ['*'], 'page', $page);
+
+        return $showrooms;
+    }
 
 }
