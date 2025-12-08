@@ -96,10 +96,6 @@ class customer_otp extends Model
     
     public static function check_customerotp($request)
 {
-<<<<<<< HEAD
-    
-=======
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
     if (($request->mobile_number == '971456789114' && $request->otp == '7345') || ($request->mobile_number == '971504522251' && $request->otp == '7345'))
     {
         $customer_otp_check = customer_otp::where('mobile_number', $request->mobile_number)
