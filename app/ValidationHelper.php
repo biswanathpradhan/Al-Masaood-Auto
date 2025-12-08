@@ -8,8 +8,9 @@
  * All error messages are managed in resources/lang/en/validation.php
  */
 
-class ValidationHelper
-{
+if (!class_exists('ValidationHelper')) {
+    class ValidationHelper
+    {
     /**
      * Get validation error message from module
      * 
@@ -322,5 +323,147 @@ class ValidationHelper
         ];
 
         return $rules[$field] ?? [];
+    }
+
+    /**
+     * Get validation rules for mobile number
+     * 
+     * @return array
+     */
+    public static function mobileNumber()
+    {
+        return ['required', 'string', 'max:20'];
+    }
+
+    /**
+     * Get validation rules for OTP
+     * 
+     * @return array
+     */
+    public static function otp()
+    {
+        return ['required', 'string', 'size:4'];
+    }
+
+    /**
+     * Get validation rules for session ID
+     * 
+     * @return array
+     */
+    public static function sessionId()
+    {
+        return ['required', 'string'];
+    }
+
+    /**
+     * Get validation rules for customer ID
+     * 
+     * @return array
+     */
+    public static function customerId()
+    {
+        return ['required', 'integer'];
+    }
+
+    /**
+     * Get validation rules for language ID
+     * 
+     * @param bool $required Whether the field is required
+     * @return array
+     */
+    public static function languageId($required = true)
+    {
+        $rules = ['integer', \Illuminate\Validation\Rule::in([1, 2])];
+        if ($required) {
+            array_unshift($rules, 'required');
+        } else {
+            array_unshift($rules, 'nullable');
+        }
+        return $rules;
+    }
+
+    /**
+     * Get validation rules for device type
+     * 
+     * @return array
+     */
+    public static function deviceType()
+    {
+        return ['required', 'integer', \Illuminate\Validation\Rule::in([1, 2])]; // 1 - IOS, 2 - Android
+    }
+
+    /**
+     * Get validation rules for brand ID
+     * 
+     * @return array
+     */
+    public static function brandId()
+    {
+        return ['required', 'integer', \Illuminate\Validation\Rule::in([1, 2, 3])];
+    }
+
+    /**
+     * Get validation rules for username
+     * 
+     * @return array
+     */
+    public static function username()
+    {
+        return ['nullable', 'string', 'max:255'];
+    }
+
+    /**
+     * Get validation rules for image
+     * 
+     * @return array
+     */
+    public static function image()
+    {
+        return ['nullable', 'image', 'mimes:jpeg,jpg,png,gif', 'max:2048'];
+    }
+
+    /**
+     * Get validation rules for device token
+     * 
+     * @param bool $required Whether the field is required
+     * @return array
+     */
+    public static function deviceToken($required = true)
+    {
+        $rules = ['string', 'max:255'];
+        if ($required) {
+            array_unshift($rules, 'required');
+        } else {
+            array_unshift($rules, 'nullable');
+        }
+        return $rules;
+    }
+
+    /**
+     * Get validation rules for car owned type
+     * 
+     * @param bool $required Whether the field is required
+     * @return array
+     */
+    public static function carOwnedType($required = true)
+    {
+        $rules = ['integer'];
+        if ($required) {
+            array_unshift($rules, 'required');
+        } else {
+            array_unshift($rules, 'nullable');
+        }
+        return $rules;
+    }
+
+    /**
+     * Get error messages for validation
+     * 
+     * @return array
+     */
+    public static function errorMessages()
+    {
+        return [];
+    }
     }
 }

@@ -27,7 +27,6 @@ use App\car_pickup_request;
 use App\notifications;
 use App\notifications_sent;
 use App\service_package_enquiry;
-use App\ValidationHelper;
 
 use DataTables;
 use Illuminate\Support\Str;
