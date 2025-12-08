@@ -8,7 +8,6 @@
  * All error messages are managed in resources/lang/en/validation.php
  */
 
-if (!class_exists('ValidationHelper')) {
     class ValidationHelper
     {
     /**
@@ -457,6 +456,23 @@ if (!class_exists('ValidationHelper')) {
     }
 
     /**
+     * Get validation rules for email
+     * 
+     * @param bool $required Whether the field is required
+     * @return array
+     */
+    public static function email($required = true)
+    {
+        $rules = ['email', 'max:255'];
+        if ($required) {
+            array_unshift($rules, 'required');
+        } else {
+            array_unshift($rules, 'nullable');
+        }
+        return $rules;
+    }
+
+    /**
      * Get error messages for validation
      * 
      * @return array
@@ -464,6 +480,5 @@ if (!class_exists('ValidationHelper')) {
     public static function errorMessages()
     {
         return [];
-    }
     }
 }

@@ -30,7 +30,7 @@ Route::get('/car/model_list', 'CustomerController@model_list')->name('customer.m
 
 Route::post('/car/model-list', 'CustomerController@getmodel_list')->name('customer.getmodel_list'); // Get Car Model List
 
-Route::post('/car/getmodel_listsignup', 'CustomerController@getmodel_listsignup')->name('customer.getmodel_listsignup');
+Route::post('/car/models/signup', 'CustomerController@getmodel_listsignup')->name('customer.getmodel_listsignup'); // Get Model List for Signup
 
 Route::post('/city/citylist', 'ModelController@getcityApi')->name('city_list');
 

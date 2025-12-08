@@ -293,12 +293,12 @@ class CustomerController extends Controller
     {	
         // XSS Protection & Pagination: Validate and sanitize incoming parameters
         $validator = Validator::make($request->all(), [
-            'language_id' => ValidationHelper::languageId(false),
+            'language_id' => \ValidationHelper::languageId(false),
             'brand_id' => ['nullable', 'integer', 'min:1'],
-            'car_owned_type' => ValidationHelper::carOwnedType(false),
+            'car_owned_type' => \ValidationHelper::carOwnedType(false),
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
-        ], ValidationHelper::errorMessages());
+        ], \ValidationHelper::errorMessages());
 
         if ($validator->fails()) {
             return ["status" => "0", "response_message" => "error", "display_message" => "Invalid input parameters", "error_message" => $validator->errors()];
@@ -637,83 +637,138 @@ public function logon()
 
         }  
 
-//     SIgnup model List Added
-public static function getmodel_listsignup(Request $request)
-    {   
-                // XSS Protection: Validate and sanitize all incoming parameters
-                $validator = Validator::make($request->all(), [
-                    'language_id' => ['required', 'integer', 'in:1,2'],
-                    'main_brand_id' => ['required', 'integer', 'min:1'],
-                    'session_id' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_\-]+$/'],
-                    'customer_id' => ['nullable', 'integer', 'min:1'],
-                    'car_owned_type' => ['nullable', 'integer', 'in:0,1'],
-                ]);
+    /**
+     * Get Model List for Signup
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public static function getmodel_listsignup(Request $request)
+    {
+        try {
+            // Define sanitization rules
+            $sanitizeRules = [
+                'language_id' => 'integer',
+                'main_brand_id' => 'integer',
+                'session_id' => 'string',
+                'customer_id' => 'integer',
+                'car_owned_type' => 'integer',
+                'page' => 'integer',
+                'per_page' => 'integer',
+            ];
 
-                if ($validator->fails()) {
-                    return ["status" => "0", "response_message" => "error", "display_message" => "Invalid input parameters", "error_message" => $validator->errors()];
+            // Sanitize input data to prevent SQL injection and XSS
+            $sanitizedData = \ValidationHelper::sanitizeInput($request->all(), $sanitizeRules);
+
+            // Additional sanitization for specific fields
+            $sanitizedData['session_id'] = isset($sanitizedData['session_id']) ? trim(strip_tags($sanitizedData['session_id'])) : null;
+            $sanitizedData['language_id'] = isset($sanitizedData['language_id']) ? (int)$sanitizedData['language_id'] : null;
+            $sanitizedData['main_brand_id'] = isset($sanitizedData['main_brand_id']) ? (int)$sanitizedData['main_brand_id'] : null;
+            $sanitizedData['customer_id'] = isset($sanitizedData['customer_id']) ? (int)$sanitizedData['customer_id'] : null;
+            $sanitizedData['car_owned_type'] = isset($sanitizedData['car_owned_type']) ? (int)$sanitizedData['car_owned_type'] : null;
+            $sanitizedData['page'] = isset($sanitizedData['page']) ? max(1, (int)$sanitizedData['page']) : 1;
+            $sanitizedData['per_page'] = isset($sanitizedData['per_page']) ? max(1, min(100, (int)$sanitizedData['per_page'])) : 10;
+
+            // Validation rules
+            $validationRules = [
+                'language_id' => \ValidationHelper::languageId(),
+                'main_brand_id' => \ValidationHelper::brandId(),
+                'session_id' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_\-]+$/'],
+                'customer_id' => ['nullable', 'integer', 'min:1'],
+                'car_owned_type' => \ValidationHelper::carOwnedType(false),
+                'page' => ['nullable', 'integer', 'min:1'],
+                'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            ];
+
+            $validator = Validator::make($sanitizedData, $validationRules, \ValidationHelper::errorMessages());
+
+            if ($validator->fails()) {
+                return \ValidationHelper::formatValidationErrors($validator);
+            }
+
+            // Check if session_id and customer_id are provided
+            $hasSession = !empty($sanitizedData['session_id']) && !empty($sanitizedData['customer_id']);
+
+            if ($hasSession) {
+                // Validate session
+                $customer_session_check = customer_session::check_customersession($request);
+                
+                if ($customer_session_check == null) {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_session",
+                        "display_message" => "Session ID does not exist. Please login to generate a new session.",
+                        "error_message" => "Invalid Session"
+                    ];
                 }
 
-                $language_id = [1,2];
-                $car_owned_type = [0,1];
+                // Validate customer
+                $check_customer_id = customer::getcustomer($sanitizedData['customer_id'], $sanitizedData['session_id']);
+                
+                if ($check_customer_id == null) {
+                    return [
+                        "status" => "0",
+                        "response_message" => "invalid_customer",
+                        "display_message" => "Customer does not exist or has been deactivated.",
+                        "error_message" => "Invalid Customer"
+                    ];
+                }
+            }
+
+            // Prepare car_owned_type array
+            $carOwnedTypes = [0, 1]; // 0 = New Car, 1 = Pre-owned
             
-                if(count($language_id)!=0 && isset($request->language_id) && isset($request->main_brand_id))
-                {   
-                     if(isset($request->session_id) && isset($request->customer_id))
-                     {
-                        
-                         if($customer_session_check == null)
-                         {
-                            return ["status" => "0","response_message" => "invalid Session","display_message" => "Session Id does not exists, Please login to generate new session","error_message" => "invalid Session"];
-                         }
-                         else
-                         {
-                           // $check_customer_id = customer::getcustomer($request->customer_id);
-                            if($check_customer_id == null)
-                            {
-                                            if(isset($request->car_owned_type))
-                                            {
-                                                $car_owned_type = [$request->car_owned_type];
-                                            }
-                                            else
-                                            {
-                                                $car_owned_type = $car_owned_type;
-                                            }
-                                            $getallcarmodelsignup = models::getallcarmodelsignup($request->language_id,$request->main_brand_id,$car_owned_type);
-                                            //dd($getallcarmodel);
-                                            return ["status" => "1","response_message" => "success","display_message" => "Model List",
-                                            "model_list" =>  $getallcarmodelsignup
-                                            ];
-                                 
-                            }
-      
-                                
-                            }
-                     }
-                     else
-                     {
+            if (isset($sanitizedData['car_owned_type']) && in_array($sanitizedData['car_owned_type'], $carOwnedTypes)) {
+                $carOwnedTypeArray = [$sanitizedData['car_owned_type']];
+            } else {
+                $carOwnedTypeArray = $carOwnedTypes;
+            }
 
-                         if(isset($request->car_owned_type))
-                                            {
-                                                $car_owned_type = $request->car_owned_type;
-                                            }
-                                            else
-                                            {
-                                                $car_owned_type = $car_owned_type;
-                                            }
-                                            $getallcarmodelsignup = models::getallcarmodelsignup($request->language_id,$request->main_brand_id,$car_owned_type);
-                                            //dd($getallcarmodel);
-                                            return ["status" => "1","response_message" => "success","display_message" => "Model List",
-                                            "model_list" =>  $getallcarmodelsignup
-                                            ];
+            // Get model list
+            $getallcarmodelsignup = models::getallcarmodelsignup(
+                $sanitizedData['language_id'],
+                $sanitizedData['main_brand_id'],
+                $carOwnedTypeArray
+            );
 
-                     }
-                    
+            // Convert to collection for pagination
+            $collection = collect($getallcarmodelsignup);
+            $total = $collection->count();
+            $totalPages = (int)ceil($total / $sanitizedData['per_page']);
 
-                        
-         
-                }        
+            // Apply pagination
+            $paginatedData = $collection->slice(($sanitizedData['page'] - 1) * $sanitizedData['per_page'], $sanitizedData['per_page'])->values();
 
-        } 
+            return [
+                "status" => "1",
+                "response_message" => "success",
+                "display_message" => "Model List Retrieved Successfully",
+                "model_list" => $paginatedData,
+                "pagination" => [
+                    "current_page" => (int)$sanitizedData['page'],
+                    "per_page" => (int)$sanitizedData['per_page'],
+                    "total" => $total,
+                    "total_pages" => $totalPages,
+                    "has_more" => $sanitizedData['page'] < $totalPages
+                ]
+            ];
+
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('Error in getmodel_listsignup: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                "status" => "0",
+                "response_message" => "server_error",
+                "display_message" => "An error occurred while processing your request. Please try again later.",
+                "error_message" => "Internal Server Error"
+            ];
+        }
+    } 
 
 //    Signup model list End
 
@@ -723,12 +778,12 @@ public static function getmodel_listsignup(Request $request)
     {	
                 // XSS Protection & Pagination: Using ValidationHelper for secure input validation
                 $validator = Validator::make($request->all(), [
-                    'session_id' => ValidationHelper::sessionId(),
-                    'customer_id' => ValidationHelper::customerId(),
-                    'language_id' => ValidationHelper::languageId(),
+                    'session_id' => \ValidationHelper::sessionId(),
+                    'customer_id' => \ValidationHelper::customerId(),
+                    'language_id' => \ValidationHelper::languageId(),
                     'page' => ['nullable', 'integer', 'min:1'],
                     'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
-                ], ValidationHelper::errorMessages());
+                ], \ValidationHelper::errorMessages());
 
                  if ($validator->fails()) {
                     return ["status" => "0","response_message" => $validator->errors(),"display_message" => "Please check your inputs","error_message" => $validator->errors()];
@@ -973,9 +1028,9 @@ public static function getmodel_listsignup(Request $request)
 {
     // XSS Protection: Using ValidationHelper for secure input validation
     $validator = Validator::make($request->all(), [
-        'mobile_number' => ValidationHelper::mobileNumber(),
-        'otp' => ValidationHelper::otp(),
-    ], ValidationHelper::errorMessages());
+        'mobile_number' => \ValidationHelper::mobileNumber(),
+        'otp' => \ValidationHelper::otp(),
+    ], \ValidationHelper::errorMessages());
 
     if ($validator->fails()) {
         return ["status" => "0", "response_message" => $validator->errors(), "display_message" => "Please check your inputs", "error_message" => $validator->errors()];
@@ -1049,10 +1104,10 @@ public static function getmodel_listsignup(Request $request)
     {   
                 // XSS Protection: Using ValidationHelper for secure input validation
 		    	$validator = Validator::make($request->all(), [
-		            'session_id' => ValidationHelper::sessionId(),
-		            'customer_id' => ValidationHelper::customerId(),
-                    'language_id' => ValidationHelper::languageId()
-		        ], ValidationHelper::errorMessages());
+		            'session_id' => \ValidationHelper::sessionId(),
+		            'customer_id' => \ValidationHelper::customerId(),
+                    'language_id' => \ValidationHelper::languageId()
+		        ], \ValidationHelper::errorMessages());
 
 		         if ($validator->fails()) {
 		            // return $validator->errors();
@@ -1726,14 +1781,14 @@ public static function getmodel_listsignup(Request $request)
     {           
                 // XSS Protection: Using ValidationHelper for secure input validation
 		    	$validator = Validator::make($request->all(), [
-		            'session_id' => ValidationHelper::sessionId(),
-		            'customer_id' => ValidationHelper::customerId(),
-		            'username' => ValidationHelper::username(),
-		            'image' => ValidationHelper::image(),
-                    'email' => ValidationHelper::email(false),
-                    'mobile' => ValidationHelper::mobileNumber(false),
-                    'language_id' => ValidationHelper::languageId()
-		        ], ValidationHelper::errorMessages());
+		            'session_id' => \ValidationHelper::sessionId(),
+		            'customer_id' => \ValidationHelper::customerId(),
+		            'username' => \ValidationHelper::username(),
+		            'image' => \ValidationHelper::image(),
+                    'email' => \ValidationHelper::email(false),
+                    'mobile' => \ValidationHelper::mobileNumber(false),
+                    'language_id' => \ValidationHelper::languageId()
+		        ], \ValidationHelper::errorMessages());
 		        
 		        
                 
@@ -1840,12 +1895,12 @@ public static function getmodel_listsignup(Request $request)
     {           
                 // XSS Protection: Using ValidationHelper for secure input validation
                 $validator = Validator::make($request->all(), [
-                    'session_id' => ValidationHelper::sessionId(),
-                    'customer_id' => ValidationHelper::customerId(),
-                    'device_token' => ValidationHelper::deviceToken(false),
-                    'main_brand_id' => ValidationHelper::brandId(),
-                    'language_id' => ValidationHelper::languageId()
-                ], ValidationHelper::errorMessages());
+                    'session_id' => \ValidationHelper::sessionId(),
+                    'customer_id' => \ValidationHelper::customerId(),
+                    'device_token' => \ValidationHelper::deviceToken(false),
+                    'main_brand_id' => \ValidationHelper::brandId(),
+                    'language_id' => \ValidationHelper::languageId()
+                ], \ValidationHelper::errorMessages());
 
                  if ($validator->fails()) {
                     // return $validator->errors();
@@ -3653,8 +3708,8 @@ public static function guestlogin(Request $request)
     {
         // XSS Protection: Using ValidationHelper for secure input validation
     	$validator = Validator::make($request->all(), [
-            'device' => ValidationHelper::deviceType() // 1 - IOS , 2- Android
-        ], ValidationHelper::errorMessages());
+            'device' => \ValidationHelper::deviceType() // 1 - IOS , 2- Android
+        ], \ValidationHelper::errorMessages());
 
          if ($validator->fails()) {
             // return $validator->errors();
