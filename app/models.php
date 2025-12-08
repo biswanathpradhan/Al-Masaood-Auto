@@ -32,10 +32,8 @@ class models extends Model
         return $models;
      }
 
-    
-
-      public static function getallcarmodel($language_id = null,$main_brand_id = null, $car_owned_type=null)
-     {
+     
+     public static function getallcarmodel($language_id = null, $main_brand_id = null, $car_owned_type=null) {
 
         if($language_id == 2)
         {   
@@ -170,11 +168,142 @@ class models extends Model
         }
         return $model_info;
         
-     }
- }
-//   Signup list model start
+        }
+    }
 
-   public static function getallcarmodelsignup($language_id = null,$main_brand_id = null, $car_owned_type)
+    public static function getallcarmodelPaginated($language_id = null, $main_brand_id = null, $car_owned_type = null, $perPage = 15, $page = 1)
+     {
+        
+         // Sanitize inputs
+         $language_id = (int) $language_id;
+         $main_brand_id = $main_brand_id !== null ? (int) $main_brand_id : null;
+         $car_owned_type = $car_owned_type !== null ? (int) $car_owned_type : 0;
+         $perPage = max(1, min(100, (int) $perPage));
+         $page = max(1, (int) $page);
+
+         $app_url = config('app.url');
+
+         if($language_id == 2)
+         {
+             if($main_brand_id != null)
+             {
+                 if($car_owned_type == 1)
+                 {
+                     $query = models::where('soft_delete', 0)
+                         ->whereIn('visible', [0])
+                         ->where('car_model.main_brand_id', $main_brand_id)
+                         ->where('car_model.car_owned_type', $car_owned_type)
+                         ->select(DB::raw('(CASE 
+                             WHEN car_model.model_name_ar != "" THEN car_model.model_name_ar
+                             ELSE car_model.model_name
+                             END) AS label'),'id as model_id','model_base_image_url as image_url')
+                         ->orderBy('sort_order_app');
+                 }
+                 else
+                 {
+                     $query = models::where('soft_delete', 0)
+                         ->where('car_model.main_brand_id', $main_brand_id)
+                         ->where('car_model.car_owned_type', $car_owned_type)
+                         ->select(DB::raw('(CASE 
+                             WHEN car_model.model_name_ar != "" THEN car_model.model_name_ar
+                             ELSE car_model.model_name
+                             END) AS label'),'id as model_id','model_base_image_url as image_url')
+                         ->orderBy('sort_order_app');
+                 }
+             }
+             else
+             {
+                 if($car_owned_type == 1)
+                 {
+                     $query = models::where('soft_delete', 0)
+                         ->whereIn('visible', [0])
+                         ->where('car_model.car_owned_type', $car_owned_type)
+                         ->select(DB::raw('(CASE 
+                             WHEN car_model.model_name_ar != "" THEN car_model.model_name_ar
+                             ELSE car_model.model_name
+                             END) AS label'),'id as model_id','model_base_image_url as image_url')
+                         ->orderBy('sort_order_app');
+                 }
+                 else
+                 {
+                     $query = models::where('soft_delete', 0)
+                         ->where('car_model.car_owned_type', $car_owned_type)
+                         ->select(DB::raw('(CASE 
+                             WHEN car_model.model_name_ar != "" THEN car_model.model_name_ar
+                             ELSE car_model.model_name
+                             END) AS label'),'id as model_id','model_base_image_url as image_url')
+                         ->orderBy('sort_order_app');
+                 }
+             }
+         }
+         else
+         {
+             if($main_brand_id != null)
+             {
+                 if($car_owned_type == 1)
+                 {
+                     $query = models::where('soft_delete', 0)
+                         ->whereIn('visible', [0])
+                         ->where('car_model.main_brand_id', $main_brand_id)
+                         ->where('car_model.car_owned_type', $car_owned_type)
+                         ->select('model_name as label','id as model_id','model_base_image_url as image_url')
+                         ->orderBy('sort_order_app');
+                 }
+                 else
+                 {
+                     $query = models::where('soft_delete', 0)
+                         ->where('car_model.main_brand_id', $main_brand_id)
+                         ->where('car_model.car_owned_type', $car_owned_type)
+                         ->select('model_name as label','id as model_id','model_base_image_url as image_url')
+                         ->orderBy('sort_order_app');
+                 }
+             }
+             else
+             {
+                 if($car_owned_type == 1)
+                 {
+                     $query = models::where('soft_delete', 0)
+                         ->whereIn('visible', [0])
+                         ->where('car_model.car_owned_type', $car_owned_type)
+                         ->select('model_name as label','id as model_id','model_base_image_url as image_url')
+                         ->orderBy('sort_order_app');
+                 }
+                 else
+                 {
+                     $query = models::where('soft_delete', 0)
+                         ->where('car_model.car_owned_type', $car_owned_type)
+                         ->select('model_name as label','id as model_id','model_base_image_url as image_url')
+                         ->orderBy('sort_order_app');
+                 }
+             }
+         }
+
+         // Paginate the query
+         $paginated = $query->paginate($perPage, ['*'], 'page', $page);
+
+         // Transform the items to include full image URLs
+         $paginated->getCollection()->transform(function ($item) use ($app_url){
+             if(isset($item->image_url) && $item->image_url != '')
+             {
+                 $item->image_url = $app_url.'/images/model/'.$item->image_url;
+             }
+             else
+             {
+                 $item->image_url = $app_url.'/images/default-cars.jpeg';
+             }
+             return [
+                 'label' => $item->label,
+                 'model_id' => $item->model_id,
+                 'image_url' => $item->image_url
+             ];
+         });
+
+         
+
+         return $paginated;
+     }
+
+     public static function getallcarmodelsignup($language_id = null,$main_brand_id = null, $car_owned_type)
      {
 
         if($language_id == 2)
@@ -306,8 +435,12 @@ class models extends Model
         }
         return $model_info;
         
+        }
      }
- }
+
+
+     
+
 //   Signup list model End
      public static function getcarmodelbyType($id,$type)
      {  
@@ -447,11 +580,6 @@ class models extends Model
     }
 
 
-         /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public static function updatecar(Request $request)
     {   
 

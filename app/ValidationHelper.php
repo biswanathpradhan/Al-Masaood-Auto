@@ -1,352 +1,3 @@
-<<<<<<< HEAD
-<?php
-
-namespace App;
-
-/**
- * ValidationHelper - Centralized XSS protection validation rules
- * 
- * Usage: ValidationHelper::getRules('field_name') or ValidationHelper::FIELD_CONSTANT
- */
-class ValidationHelper
-{
-    // ==========================================
-    // XSS-Safe Regex Patterns
-    // ==========================================
-    
-    // Name fields: letters, spaces, apostrophes, hyphens, dots
-    const REGEX_NAME = '/^[a-zA-Z\s\'\-\.]+$/';
-    
-    // Arabic and English name support
-    const REGEX_NAME_MULTILANG = '/^[\p{Arabic}a-zA-Z\s\'\-\.]+$/u';
-    
-    // Mobile number: digits with optional + prefix
-    const REGEX_MOBILE = '/^\+?[0-9\s\-\(\)]+$/';
-    
-    // OTP: digits only
-    const REGEX_OTP = '/^[0-9]+$/';
-    
-    // Alphanumeric: letters and numbers only
-    const REGEX_ALPHANUMERIC = '/^[a-zA-Z0-9]+$/';
-    
-    // Alphanumeric with spaces and hyphens (for registration numbers, etc.)
-    const REGEX_ALPHANUMERIC_EXTENDED = '/^[a-zA-Z0-9\s\-]+$/';
-    
-    // Chassis number: alphanumeric with hyphens
-    const REGEX_CHASSIS = '/^[a-zA-Z0-9\-]+$/';
-    
-    // Device ID/Token: alphanumeric with hyphens, underscores, colons
-    const REGEX_DEVICE_TOKEN = '/^[a-zA-Z0-9\-_:]+$/';
-    
-    // Session ID: alphanumeric with hyphens and underscores
-    const REGEX_SESSION_ID = '/^[a-zA-Z0-9_\-]+$/';
-    
-    // Safe text: letters, numbers, spaces, common punctuation (no HTML)
-    const REGEX_SAFE_TEXT = '/^[a-zA-Z0-9\s\.\,\!\?\'\-\(\)]+$/';
-    
-    // Safe text with Arabic support
-    const REGEX_SAFE_TEXT_MULTILANG = '/^[\p{Arabic}a-zA-Z0-9\s\.\,\!\?\'\-\(\)]+$/u';
-
-    // ==========================================
-    // Pre-defined Validation Rule Sets
-    // ==========================================
-    
-    /**
-     * Username validation rules
-     */
-    public static function username($required = true)
-    {
-        $rules = ['string', 'max:255', 'regex:' . self::REGEX_NAME];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Mobile number validation rules
-     */
-    public static function mobileNumber($required = true, $unique = null)
-    {
-        $rules = ['string', 'min:10', 'max:15', 'regex:' . self::REGEX_MOBILE];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        if ($unique) $rules[] = 'unique:' . $unique;
-        return $rules;
-    }
-    
-    /**
-     * OTP validation rules
-     */
-    public static function otp($required = true, $maxLength = 10)
-    {
-        $rules = ['string', 'max:' . $maxLength, 'regex:' . self::REGEX_OTP];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Email validation rules
-     */
-    public static function email($required = true, $unique = null)
-    {
-        $rules = ['email:rfc,dns', 'max:255'];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        if ($unique) $rules[] = 'unique:' . $unique;
-        return $rules;
-    }
-    
-    /**
-     * Car registration number validation rules
-     */
-    public static function carRegistration($required = true)
-    {
-        $rules = ['string', 'max:255', 'regex:' . self::REGEX_ALPHANUMERIC_EXTENDED];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Chassis number validation rules
-     */
-    public static function chassisNumber($required = true, $unique = null)
-    {
-        $rules = ['string', 'max:255', 'regex:' . self::REGEX_CHASSIS];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        if ($unique) $rules[] = 'unique:' . $unique;
-        return $rules;
-    }
-    
-    /**
-     * Session ID validation rules
-     */
-    public static function sessionId($required = true)
-    {
-        $rules = ['string', 'max:255', 'regex:' . self::REGEX_SESSION_ID];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Customer ID validation rules
-     */
-    public static function customerId($required = true)
-    {
-        $rules = ['integer', 'min:1'];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Language ID validation rules
-     */
-    public static function languageId($required = true)
-    {
-        $rules = ['integer', 'in:1,2'];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Brand ID validation rules
-     */
-    public static function brandId($required = true, $allowedValues = [1, 2, 3])
-    {
-        $rules = ['integer', 'in:' . implode(',', $allowedValues)];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Model ID validation rules
-     */
-    public static function modelId($required = true)
-    {
-        $rules = ['integer', 'min:1'];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Device type validation rules
-     */
-    public static function deviceType($required = true, $allowedValues = [1, 2])
-    {
-        $rules = ['integer', 'in:' . implode(',', $allowedValues)];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Device ID validation rules
-     */
-    public static function deviceId($required = true)
-    {
-        $rules = ['string', 'max:255', 'regex:' . self::REGEX_DEVICE_TOKEN];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Device token validation rules
-     */
-    public static function deviceToken($required = true)
-    {
-        $rules = ['string', 'max:500', 'regex:' . self::REGEX_DEVICE_TOKEN];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Latitude validation rules
-     */
-    public static function latitude($required = true)
-    {
-        $rules = ['numeric', 'between:-90,90'];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Longitude validation rules
-     */
-    public static function longitude($required = true)
-    {
-        $rules = ['numeric', 'between:-180,180'];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Category number validation rules
-     */
-    public static function categoryNumber($required = true)
-    {
-        $rules = ['string', 'max:50', 'regex:' . self::REGEX_ALPHANUMERIC_EXTENDED];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Car owned type validation rules
-     */
-    public static function carOwnedType($required = true, $allowedValues = [0, 1])
-    {
-        $rules = ['integer', 'in:' . implode(',', $allowedValues)];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Image validation rules
-     */
-    public static function image($required = false, $maxSize = 5120)
-    {
-        $rules = ['image', 'max:' . $maxSize, 'mimes:jpeg,png,jpg,gif,webp'];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Safe text validation rules (for comments, descriptions, etc.)
-     */
-    public static function safeText($required = true, $maxLength = 1000)
-    {
-        $rules = ['string', 'max:' . $maxLength, 'regex:' . self::REGEX_SAFE_TEXT_MULTILANG];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Date validation rules
-     */
-    public static function date($required = true, $format = 'Y-m-d')
-    {
-        $rules = ['date_format:' . $format];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    /**
-     * Positive integer validation rules
-     */
-    public static function positiveInteger($required = true)
-    {
-        $rules = ['integer', 'min:1'];
-        if ($required) array_unshift($rules, 'required');
-        else array_unshift($rules, 'nullable');
-        return $rules;
-    }
-    
-    // ==========================================
-    // Custom XSS Sanitization Methods
-    // ==========================================
-    
-    /**
-     * Strip potential XSS content from string
-     */
-    public static function sanitize($input)
-    {
-        if (is_array($input)) {
-            return array_map([self::class, 'sanitize'], $input);
-        }
-        
-        if (!is_string($input)) {
-            return $input;
-        }
-        
-        // Remove HTML tags
-        $input = strip_tags($input);
-        
-        // Encode special characters
-        $input = htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
-        
-        // Remove potential script injections
-        $input = preg_replace('/javascript:/i', '', $input);
-        $input = preg_replace('/on\w+=/i', '', $input);
-        
-        return trim($input);
-    }
-    
-    /**
-     * Get standard error messages for XSS validation
-     */
-    public static function errorMessages()
-    {
-        return [
-            'regex' => 'The :attribute contains invalid characters.',
-            'username.regex' => 'The username may only contain letters, spaces, apostrophes, hyphens, and dots.',
-            'mobile_number.regex' => 'The mobile number may only contain digits, plus sign, spaces, hyphens, and parentheses.',
-            'otp.regex' => 'The OTP may only contain digits.',
-            'session_id.regex' => 'The session ID contains invalid characters.',
-            'device_id.regex' => 'The device ID contains invalid characters.',
-            'device_token.regex' => 'The device token contains invalid characters.',
-            'car_registration_number.regex' => 'The car registration number may only contain letters, numbers, spaces, and hyphens.',
-            'reg_chasis_number.regex' => 'The chassis number may only contain letters, numbers, and hyphens.',
-            'category_number.regex' => 'The category number may only contain letters, numbers, spaces, and hyphens.',
-        ];
-    }
-}
-
-=======
 <?php
 
 /**
@@ -354,10 +5,57 @@ class ValidationHelper
  * 
  * This class provides centralized validation helper functions
  * for consistent validation across the application.
+ * All error messages are managed in resources/lang/en/validation.php
  */
 
 class ValidationHelper
 {
+    /**
+     * Get validation error message from module
+     * 
+     * @param string $module Module name (e.g., 'service-list', 'customer', 'appointment')
+     * @param string $field Field name
+     * @param string $rule Validation rule
+     * @param array $replace Replacement values for placeholders
+     * @return string
+     */
+    public static function getModuleMessage($module, $field, $rule, $replace = [])
+    {
+        $key = "validation.modules.{$module}.{$field}.{$rule}";
+        $message = trans($key, $replace);
+        
+        // If module-specific message not found, try custom message
+        if ($message === $key) {
+            return self::getCustomMessage($field, $rule, $replace);
+        }
+        
+        return $message;
+    }
+
+    /**
+     * Get all validation messages for a module
+     * 
+     * @param string $module Module name
+     * @return array
+     */
+    public static function getModuleMessages($module)
+    {
+        $messages = [];
+        $moduleMessages = trans("validation.modules.{$module}", []);
+        
+        if (is_array($moduleMessages)) {
+            foreach ($moduleMessages as $field => $rules) {
+                if (is_array($rules)) {
+                    foreach ($rules as $rule => $message) {
+                        $messages["{$field}.{$rule}"] = $message;
+                    }
+                }
+            }
+        }
+        
+        return $messages;
+    }
+
     /**
      * Get validation error message
      * 
@@ -374,22 +72,36 @@ class ValidationHelper
      * Format validation errors for API response
      * 
      * @param \Illuminate\Contracts\Validation\Validator $validator
+     * @param string|null $module Optional module name for module-specific formatting
      * @return array
      */
-    public static function formatValidationErrors($validator)
+    public static function formatValidationErrors($validator, $module = null)
     {
         $errors = $validator->errors()->toArray();
         $formatted = [];
+        $firstError = null;
+        $firstField = null;
 
         foreach ($errors as $field => $messages) {
-            $formatted[$field] = is_array($messages) ? $messages[0] : $messages;
+            $errorMessage = is_array($messages) ? $messages[0] : $messages;
+            $formatted[$field] = $errorMessage;
+            
+            // Get the first error message for display
+            if ($firstError === null) {
+                $firstError = $errorMessage;
+                $firstField = $field;
+            }
         }
+
+        // Use the first error as display message
+        $displayMessage = $firstError ?: 'Validation failed';
 
         return [
             'status' => '0',
             'response_message' => 'validation_error',
-            'display_message' => 'Validation failed',
-            'errors' => $formatted
+            'display_message' => $displayMessage,
+            'errors' => $formatted,
+            'first_error_field' => $firstField
         ];
     }
 
@@ -409,7 +121,10 @@ class ValidationHelper
             return trans($key, $parameters);
         }
 
-        return trans("validation.{$rule}", array_merge(['attribute' => $attribute], $parameters));
+        // Get attribute name
+        $attributeName = self::getAttributeName($attribute);
+        
+        return trans("validation.{$rule}", array_merge(['attribute' => $attributeName], $parameters));
     }
 
     /**
@@ -418,14 +133,15 @@ class ValidationHelper
      * @param array $data
      * @param array $rules
      * @param array $messages
+     * @param string|null $module Optional module name
      * @return array|null
      */
-    public static function validate($data, $rules, $messages = [])
+    public static function validate($data, $rules, $messages = [], $module = null)
     {
         $validator = \Validator::make($data, $rules, $messages);
 
         if ($validator->fails()) {
-            return self::formatValidationErrors($validator);
+            return self::formatValidationErrors($validator, $module);
         }
 
         return null;
@@ -446,6 +162,122 @@ class ValidationHelper
         }
 
         return str_replace('_', ' ', ucwords($attribute, '_'));
+    }
+
+    /**
+     * Get validation rules and messages for a module
+     * 
+     * @param string $module Module name
+     * @param array $rules Validation rules array
+     * @return array Returns ['rules' => [...], 'messages' => [...]]
+     */
+    public static function getModuleValidation($module, $rules)
+    {
+        $messages = self::getModuleMessages($module);
+        
+        // Build messages array in Laravel format
+        $formattedMessages = [];
+        foreach ($rules as $field => $fieldRules) {
+            if (is_string($fieldRules)) {
+                $fieldRules = explode('|', $fieldRules);
+            }
+            
+            foreach ($fieldRules as $rule) {
+                $ruleName = null;
+                
+                // Handle Rule objects (like Rule::in())
+                if (is_object($rule)) {
+                    $className = get_class($rule);
+                    
+                    // Check for specific Rule types
+                    if ($className === 'Illuminate\Validation\Rules\In' || 
+                        strpos($className, 'Rules\\In') !== false) {
+                        $ruleName = 'in';
+                    } elseif ($className === 'Illuminate\Validation\Rules\NotIn' || 
+                              strpos($className, 'Rules\\NotIn') !== false) {
+                        $ruleName = 'not_in';
+                    } elseif (method_exists($rule, '__toString')) {
+                        $ruleString = (string) $rule;
+                        $ruleName = explode(':', $ruleString)[0];
+                    } else {
+                        // Try to get rule name from class name
+                        $parts = explode('\\', $className);
+                        $ruleName = strtolower(end($parts));
+                    }
+                } elseif (is_string($rule)) {
+                    $ruleName = explode(':', $rule)[0];
+                } else {
+                    continue;
+                }
+                
+                if ($ruleName) {
+                    $key = "{$field}.{$ruleName}";
+                    
+                    if (isset($messages[$key])) {
+                        $formattedMessages[$key] = $messages[$key];
+                    }
+                }
+            }
+        }
+        
+        return [
+            'rules' => $rules,
+            'messages' => $formattedMessages
+        ];
+    }
+
+    /**
+     * Sanitize input data to prevent SQL injection
+     * 
+     * @param array $data
+     * @param array $sanitizeRules Rules for sanitization ['field' => 'type']
+     * @return array
+     */
+    public static function sanitizeInput($data, $sanitizeRules = [])
+    {
+        $sanitized = [];
+        
+        if (!is_array($data)) {
+            return $sanitized;
+        }
+        
+        foreach ($data as $key => $value) {
+            // Handle null or empty values
+            if ($value === null || $value === '') {
+                $sanitized[$key] = $value;
+                continue;
+            }
+            
+            if (isset($sanitizeRules[$key])) {
+                $type = $sanitizeRules[$key];
+                
+                switch ($type) {
+                    case 'int':
+                    case 'integer':
+                        $sanitized[$key] = is_numeric($value) ? (int) $value : 0;
+                        break;
+                    case 'string':
+                        $sanitized[$key] = is_string($value) ? trim(strip_tags($value)) : (string) $value;
+                        break;
+                    case 'float':
+                        $sanitized[$key] = is_numeric($value) ? (float) $value : 0.0;
+                        break;
+                    case 'email':
+                        $sanitized[$key] = is_string($value) ? filter_var(trim($value), FILTER_SANITIZE_EMAIL) : '';
+                        break;
+                    case 'url':
+                        $sanitized[$key] = is_string($value) ? filter_var(trim($value), FILTER_SANITIZE_URL) : '';
+                        break;
+                    default:
+                        $sanitized[$key] = is_string($value) ? trim($value) : $value;
+                }
+            } else {
+                // Default sanitization: trim strings
+                $sanitized[$key] = is_string($value) ? trim($value) : $value;
+            }
+        }
+        
+        return $sanitized;
     }
 
     /**
@@ -492,5 +324,3 @@ class ValidationHelper
         return $rules[$field] ?? [];
     }
 }
-
->>>>>>> 1f0e266bb249cbedf94582f0150e55e588e364c1
